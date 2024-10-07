@@ -656,17 +656,18 @@ adjstrings(Symbol *sym)
 
 	tp = sym->type;
 	s = sym->u.s;
-	for (len = strlen(s);; len += n) {
+	for (len = tp->n.elem;; len += n) {
 		next();
 		if (yytoken != STRING)
 			break;
 		t = yylval.sym->u.s;
-		n = strlen(t);
-		s = xrealloc(s, len + n + 1);
-		memcpy(s+len, t, n);
+		n = yylval.sym->type->n.elem - 1;
+
+		s = xrealloc(s, len + n);
+		memcpy(s + len - 1, t, n);
 		s[len + n] = '\0';
 	}
-	++len;
+
 	if (tp->n.elem != len) {
 		sym->type = mktype(chartype, ARY, len, NULL);
 		sym->u.s = s;
