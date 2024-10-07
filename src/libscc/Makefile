@@ -20,12 +20,13 @@ OBJS =\
 	getstat-$(DRIVER).o\
 	setstat-$(DRIVER).o\
 
-TARGET = $(LIBDIR)/scc/libscc.a
+TARGET = libscc.a
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(AR) $(PROJ_ARFLAGS) $@ $?
 	$(RL) $(PROJ_RLFLAGS) $@
+	cp $@ $(LIBDIR)/scc
 
 include deps.mk

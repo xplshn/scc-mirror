@@ -7,5 +7,6 @@ AMD64_OBJ =\
 target/x86/amd64tbl.c: target/x86/ops.dat target/x86/opers.dat lexh
 	./mktbl -f x86 -c amd64
 
-$(LIBEXEC)/scc/as-amd64: $(AMD64_OBJ)
+as-amd64: $(AMD64_OBJ)
 	$(CC) $(PROJ_LDFLAGS) $(AMD64_OBJ) $(PROJ_LDLIBS) -o $@
+	cp $@ $(LIBEXEC)/scc

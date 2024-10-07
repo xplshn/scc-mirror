@@ -13,13 +13,12 @@ OBJS = \
 	symbol.o\
 
 TARGET =\
-	$(BINDIR)/scc-as\
-	$(LIBEXEC)/scc/as-amd64\
-	$(LIBEXEC)/scc/as-i286\
-	$(LIBEXEC)/scc/as-i386\
-	$(LIBEXEC)/scc/as-powerpc\
-	$(LIBEXEC)/scc/as-powerpc64\
-	$(LIBEXEC)/scc/as-z80 \
+	as-amd64\
+	as-i286\
+	as-i386\
+	as-powerpc\
+	as-powerpc64\
+	as-z80 \
 
 MORE_LDLIBS =  -lscc -lmach
 
@@ -27,8 +26,8 @@ all: $(TARGET)
 
 $(TARGET): $(LIBSCC) $(LIBMACH)
 
-$(BINDIR)/scc-as: as
-	cp as $@
+scc-as: as
+	cp as $(BINDIR)
 
 genhash.o: ../../libscc/genhash.c
 	$(HOSTCC) -c ../../libscc/genhash.c

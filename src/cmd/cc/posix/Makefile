@@ -3,26 +3,25 @@
 PROJECTDIR = ../../../..
 include $(PROJECTDIR)/scripts/rules.mk
 
-TARGETS =\
-	$(BINDIR)/scc-cc\
-	$(BINDIR)/scc-cpp\
-	$(BINDIR)/scc\
+TARGET =\
+	scc-cc\
+	scc-cpp\
+	scc\
 
-all: $(TARGETS)
+all: $(TARGET)
 
-$(BINDIR)/scc-cc: $(LIBSCC) cc.o
+scc-cc: $(LIBSCC) cc.o
 	$(CC) $(PROJ_LDFLAGS) cc.o -lscc $(PROJ_LDLIBS) -o $@
+	cp $@ $(BINDIR)
 
-$(BINDIR)/scc-cpp: scc.sh
+scc-cpp: scc.sh
 	cp scc.sh $@
 	chmod +x $@
+	cp $@ $(BINDIR)
 
-$(BINDIR)/scc: scc.sh
+scc: scc.sh
 	cp scc.sh $@
 	chmod +x $@
-
-clean:
-	rm -f scc scpp *.o
-	rm -f $(TARGETS)
+	cp $@ $(BINDIR)
 
 include deps.mk

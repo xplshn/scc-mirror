@@ -4,5 +4,6 @@ OBJ-qbe_amd64-sysv = $(OBJS)  \
         target/qbe/code.o \
         target/amd64-sysv/types.o
 
-$(LIBEXEC)/scc/cc2-qbe_amd64-sysv: $(LIBSCC) $(OBJ-qbe_amd64-sysv)
+cc2-qbe_amd64-sysv: $(LIBSCC) $(OBJ-qbe_amd64-sysv)
 	$(CC) $(PROJ_LDFLAGS) $(OBJ-qbe_amd64-sysv) -lscc $(PROJ_LDLIBS) -o $@
+	cp $@ $(LIBEXEC)/scc

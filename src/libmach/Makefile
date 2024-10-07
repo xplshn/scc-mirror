@@ -5,7 +5,7 @@ include $(PROJECTDIR)/scripts/rules.mk
 include coff32/rules.mk
 include elf64/rules.mk
 
-TARGET = $(LIBDIR)/scc/libmach.a
+TARGET = libmach.a
 
 all: $(TARGET)
 
@@ -44,6 +44,7 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(AR) $(PROJ_ARFLAGS) $@ $?
 	$(RL) $(PROJ_RLFLAGS) $@
+	cp $@ $(LIBDIR)/scc
 
 clean:
 	rm -f $(TBLS) objlst.mk
