@@ -485,7 +485,7 @@ number(void)
 static int
 escape(void)
 {
-	int c, base;
+	int c, d, i, cnt, base;
 
 	switch (*++input->p) {
 	case 'a':
@@ -521,23 +521,37 @@ escape(void)
 	case 'x':
 		if (!isxdigit(*++input->p))
 			warn("\\x used with no following hex digits");
+		cnt = 2;
 		base = 16;
 		break;
 	case '0':
-		if (!strchr("01234567", *++input->p))
-			warn("\\0 used with no following octal digits");
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+		cnt = 3;
 		base = 8;
 		break;
 	default:
 		warn("unknown escape sequence");
 		return ' ';
 	}
-	errno = 0;
-	/* FIXME: We don't check that there is an actual number */
-	c = strtoul(input->p, &input->p, base);
-	if (errno || c > 255)
-		warn("character constant out of range");
+
+	for (c = i = 0; i < cnt; ++i) {
+		static char digits[] = "0123456789ABCDEF";
+		char *p = strchr(digits, toupper(*input->p));
+
+		if (!p || (d = p - digits) > base)
+			break;
+		c *= base;
+		c += d;
+		++input->p;
+	}
 	--input->p;
+
 	return c;
 }
 
