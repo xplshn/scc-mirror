@@ -843,7 +843,7 @@ typeof(Node *np)
 	return tp;
 }
 
-static Node *cast(void);
+static Node *unary(void), *cast(void);
 
 static Type *
 sizeexp(void)
@@ -851,7 +851,7 @@ sizeexp(void)
 	Type *tp;
 
 	if (!accept('('))
-		return typeof(cast());
+		return typeof(unary());
 
 	switch (yytoken) {
 	case TYPE:
@@ -859,7 +859,7 @@ sizeexp(void)
 		tp = typename();
 		break;
 	default:
-		tp = typeof(cast());
+		tp = typeof(unary());
 		break;
 	}
 	expect(')');
