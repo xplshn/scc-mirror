@@ -1,7 +1,6 @@
 .POSIX:
 
 DIRS   =\
-	qbe\
 	ld\
 	as\
 	cc\
@@ -27,7 +26,8 @@ qbe/.git:
 	git submodule init qbe
 	git submodule update qbe
 
-qbe: qbe/.git
+qbe: qbe/.git FORCE
+	+cd qbe && $(MAKE) CC=$(CC) CFLAGS='$(PROJ_CFLAGS)'
 
 qbe/qbe: qbe
 
