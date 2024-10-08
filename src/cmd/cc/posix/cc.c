@@ -234,14 +234,14 @@ settool(int tool, char *infile, int nexttool)
 		goto local_tool;
 	case CC2:
 		fmt = cc2fmt(tool);
-		goto local_tool;
-	case QBE:
-		fmt = "%s/libexec/scc/%s";
 	local_tool:
 		n = snprintf(t->cmd, sizeof(t->cmd),
 		             fmt, prefix, t->bin, arch, abi);
 		if (n < 0 || n >= sizeof(t->cmd))
 			die("scc-cc: target tool path is too long");
+		break;
+	case QBE:
+		strcpy(t->cmd, "qbe");
 		break;
 	case LD:
 		if (!outfile)

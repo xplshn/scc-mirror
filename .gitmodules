@@ -1,3 +1,0 @@
-[submodule "src/cmd/qbe"]
-	path = src/cmd/qbe
-	url = git://git.simple-cc.org/qbe

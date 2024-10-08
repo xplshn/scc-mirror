@@ -18,19 +18,8 @@ TARGET =\
 	scc-objdump\
 	scc-objcopy\
 	scc-addr2line\
-	qbe/qbe\
 
 all: $(TARGET) $(DIRS)
-
-qbe/qbe: qbe
-	cp $@ $(LIBEXEC)/scc
-
-qbe/.git:
-	git submodule init qbe
-	git submodule update qbe
-
-qbe: qbe/.git FORCE
-	+cd qbe && $(MAKE) CC=$(CC) CFLAGS='$(PROJ_CFLAGS)'
 
 scc-nm: nm.o $(LIBMACH) $(LIBSCC)
 	$(CC) $(PROJ_LDFLAGS) nm.o -lmach -lscc $(PROJ_LDLIBS) -o $@
