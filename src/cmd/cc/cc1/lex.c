@@ -649,13 +649,14 @@ static int
 string(void)
 {
 	char *bp = yytext;
-	int c;
+	int c, esc;
 
 	*bp++ = '"';
+	esc = 0;
 	for (++input->p; ; ++input->p) {
 		c = *input->p;
 
-		if (c == '"')
+		if (c == '"' && !esc)
 			break;
 
 		if (c == '\0') {
@@ -663,7 +664,9 @@ string(void)
 			break;
 		}
 
-		if (c == '\\' && !disescape)
+		esc = (c == '\\' && !esc && disescape);
+
+		if (c == '\\' && !esc)
 			c = escape();
 
 		if (bp == &yytext[STRINGSIZ+1]) {
