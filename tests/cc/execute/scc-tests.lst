@@ -145,13 +145,13 @@
 0152-cat.c
 0153-cpp_string.c
 0154-if_defined.c
-0155-struct_compl.c [TODO]
+0155-struct_compl.c
 0156-duff2.c
 0157-list.c
 0158-ternary.c
 0159-typedef.c
 0160-cpp_if.c
-0161-struct.c [TODO]
+0161-struct.c
 0162-array.c
 0163-array.c
 0164-struct.c [TODO]
