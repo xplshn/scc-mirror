@@ -135,6 +135,14 @@ important to highlight that the file is not removed by `make clean`
 because it can contain local user modifications. You should use
 `make distclean` to remove it.
 
+Runtime dependencies
+====================
+
+Some configurations of scc require having the QBE [1] executable in the PATH,
+whose version must support common storage which was incorporated to it after
+the commit 8ded7a5, but it is not part of a stable release of QBE yet.
+
+[1] https://c9x.me/compile/
 
 Musl libc support
 =================
