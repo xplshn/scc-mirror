@@ -843,7 +843,7 @@ typeof(Node *np)
 	return tp;
 }
 
-static Node *unary(void), *cast(void);
+static Node *unary(void);
 
 static Type *
 sizeexp(void)
@@ -859,7 +859,7 @@ sizeexp(void)
 		tp = typename();
 		break;
 	default:
-		tp = typeof(unary());
+		tp = typeof(expr());
 		break;
 	}
 	expect(')');
@@ -902,6 +902,8 @@ postfix(Node *lp)
 		}
 	}
 }
+
+static Node *cast(void);
 
 static Node *
 unary(void)
