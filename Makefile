@@ -19,7 +19,7 @@ all:
 	+@$(MAKE) `$(SCRIPTDIR)/config` `uname -m`
 
 config:
-	+@cd include/bits/scc && $(MAKE) $@
+	+@cd include/bits/scc && $(MAKE)
 
 install: all
 	$(SCRIPTDIR)/install $(ROOT)

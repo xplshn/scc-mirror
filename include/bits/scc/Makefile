@@ -5,18 +5,16 @@ PROJECTDIR = ../../..
 include $(PROJECTDIR)/scripts/rules.mk
 
 SYSHDR =\
-	sysld.h\
-	sysincludes.h\
+	config.h\
+	sys.h\
 	cstd.h\
 
 NODEP = 1
 
-all: cstd.h
+all: $(SYSHDR)
 
 cstd.h: cstd-$(STD).h
 	cp cstd-$(STD).h $@
-
-config: sys.h config.h
 
 config.h:
 	rm -f $@;\
