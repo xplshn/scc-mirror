@@ -21,7 +21,7 @@ NODEP = 1
 TARGET = $(LIBC) $(BINDIR)/gcc-scc
 
 all: $(DIRS)
-	$(MAKE) $(TARGET)
+	+@$(MAKE) $(TARGET)
 
 $(LIBC): $(OBJS)
 	$(AR) $(PROJ_ARFLAGS) $(LIBC) $?
