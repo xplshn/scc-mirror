@@ -13,12 +13,13 @@ include scripts/rules.mk
 ROOT = $(DESTDIR)$(PREFIX)
 NODEP = 1
 
-all: config
+all:
+	+@$(MAKE) `$(SCRIPTDIR)/config -c` config
 	+@$(MAKE) `$(SCRIPTDIR)/config -c` toolchain
 	+@$(MAKE) `$(SCRIPTDIR)/config` `uname -m`
 
 config:
-	cd include/bits/scc && $(MAKE) $@
+	+@cd include/bits/scc && $(MAKE)
 
 install: all
 	$(SCRIPTDIR)/install $(ROOT)
