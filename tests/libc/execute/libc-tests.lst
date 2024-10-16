@@ -14,7 +14,7 @@
 0014-strcoll
 0015-strcpy
 0016-strcspn
-0017-strerror [TODO]
+0017-strerror
 0018-strlen
 0019-strncat
 0020-strncmp
