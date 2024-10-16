@@ -1,6 +1,9 @@
 .POSIX:
 
-CC     = gcc-scc
+ROOT=../../..
+SCCPREFIX=$(ROOT)
+CC=$(ROOT)/bin/gcc-scc
+CFLAGS=
 
 .c:
 	$(CC) $(CFLAGS) -o $@ $<

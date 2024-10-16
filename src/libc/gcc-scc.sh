@@ -43,7 +43,7 @@ sys_arch_inc=$inc/bits/$sys/$abi
 lib=$root/lib/scc/${abi}-${sys}
 crt=$root/lib/scc/${abi}-${sys}/crt.o
 obj=${1%.c}.o
-cc=${CROSS_COMPILE}gcc
+cc=${CROSS_COMPILE}cc
 ld=${CROSS_COMPILE}ld
 
 case `uname` in
