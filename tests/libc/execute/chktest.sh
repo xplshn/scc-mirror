@@ -3,7 +3,7 @@
 file=${1?' empty input file'}
 tmp1=`mktemp`
 tmp2=`mktemp`
-#trap "rm -f *.o  $tmp1 $tmp2" EXIT INT QUIT TERM
+trap "rm -f *.o  $tmp1 $tmp2" EXIT INT QUIT TERM
 ulimit -c 0
 rm -f test.log
 
