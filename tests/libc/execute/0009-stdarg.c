@@ -4,25 +4,21 @@
 #include <stdlib.h>
 
 /*
-TODO: Test va_copy, new c99 extension.
 output:
+testing
 test 1
 test 2
+done
 end:
 */
 
 void
-test(char *s, char *fmt, ...)
+vtest(char *fmt, va_list va)
 {
-	va_list va;
 	int cnt = 1;
 	long long *p;
 
-	puts(s);
-
-	va_start(va, fmt);
 	while (*fmt) {
-		printf("fmt = '%c'\n", *fmt);
 		switch (*fmt++) {
 		case 'c':
 			assert(va_arg(va, int) == cnt++);
@@ -50,6 +46,18 @@ test(char *s, char *fmt, ...)
 			abort();
 		}
 	}
+}
+
+void
+test(char *s, char *fmt, ...)
+{
+	va_list va, vc;
+
+	puts(s);
+	va_start(va, fmt);
+	va_copy(vc, va);
+	vtest(fmt, vc);
+	va_end(vc);
 	va_end(va);
 }
 
@@ -63,18 +71,19 @@ main()
 	long long ll;
 	float f;
 
+	puts("testing");
 	c = 1;
 	i = 2;
 	l = 3;
 	ll = 4;
 	test("test 1", "cilp", c, i, l, (void *) &ll);
 
-
 	c = 1;
 	s = 2;
 	ll = 3;
 	f = 4.0;
 	test("test 2", "csqf", c, s, ll, f);
+	puts("done");
 
 	return 0;
 }
