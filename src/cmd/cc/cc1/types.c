@@ -256,7 +256,7 @@ deftype(Type *tp)
 static Type *
 newtype(Type *base)
 {
-	Type *tp;
+	Type *tp, **pars;
 	size_t siz;
 
 	tp = xmalloc(sizeof(*tp));
@@ -264,8 +264,12 @@ newtype(Type *base)
 	tp->id = newid();
 
 	if (tp->op == FTN) {
-		siz = tp->n.elem * sizeof(Type *);
-		tp->p.pars = memcpy(xmalloc(siz), tp->p.pars, siz);
+		siz = (tp->n.elem + 1) * sizeof(Type *);
+		pars = xmalloc(siz);
+		if (tp->n.elem > 0)
+			memcpy(pars, tp->p.pars, siz);
+		pars[tp->n.elem] = NULL;
+		tp->p.pars = pars;
 	} else if (tp->op == ARY) {
 		/* We need alignment for flexible array members */
 		tp->align = tp->type->align;
