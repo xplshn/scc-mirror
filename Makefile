@@ -16,7 +16,7 @@ NODEP = 1
 all:
 	+@$(MAKE) `$(SCRIPTDIR)/config -c` config
 	+@$(MAKE) `$(SCRIPTDIR)/config -c` toolchain
-	+@$(MAKE) `$(SCRIPTDIR)/config` `uname -m`
+	+@$(MAKE) `$(SCRIPTDIR)/config` $(ARCH)
 
 config:
 	+@cd include/bits/scc && $(MAKE)
