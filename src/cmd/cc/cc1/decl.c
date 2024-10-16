@@ -449,8 +449,7 @@ ansifun(struct declarators *dp)
 			sym = NULL;
 			tp = ellipsistype;
 		} else if ((sym = dodcl(NOREP, parameter, NS_IDEN, &type)) == NULL) {
-			if (type.n.elem == 1 && ntype > 1)
-				voidpar = 1;
+			voidpar = 1;
 			sym = NULL;
 			tp = NULL;
 		} else {
@@ -480,7 +479,7 @@ ansifun(struct declarators *dp)
 
 	if (toomany == 1)
 		errorp("too many parameters in function definition");
-	if (voidpar && ntype > 1)
+	if (voidpar && ntype > 0)
 		errorp("'void' must be the only parameter");
 	return ntype;
 }
