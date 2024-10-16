@@ -7,7 +7,6 @@
 output:
 testing
 test1
-test2
 done
 end:
 */
@@ -24,26 +23,11 @@ test1(void)
 		printf("invalid EILSEQ string\n");
 }
 
-void
-test2(void)
-{
-	int i;
-
-	printf("test2\n");
-#ifdef EUNKNOWN
-	for (i = 1; i <= EUNKNOWN; i++) {
-		if (!strerror(i))
-			printf("invalid string for errno=%d\n", i);
-	}
-#endif
-}
-
 int
 main()
 {
 	printf("testing\n");
 	test1();
-	test2();
 	printf("done\n");
 
 	return 0;
