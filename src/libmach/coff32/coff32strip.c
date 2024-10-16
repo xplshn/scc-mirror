@@ -27,8 +27,10 @@ coff32strip(Obj *obj)
 	hdr->f_flags |= F_RELFLG | F_LMNO | F_LSYMS;
 
 	for (i = 0; i < coff->hdr.f_nscns; i++) {
-		free(coff->rels[i]);
-		free(coff->lines[i]);
+		if (coff->rels)
+			free(coff->rels[i]);
+		if (coff->lines)
+			free(coff->lines[i]);
 	}
 
 	free(coff->ents);

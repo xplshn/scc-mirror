@@ -18,8 +18,10 @@ coff32del(Obj *obj)
 		free(coff->strtbl);
 
 		for (i = 0; i < coff->hdr.f_nscns; i++) {
-			free(coff->rels[i]);
-			free(coff->lines[i]);
+			if (coff->rels)
+				free(coff->rels[i]);
+			if (coff->lines)
+				free(coff->lines[i]);
 		}
 		free(coff->rels);
 		free(coff->lines);
