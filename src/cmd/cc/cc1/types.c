@@ -171,7 +171,8 @@ ctype(int type, int sign, int size)
 	}
 
 invalid_type:
-	error("invalid type specification");
+	errorp("invalid type specification");
+	return inttype;
 }
 
 void
