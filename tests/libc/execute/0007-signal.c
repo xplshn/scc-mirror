@@ -164,5 +164,5 @@ main()
 	test3();
 	test4();
 
-	return;
+	return 0;
 }
