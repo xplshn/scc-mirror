@@ -65,7 +65,7 @@ dumpstab(char *msg)
 
 		fprintf(stderr, "[%d]", (int) (bp - hashtbl));
 		for (lp = *bp; lp; lp = lp->hash) {
-			fprintf(stderr, " -> %s:%0X:%0X",
+			fprintf(stderr, " -> %s:%0X:%0llX",
 			       lp->sym.name,
 			       lp->sym.flags,
 			       lp->sym.value);
