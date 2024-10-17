@@ -9,7 +9,7 @@ all: $(OUT)
 	@PATH=$(ROOT)/bin:$$PATH:. chktest.sh
 
 tests:
-	@if $(AS) /dev/null 2>/dev/null;\
+	@if command -v $(AS) >/dev/null;\
 	then\
 		$(MAKE) | \
 		grep -v TODO |\
