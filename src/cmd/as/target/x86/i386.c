@@ -12,7 +12,7 @@ iarch(void)
 {
 	static struct {
 		char *name;
-		char type;
+		unsigned char type;
 	} regs[] = {
 		"CS", AREG_CS,
 		"DS", AREG_DS,
