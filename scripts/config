@@ -6,7 +6,7 @@ OpenBSD)
 	;;
 NetBSD)
 	#TODO: send a patch to NetBSD to solve this problem
-	echo HOST=bsd ARFLAGS="${ARFLAGS:--rv}"
+	echo TOOL=${TOOL:-gnu} HOST=bsd ARFLAGS="${ARFLAGS:--rv}"
 	;;
 FreeBSD)
 	echo TOOL=${TOOL:-clang} HOST=bsd
