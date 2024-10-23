@@ -1,10 +1,10 @@
 .POSIX:
 
 DIRS   =\
-	ld\
-	as\
-	cc\
-	make\
+	scc-ld\
+	scc-as\
+	scc-cc\
+	scc-make\
 
 PROJECTDIR = ../..
 include $(PROJECTDIR)/scripts/rules.mk
