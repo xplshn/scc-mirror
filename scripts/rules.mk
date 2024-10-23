@@ -46,6 +46,7 @@ PROJ_CPPFLAGS =\
 	$(MORE_CPPFLAGS)
 
 PROJ_CFLAGS =\
+	$(PROJ_CPPFLAGS)\
 	$(MORE_CFLAGS)\
 	$(HOST_CFLAGS)\
 	$(SYS_CFLAGS)\
@@ -111,7 +112,7 @@ $(DIRS) DUMMY : FORCE
 	   .ms .1 .2 .3 .4 .5 .6 .7\
 
 .c:
-	$(CC) $(PROJ_CPPFLAGS) $(PROJ_CFLAGS) -o $@ $<
+	$(CC) $(PROJ_CFLAGS) $(PROJ_LDFLAGS) -o $@ $< $(PROJ_LDLIBS)
 
 .s.o:
 	$(AS) $(PROJ_ASFLAGS) $< -o $@
@@ -120,10 +121,10 @@ $(DIRS) DUMMY : FORCE
 	$(AS) $(PROJ_ASFLAGS) $< -o $@
 
 .c.o:
-	$(CC) $(PROJ_CPPFLAGS) $(PROJ_CFLAGS) -o $@ -c $<
+	$(CC) $(PROJ_CFLAGS) -o $@ -c $<
 
 .c.s:
-	$(CC) $(PROJ_CPPFLAGS) $(PROJ_CFLAGS) -S -o $@ $<
+	$(CC) $(PROJ_CFLAGS) -S -o $@ $<
 
 .c.i:
 	$(CPP) $(PROJ_CPPFLAGS) -o $@ $<

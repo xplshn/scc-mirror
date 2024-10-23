@@ -19,38 +19,11 @@ TARGET =\
 	scc-objcopy\
 	scc-addr2line\
 
+MORE_LDLIBS = -lmach -lscc
+
 all: $(TARGET) $(DIRS)
+	@cp $(TARGET) $(BINDIR)
 
-scc-nm: nm.o $(LIBMACH) $(LIBSCC)
-	$(CC) $(PROJ_LDFLAGS) nm.o -lmach -lscc $(PROJ_LDLIBS) -o $@
-	cp $@ $(BINDIR)
-
-scc-strip: strip.o $(LIBMACH) $(LIBSCC)
-	$(CC) $(PROJ_LDFLAGS) strip.o -lmach -lscc $(PROJ_LDLIBS) -o $@
-	cp $@ $(BINDIR)
-
-scc-size: size.o $(LIBMACH) $(LIBSCC)
-	$(CC) $(PROJ_LDFLAGS) size.o -lmach -lscc $(PROJ_LDLIBS) -o $@
-	cp $@ $(BINDIR)
-
-scc-ranlib: ranlib.o $(LIBMACH) $(LIBSCC)
-	$(CC) $(PROJ_LDFLAGS) ranlib.o -lmach -lscc $(PROJ_LDLIBS) -o $@
-	cp $@ $(BINDIR)
-
-scc-objdump: objdump.o $(LIBMACH)
-	$(CC) $(PROJ_LDFLAGS) objdump.o -lmach $(PROJ_LDLIBS) -o $@
-	cp $@ $(BINDIR)
-
-scc-objcopy: objcopy.o $(LIBMACH)
-	$(CC) $(PROJ_LDFLAGS) objcopy.o -lmach $(PROJ_LDLIBS) -o $@
-	cp $@ $(BINDIR)
-
-scc-addr2line: addr2line.o $(LIBMACH) $(LIBSCC)
-	$(CC) $(PROJ_LDFLAGS) addr2line.o -lmach -lscc $(PROJ_LDLIBS) -o $@
-	cp $@ $(BINDIR)
-
-scc-ar: ar.o $(LIBSCC)
-	$(CC) $(PROJ_LDFLAGS) ar.o $(PROJ_LDLIBS) -lscc -o $@
-	cp $@ $(BINDIR)
+$(TARGET): $(LIBMACH) $(LIBSCC)
 
 include deps.mk
