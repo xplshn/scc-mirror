@@ -3,10 +3,10 @@ BEGIN		{
 		nvar=0
 		printf "#include <scc/mach.h>\n"\
 		       "#include <scc/scc.h>\n"\
-		       "#include \"../../as.h\"\n"\
+		       "#include \"../as.h\"\n"\
 		       "#include \"../" family "/proc.h\"\n"
 
-		rules = "target/" family "/opers.dat"
+		rules = family "/opers.dat"
 		while (getline < rules > 0) {
 			regex[++nregs] = $1
 			value[nregs] = $2

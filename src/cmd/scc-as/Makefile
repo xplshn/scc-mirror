@@ -39,13 +39,12 @@ lexh: lexh.o genhash.o
 	$(HOSTCC) -o $@ lexh.o genhash.o
 
 clean:
-	rm -f target/*/*.o target/*/*tbl.c lexh
+	rm -f */*.o */*tbl.c lexh
 	rm -f as
 
-include target/powerpc/powerpc64.mk
-include target/powerpc/powerpc.mk
-include target/x86/amd64.mk
-include target/x86/i386.mk
-include target/x86/i286.mk
-include target/x80/z80.mk
-include deps.mk
+include powerpc/powerpc64.mk
+include powerpc/powerpc.mk
+include x86/amd64.mk
+include x86/i386.mk
+include x86/i286.mk
+include x80/z80.mk

@@ -1,4 +1,4 @@
-POWERPC = target/powerpc
+POWERPC = powerpc
 POWERPC_OBJ =\
 	$(OBJS)\
 	$(POWERPC)/powerpctbl.o\

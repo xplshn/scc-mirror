@@ -1,10 +1,10 @@
 AMD64_OBJ =\
 	$(OBJS)\
-	target/x86/amd64tbl.o\
-	target/x86/amd64.o\
-	target/x86/ins.o\
+	x86/amd64tbl.o\
+	x86/amd64.o\
+	x86/ins.o\
 
-target/x86/amd64tbl.c: target/x86/ops.dat target/x86/opers.dat lexh
+x86/amd64tbl.c: x86/ops.dat x86/opers.dat lexh
 	./mktbl -f x86 -c amd64
 
 as-amd64: $(AMD64_OBJ)

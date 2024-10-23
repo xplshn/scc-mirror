@@ -4,7 +4,7 @@
 #include <scc/mach.h>
 #include <scc/scc.h>
 
-#include "../../as.h"
+#include "../as.h"
 #include "proc.h"
 
 #define addrbyte(mod, reg, rm) ((mod) << 6 | (reg) << 3 | (rm))

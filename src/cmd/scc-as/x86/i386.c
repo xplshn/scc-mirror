@@ -1,7 +1,7 @@
 #include <scc/mach.h>
 #include <scc/scc.h>
 
-#include "../../as.h"
+#include "../as.h"
 #include "../x86/proc.h"
 
 TUINT maxaddr = 0xFFFFFFFF;
