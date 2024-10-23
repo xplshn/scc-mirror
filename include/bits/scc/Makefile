@@ -7,7 +7,7 @@ NODEP = 1
 
 all: config.h sys.h cstd.h
 
-cstd.h:
+cstd.h: FORCE
 	cp cstd-$(STD).h $@
 
 config.h: FORCE
@@ -20,7 +20,7 @@ config.h: FORCE
 	 echo '#define LIBPREFIX "$(LIBPREFIX)"';\
 	 echo '#define FORMAT "$(FORMAT)"') > $$$$.h && mv $$$$.h $@
 
-sys.h:
+sys.h: FORCE
 	rm -f $@;\
 	trap "rm -f $$$$.tmp" INT QUIT TERM HUP;\
 	sed -e 's/%NOPIE%/"$(NOPIE_LDFLAGS)",/' \

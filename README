@@ -205,6 +205,23 @@ environment variable SCCLIBPREFIX must be set:
 
 	$ SCCLIBPREFIX=/usr/local/musl scc hello.c
 
+Be sure that you modified `include/bits/scc/sys.h` to accomodate it to
+your system, specially the macro `GCCLIBPATH` that is heavily system
+dependent. In order to simplify this process the top level Makefile
+has a helper target `config-musl` that uses the gcc output to set it
+correctly:
+
+	$ make LIBPREFIX=/usr/local/musl LIBPROFILE=musl config-musl
+	$ make
+	$ LIBPREFIX=/usr/local/musl scc hello.c
+
+or
+
+	$ make LIBPREFIX=/usr/local/musl LIBPROFILE=musl config-musl
+	$ make
+	$ make install
+	$ scc-cc hello.c
+
 Deviations from standard C
 ===========================
 This compiler aims to be fully compatible with the C99 standard, but
