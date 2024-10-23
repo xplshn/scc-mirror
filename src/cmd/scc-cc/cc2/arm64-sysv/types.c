@@ -1,6 +1,6 @@
 #include <scc/scc.h>
 
-#include "../../cc2.h"
+#include "../cc2.h"
 
 
 Type int8type = {
@@ -24,7 +24,7 @@ Type int32type = {
 Type int64type = {
 	.flags  = SIGNF | INTF,
 	.size   = 8,
-	.align  = 4
+	.align  = 8
 };
 
 Type uint8type = {
@@ -42,19 +42,19 @@ Type uint16type = {
 Type uint32type = {
 	.flags  = INTF,
 	.size   = 4,
-	.align  = 2
+	.align  = 4
 };
 
 Type uint64type = {
 	.flags  = INTF,
 	.size   = 8,
-	.align  = 4
+	.align  = 8
 };
 
 Type ptrtype = {
 	.flags  = INTF,
-	.size   = 4,
-	.align  = 4
+	.size   = 8,
+	.align  = 8
 };
 
 Type booltype = {
@@ -72,13 +72,13 @@ Type float32type = {
 Type float64type = {
 	.flags  = FLOATF,
 	.size   = 8,
-	.align  = 4
+	.align  = 8
 };
 
 Type float80type = {
 	.flags  = FLOATF,
-	.size   = 12,
-	.align  =  4
+	.size   = 16,
+	.align  = 16
 };
 
 Type voidtype = {
@@ -87,6 +87,7 @@ Type voidtype = {
 };
 
 Type arg_type = {
-	.size = 4,
-	.align = 4
+	.flags = ARRF,
+	.size = 24,
+	.align = 8
 };

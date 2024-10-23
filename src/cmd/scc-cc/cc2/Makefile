@@ -3,8 +3,6 @@
 PROJECTDIR = ../../../..
 include $(PROJECTDIR)/scripts/rules.mk
 
-MORE_CPPFLAGS = -I$(INCDIR)/$(STD) -I$(CMDDIR) -I.
-
 OBJS =\
 	main.o\
 	parser.o\
@@ -33,9 +31,9 @@ error.h: cc2.h
 clean:
 	rm -f target/*/*.o error.h
 
-include target/amd64-sysv/target.mk
-include target/i386-sysv/target.mk
-include target/qbe_amd64-sysv/target.mk
-include target/qbe_arm64-sysv/target.mk
-include target/z80-scc/target.mk
+include amd64-sysv/target.mk
+include i386-sysv/target.mk
+include qbe_amd64-sysv/target.mk
+include qbe_arm64-sysv/target.mk
+include z80-scc/target.mk
 include deps.mk

@@ -5,7 +5,7 @@
 #include <scc/scc.h>
 
 #include "arch.h"
-#include "../../cc2.h"
+#include "../cc2.h"
 
 enum segment {
 	CODESEG,

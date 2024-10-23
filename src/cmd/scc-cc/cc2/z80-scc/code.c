@@ -5,7 +5,7 @@
 #include <scc/scc.h>
 
 #include "arch.h"
-#include "../../cc2.h"
+#include "../cc2.h"
 
 enum segment {
 	CODESEG,
@@ -15,14 +15,15 @@ enum segment {
 };
 
 static int curseg = NOSEG;
+static unsigned long offpar, offvar;
 
 static void
 segment(int seg)
 {
 	static char *txt[] = {
-		[CODESEG] = "\t.text\n",
-		[DATASEG] = "\t.data\n",
-		[BSSSEG] = "\t.bss\n",
+		[CODESEG] = "\tCSEG\n",
+		[DATASEG] = "\tDSEG\n",
+		[BSSSEG] = "\tASEG\n",
 	};
 
 	if (seg == curseg)
@@ -38,16 +39,44 @@ symname(Symbol *sym)
 
 	if (sym->name) {
 		switch (sym->kind) {
-		case SEXTRN:
 		case SGLOB:
+		case SEXTRN:
+			snprintf(name, sizeof(name), "_%s", sym->name);
+			return name;
 		case SPRIV:
 			return sym->name;
 		}
 	}
 
-	sprintf(name, ".L%d", sym->numid);
+	sprintf(name, ".%d", sym->numid);
 
 	return name;
+}
+
+static void
+label(Symbol *sym)
+{
+	int seg;
+	char *name = symname(sym);
+
+	if (sym->type.flags & FUNF)
+		seg = CODESEG;
+	else if (sym->type.flags & INITF)
+		seg = DATASEG;
+	else
+		seg = BSSSEG;
+	segment(seg);
+
+	switch (sym->kind) {
+	case SEXTRN:
+		printf("\tEXTRN\t%s\n", name);
+		return;
+	case SGLOB:
+		printf("\tPUBLIC\t%s\n", name);
+		break;
+	}
+
+	printf("%s:\n", name);
 }
 
 static void
@@ -62,9 +91,6 @@ emitconst(Node *np)
 		break;
 	case 4:
 		printf("%ld", (long) np->u.i & 0xFFFFFFFF);
-		break;
-	case 8:
-		printf("%lld", (long long) np->u.i & 0xFFFFFFFF);
 		break;
 	default:
 		abort();
@@ -99,29 +125,30 @@ emittree(Node *np)
 		break;
 	}
 }
+
 static void
 size2asm(Type *tp)
 {
 	char *s;
 
+	/*
+	 * In z80 we can ignore the alignment
+	 */
 	if (tp->flags & STRF) {
-		s = "\t.ascii\t";
+		s = "\tDB\t";
 	} else {
 		switch (tp->size) {
 		case 1:
-			s = "\t.byte\t";
+			s = "\tDB\t";
 			break;
 		case 2:
-			s = "\t.short\t";
+			s = "\tDW\t";
 			break;
 		case 4:
-			s = "\t.long\t";
-			break;
-		case 8:
-			s = "\t.quad\t";
+			s = "\tDD\t";
 			break;
 		default:
-			s = "\t.space\t%lu,";
+			s = "\tDS\t%lu,";
 			break;
 		}
 	}
@@ -129,42 +156,46 @@ size2asm(Type *tp)
 }
 
 void
-data(Node *np)
+newfun()
 {
-	size2asm(&np->type);
-	emittree(np);
-	putchar('\n');
+	offpar = offvar = 0;
 }
 
-static void
-label(Symbol *sym)
+void
+defpar(Symbol *sym)
 {
-	int seg;
-	char *name = symname(sym);
-	Type *tp = &sym->type;
+	unsigned long align, size;
 
-	if (sym->type.flags & FUNF)
-		seg = CODESEG;
-	else if (sym->type.flags & INITF)
-		seg = DATASEG;
-	else
-		seg = BSSSEG;
-	segment(seg);
-
-	switch (sym->kind) {
-	case SEXTRN:
-		printf("\t.extern\t%s\n", name);
-	case SLOCAL:
+	if (sym->kind != SREG && sym->kind != SAUTO)
 		return;
-	case SGLOB:
-		printf("\t.global\t%s\n", name);
-		if (seg == BSSSEG)
-			printf("\t.comm\t%s,%lu\n", name, tp->size);
-		break;
-	}
-	if (sym->type.align != 1)
-		printf("\t.align\t%lu\n", sym->type.align );
-	printf("%s:\n", name);
+	align = sym->type.align;
+	size = sym->type.size;
+
+	offpar -= align-1 & ~align;
+	sym->u.off = offpar;
+	offpar -= size;
+	sym->kind = SAUTO;
+}
+
+void
+defvar(Symbol *sym)
+{
+	unsigned long align, size;
+
+	if (sym->kind != SREG && sym->kind != SAUTO)
+		return;
+	align = sym->type.align;
+	size = sym->type.size;
+
+	offvar += align-1 & ~align;
+	sym->u.off = offvar;
+	offvar += size;
+	sym->kind = SAUTO;
+}
+
+void
+deftype(Type *tp)
+{
 }
 
 void
@@ -178,23 +209,11 @@ defglobal(Symbol *sym)
 }
 
 void
-deftype(Type *tp)
+data(Node *np)
 {
-}
-
-void
-defpar(Symbol *sym)
-{
-}
-
-void
-defvar(Symbol *sym)
-{
-}
-
-void
-newfun(void)
-{
+	size2asm(&np->type);
+	emittree(np);
+	putchar('\n');
 }
 
 void
