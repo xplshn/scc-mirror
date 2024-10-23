@@ -1,9 +1,12 @@
 .POSIX:
 
+DIRS =\
+	ppc\
+	x80\
+	x86\
+
 PROJECTDIR = ../../..
 include $(PROJECTDIR)/scripts/rules.mk
-
-MORE_CFLAGS = -I$(INCDIR)/$(STD)
 
 OBJS = \
 	expr.o\
@@ -13,21 +16,24 @@ OBJS = \
 	symbol.o\
 
 TARGET =\
+	scc-as\
 	as-amd64\
 	as-i286\
 	as-i386\
-	as-powerpc\
-	as-powerpc64\
-	as-z80 \
+	as-ppc\
+	as-ppc64\
+	as-z80\
 
 MORE_LDLIBS =  -lscc -lmach
 
-all: $(TARGET)
+all:
+	$(MAKE) $(DIRS)
+	$(MAKE) $(TARGET)
+	@cp as-* $(LIBEXEC)/scc
+	@cp scc-as $(BINDIR)
 
+$(DIRS): lexh
 $(TARGET): $(LIBSCC) $(LIBMACH)
-
-scc-as: as
-	cp as $(BINDIR)
 
 genhash.o: ../../libscc/genhash.c
 	$(HOSTCC) -c ../../libscc/genhash.c
@@ -38,13 +44,23 @@ lexh.o: lexh.c
 lexh: lexh.o genhash.o
 	$(HOSTCC) -o $@ lexh.o genhash.o
 
-clean:
-	rm -f */*.o */*tbl.c lexh
-	rm -f as
+as-ppc: $(OBJS) ppc/ppc.o
+	$(CC) $(PROJ_LDFLAGS) $(OBJS) ppc/ppc.o $(PROJ_LDLIBS) -o $@
 
-include powerpc/powerpc64.mk
-include powerpc/powerpc.mk
-include x86/amd64.mk
-include x86/i386.mk
-include x86/i286.mk
-include x80/z80.mk
+as-ppc64: $(OBJS) ppc/ppc64.o
+	$(CC) $(PROJ_LDFLAGS) $(OBJS) ppc/ppc64.o $(PROJ_LDLIBS) -o $@
+
+as-z80: $(OBJS) x80/z80.o
+	$(CC) $(PROJ_LDFLAGS) $(OBJS) x80/z80.o $(PROJ_LDLIBS) -o $@
+
+as-i286: $(OBJS) x86/i286.o
+	$(CC) $(PROJ_LDFLAGS) $(OBJS) x86/i286.o $(PROJ_LDLIBS) -o $@
+
+as-i386: $(OBJS) x86/i386.o
+	$(CC) $(PROJ_LDFLAGS) $(OBJS) x86/i386.o $(PROJ_LDLIBS) -o $@
+
+as-amd64: $(OBJS) x86/amd64.o
+	$(CC) $(PROJ_LDFLAGS) $(OBJS) x86/amd64.o $(PROJ_LDLIBS) -o $@
+
+clean:
+	rm -f lexh

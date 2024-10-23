@@ -4,9 +4,9 @@ BEGIN		{
 		printf "#include <scc/mach.h>\n"\
 		       "#include <scc/scc.h>\n"\
 		       "#include \"../as.h\"\n"\
-		       "#include \"../" family "/proc.h\"\n"
+		       "#include \"proc.h\"\n"
 
-		rules = family "/opers.dat"
+		rules = "opers.dat"
 		while (getline < rules > 0) {
 			regex[++nregs] = $1
 			value[nregs] = $2
@@ -48,8 +48,8 @@ END		{
 		printf "};\n\n"
 
 		for (i = 0; i < nop; i++)
-			print opnames[i] | "./lexh"
-		close("./lexh")
+			print opnames[i] | "../lexh"
+		close("../lexh")
 
 		print "struct op optab[] = {"
 		for (i = 0; i < nvar; i++) {

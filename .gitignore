@@ -14,11 +14,12 @@ dirs
 /src/cmd/scc-ar
 /src/cmd/scc-nm
 /src/cmd/scc-ranlib
+/src/cmd/scc-as/scc-as
 /src/cmd/scc-as/as-amd64
 /src/cmd/scc-as/as-i286
 /src/cmd/scc-as/as-i386
-/src/cmd/scc-as/as-powerpc
-/src/cmd/scc-as/as-powerpc64
+/src/cmd/scc-as/as-ppc
+/src/cmd/scc-as/as-ppc64
 /src/cmd/scc-as/as-z80
 /src/cmd/scc-cc/cc1/cc1
 /src/cmd/scc-cc/cc1/cpp-bug.c
