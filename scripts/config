@@ -1,56 +1,66 @@
 #!/bin/sh
 
-case `uname` in
-OpenBSD)
-	echo TOOL=${TOOL:-clang} HOST=obsd ARFLAGS="${ARFLAGS:--rv}" NOPIE_LDFLAGS=-no-pie
+exec > $$.tmp
+trap "rm -f $$.tmp" EXIT INT TERM
+
+arch=`uname -m`
+sys=`uname -s | tr 'A-Z' 'a-z'`
+
+case $sys in
+openbsd)
+	echo TOOL=${TOOL:-clang}
+	echo HOST=obsd
+	echo ARFLAGS="${ARFLAGS:--rv}" NOPIE_LDFLAGS=-no-pie
 	;;
-NetBSD)
+netbsd)
 	#TODO: send a patch to NetBSD to solve this problem
-	echo TOOL=${TOOL:-gnu} HOST=bsd ARFLAGS="${ARFLAGS:--rv}"
+	echo TOOL=${TOOL:-gnu}
+	echo HOST=bsd
+	echo ARFLAGS="${ARFLAGS:--rv}"
 	;;
-FreeBSD)
-	echo TOOL=${TOOL:-clang} HOST=bsd
-	;;
-Darwin)
-	echo HOST=bsd RANLIB_FLAGS="${RANLIB_FLAGS:--c}"
-	;;
-Minix)
-	echo RANLIB="${RANLIB:-ar t}"
-	;;
-*BSD)
+freebsd)
+	echo TOOL=${TOOL:-clang}
 	echo HOST=bsd
 	;;
-Linux)
-	echo TOOL=${TOOL:-gnu} HOST=linux
+darwin)
+	echo HOST=bsd
+	echo RANLIB_FLAGS="${RANLIB_FLAGS:--c}"
 	;;
-Plan9)
-	echo TOOL=${TOOL:-plan9} HOST=plan9
+minix)
+	echo RANLIB="${RANLIB:-ar t}"
 	;;
+*bsd)
+	echo HOST=bsd
+	;;
+linux)
+	echo TOOL=${TOOL:-gnu}
+	echo HOST=linux
+	;;
+plan9)
+	echo TOOL=${TOOL:-plan9}
+	echo HOST=plan9
+	;;
+*)
+	echo TOOL=${TOOL:-unix}
+	echo HOST=${HOST:-posix}
 esac
 
 
-for i
-do
-	case $1 in
-	-c)
+case $arch in
+x86_64)
+	arch=amd64
+	;;
+aarch64)
+	arch=arm64
+	;;
+esac
 
-		mach=`uname -m`
+echo CONF=${CONF:-$arch-$sys}
+echo CROSS_COMPILE=$CROSS_COMPILE
+echo DESTDIR=$DESTDIR
+echo PREFIX=${PREFIX:=/usr/local}
+echo LIBPREFIX=${LIBPREFIX:-$PREFIX}
+echo LIBPROFILE=${LIBPROFILE:-scc}
+echo STD=${STD:-c99}
 
-		case $mach in
-		x86_64)
-			mach=amd64
-			;;
-		aarch64)
-			mach=arm64
-			;;
-		esac
-
-		sys=`uname -s | tr 'A-Z' 'a-z'`
-		echo CONF=$mach-$sys
-		;;
-	*)
-		echo usage: config [-c] >&2
-		exit 1
-		;;
-	esac
-done
+mv $$.tmp config.mk

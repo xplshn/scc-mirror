@@ -34,4 +34,4 @@ dirs
 /src/cmd/cc/posix/scc-cpp
 /src/cmd/ld/scc-ld
 /src/cmd/make/scc-make
-/
+/config.mk

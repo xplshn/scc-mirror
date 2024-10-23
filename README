@@ -1,9 +1,82 @@
 Compiling
 =========
 
-SCC is a portable toolchain that can be compiled on any UNIX system
-out of the box. It supports several configuration options that
-can be passed to the command line:
+SCC is a portable toolchain that can be compiled on any UNIX system out
+of the box. Compiling the project is so simple like:
+
+	$ make
+
+It will build scc selecting the more appropiate options for the host
+system. In some situations (like for example when cross compiling),
+can be desirable to select custom options for the build and use:
+
+	$ make config
+	$ make
+
+and pass the required options the the config target. For example
+if we want to cross compile scc for aarch64-linux-musl target
+from a amd64-linux-gnu host system:
+
+	$ make config CROSS_COMPILE=aarch-linux-musl- CONF=arm64-linux
+	$ make
+
+The build system of scc supports parallel builds that will reduce
+dramatically the build time.
+
+config.mk
+---------
+
+This file is generated when the config target is built. Once it is
+generated it is used by any Makefile in the build system, and it is not
+modified by the build system, allowing to the user doing any modifications
+as required. This file incules the following options that can be overriden
+in the command line of `make config`:
+
+	- TOOL: Specify the toolchain type to be used.  Possible
+	  supported values are:
+
+		- clang
+		- gcov
+		- gnu
+		- pcc
+		- plan9
+		- unix
+
+	- HOST: Specify the host system to be used. Possible supported
+	  values are:
+
+		- bsd
+		- linux
+		- obsd
+		- plan9
+		- posix
+
+	- CONF: Specify the build configuration used. It determines
+	  the default values for the architecture, ABI, system and
+	  binary format for the cross compiler. It also determines
+	  what versions of the libc are built (at this moment scc
+	  depends of external tools to build the libc and it limits
+	  the versions of the libc that can be built to the ones
+	  supported by the toolchain used to build scc itself).
+
+		- amd64-darwin
+		- amd64-dragonfly
+		- amd64-freebsd
+		- amd64-linux
+		- amd64-netbsd
+		- amd64-openbsd
+		- amd64-plan9
+		- arm32-linux
+		- arm64-linux
+		- ppc32-linux
+
+	- CROSS_COMPILE: Specify a prefix name for the tools called by the
+	  Makefile.
+
+	- DESTDIR: Temporary directory prepend to PREFIX used in the
+	  install path. It is mainly intended to help package maintainers
+	  to install in a specific directory used as base for the package
+	  generation.
 
 	- PREFIX: Prefix of the path where scc toolchain is going
 	  to be installed. /usr/local by default.
@@ -12,79 +85,42 @@ can be passed to the command line:
 	  headers and libraries when scc is executed. $PREFIX
 	  by default.
 
-	- DESTDIR: Temporary directory prepend to PREFIX used in the
-	  install path. It is mainly intended to help package maintainers
-	  to install in a specific directory used as base for the package
-	  generation.
+	- LIBPROFILE: The profile used to configure the libc used by the
+	  target compiler.
 
-	- CROSS_COMPILE:
-          Specify a prefix name for the tools called by the Makefile.
+		- scc: The scc libc.
+		- scc_clang: The scc libc, but using the clang assembler
+		             and linker.
+		- musl: The linux musl libc.
 
-	- HOST:
-	  Specify the host system to be used. Possible supported
-	  values are:
+	- STD: What version of the C standard is used in the target
+	  compiler and libc.
 
-		- unix (by default)
-		- bsd
-		- plan9
+		- c89: ANSI or C90 ISO standard.
+		- c99: C99 ISO standard.
 
-	- CONF: Specify which version of libc to build.
-	  Once the build process completes only the target specified in
-          CONF will be built. Supported values are:
-
-		- amd64-linux (default)
-		- amd64-darwin
-		- amd64-openbsd
-		- arm64-linux
-		- amd64-dragonfly
-		- amd64-freebsd
-		- amd64-netbsd
-		- arm32-linux
-		- i386-linux
-
-	  Not all the configurations have the same level of support in
-	  the libc and in some cases the support is minimal.
-
-	- TOOL: Specify the toolchain type to be used.  Possible
-	  supported values are:
-
-		- unix (by default)
-		- gnu
-		- gnu-darwin
-		- clang
-		- pcc
-		- plan9
-
-Beware that the default target selects the appropiate value for HOST,
-CONF and TOOL. In case of being needed, TOOL can be still overloaded
-in the command line.
+Not all the configurations have the same level of support in
+the libc and in some cases the support is minimal.
 
 The main targets of the Makefile are:
 
 	- all:
-	  Compile the toolchain and the libc. It automatically
-	  determines what is the best value for HOST. It sets the
-	  value of CONF for the toolchain that is used by the
-	  toolchain as the default target. It also compiles the libc
+	  Compile the toolchain and the libc. It compiles the libc
 	  for all the available configurations based in the host
 	  architecture.
 
-	- config
-	  Generate headers supposed to be customized by the user.
-
-	- toolchain
-	  Compile the toolchain with the default configuration
-	  specified in CONF. Beware that this target is executed without
-	  the automatic detection of the host parameters. It makes
-	  easier to cross compile.
-
-	- libc:
-	  Compile the libc for the target specified in CONF. Beware
-	  that this target is executed without the automatic detection
-	  of the host parameters. It makes easier to cross compile.
+	- config:
+	  Generate config.mk and the headers `include/bits/scc/sys.h`,
+	  `include/bits/scc/std.h` and `include/bits/scc/config.h`.
+	  These files are not modified by any other target of the
+	  Makefile, and they can be customized as required after being
+	  generated. They are  removed by the `distclean` target.
 
 	- install:
 	  Installs scc in PREFIX.
+
+	- uninstall:
+	  Uninstall scc from PREFIX.
 
 	- clean:
 	  Remove all the generated files except the one supposed to be edited
@@ -160,7 +196,9 @@ depends heavily of the toolchain used to compile musl. As the musl libc
 is likely installed in a different prefix the scc compilation must be
 modified to:
 
-	$ make LIBPREFIX=/usr/local/musl # point to the prefix used by your musl
+	$ make LIBPREFIX=/usr/local/musl LIBPROFILE=musl config
+
+where `LIBPREFIX` points to the prefix used by your musl libc installation.
 
 If the helper scc shell script is used instead of scc-cc then the
 environment variable SCCLIBPREFIX must be set:

@@ -1,7 +1,6 @@
 # Define the target all as default
 all:
 
-# Define default configuration variables
 PREFIX = /usr/local
 LIBPREFIX = $(PREFIX)
 LIBPROFILE = scc
@@ -9,6 +8,7 @@ CONF = amd64-linux
 TOOL = unix
 HOST = posix
 ROFF = gnu
+include $(PROJECTDIR)/config.mk
 
 # Define helper macros for project directories
 DOCDIR    = $(PROJECTDIR)/doc
@@ -38,9 +38,6 @@ include $(BUILDDIR)/host/$(HOST).mk
 CPPINCLUDES = -I$(INCDIR)/bits
 ASINCLUDES  = -I$(INCDIR)bits
 LDINCLUDES  = -L$(LIBDIR)/scc
-
-# C standard for the target compiler
-STD = c99
 
 # Definition of command line for cc, as, ld and emu
 PROJ_CPPFLAGS =\

@@ -1,56 +1,25 @@
 .POSIX:
 
-DIRS  =\
-	src\
-	src/libc\
-	src/libcrt\
-	include/bits/scc\
-	tests\
+all tests install uninstall: check_config FORCE
+	+@$(MAKE) -f main.mk $@
 
-PROJECTDIR = .
-include scripts/rules.mk
+check_config: FORCE
+	@if ! test -f config.mk;\
+	then\
+		$(MAKE) config;\
+	fi
 
-ROOT = $(DESTDIR)$(PREFIX)
-NODEP = 1
+config: FORCE
+	./scripts/config
+	$(MAKE) -f main.mk config
 
-all:
-	+@$(MAKE) `$(SCRIPTDIR)/config -c` config
-	+@$(MAKE) `$(SCRIPTDIR)/config -c` toolchain
-	+@$(MAKE) `$(SCRIPTDIR)/config` $(ARCH)
+clean: FORCE
+	touch config.mk
+	$(MAKE) -f main.mk clean
 
-config:
-	+@cd include/bits/scc && $(MAKE)
+distclean: FORCE
+	touch config.mk
+	$(MAKE) -f main.mk distclean
+	rm -f config.mk
 
-install: all
-	$(SCRIPTDIR)/install $(ROOT)
-	+@$(MAKE) install-`uname -m`
-
-uninstall:
-	$(SCRIPTDIR)/uninstall $(ROOT)
-	+@$(MAKE) uninstall-`uname -m`
-
-toolchain: src
-libc: src/libc
-libcrt: src/libcrt
-src: dirs include/bits/scc
-src/libc: dirs
-src/libcrt: dirs
-
-dirs: $(SCRIPTDIR)/libc-dirs
-	xargs mkdir -p < $(SCRIPTDIR)/libc-dirs
-	touch dirs
-
-clean:
-	xargs rm -rf < $(SCRIPTDIR)/libc-dirs
-	find . -name '*.gcno' -o -name '*.gcda' | xargs rm -f
-	rm -rf dirs coverage
-
-distclean: clean
-	rm -f include/bits/scc/sys.h
-	rm -f include/bits/scc/config.h
-
-include scripts/amd64.mk
-include scripts/arm.mk
-include scripts/arm64.mk
-include scripts/i386.mk
-include scripts/ppc.mk
+FORCE:

@@ -1,5 +1,5 @@
 ppc:
-	+@$(MAKE) `$(SCRIPTDIR)/config` CONF=ppc-linux libc libcrt
+	+@$(MAKE) -f main.mk CONF=ppc-linux libc libcrt
 
 install-ppc: ppc
 	$(SCRIPTDIR)/install -p $(SCRIPTDIR)/proto.ppc $(ROOT)
