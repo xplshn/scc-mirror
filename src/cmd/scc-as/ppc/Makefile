@@ -21,11 +21,13 @@ ppc.o: $(OBJS32)
 ppc64.o: $(OBJS64)
 	$(LD) -r -o $@ $(OBJS64)
 
-ppctbl.c: ops.dat opers.dat
+ppctbl.o: ops.dat opers.dat
 	../mktbl -c ppc
+	$(CC) $(PROJ_CFLAGS) -c ppctbl.c
 
-ppc64tbl.c: ops.dat opers.dat
+ppc64tbl.o: ops.dat opers.dat
 	../mktbl -c ppc64
+	$(CC) $(PROJ_CFLAGS) -c ppc64tbl.c
 
 clean:
 	rm -f ppc64tbl.c ppctbl.c

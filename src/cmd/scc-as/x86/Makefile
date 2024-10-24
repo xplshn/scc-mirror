@@ -29,14 +29,17 @@ i386.o: $(OBJS_386)
 amd64.o: $(OBJS_AMD64)
 	$(LD) -r -o $@ $(OBJS_AMD64)
 
-i286tbl.c: ops.dat opers.dat
+i286tbl.o: ops.dat opers.dat
 	../mktbl -c i286
+	$(CC) $(PROJ_CFLAGS) -c i286tbl.c
 
-i386tbl.c: ops.dat opers.dat
+i386tbl.o: ops.dat opers.dat
 	../mktbl -c i386
+	$(CC) $(PROJ_CFLAGS) -c i386tbl.c
 
-amd64tbl.c: ops.dat opers.dat
+amd64tbl.o: ops.dat opers.dat
 	../mktbl -c amd64
+	$(CC) $(PROJ_CFLAGS) -c amd64tbl.c
 
 clean:
 	rm -f amd64tbl.c i386tbl.c i286tbl.c

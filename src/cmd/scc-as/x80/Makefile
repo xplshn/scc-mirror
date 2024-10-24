@@ -13,8 +13,9 @@ all: z80.o
 z80.o: $(OBJS_Z80)
 	$(LD) -r -o $@ $(OBJS_Z80)
 
-z80tbl.c: ops.dat opers.dat
+z80tbl.o: ops.dat opers.dat
 	../mktbl -c z80
+	$(CC) $(PROJ_CFLAGS) -c z80tbl.c
 
 clean:
 	rm -f z80tbl.c
