@@ -139,15 +139,21 @@ appendmakeflags(char *text)
 	free(t);
 }
 
+static int
+hasargs(int c)
+{
+	return c == 'f' || c == 'j';
+}
+
 static void
 parseflag(int flag, char **args, char ***argv)
 {
-	char *arg;
+	if (hasargs(flag))
+		getarg(args, argv);
 
 	switch (flag) {
 	case 'j':
 	case 'f':
-		getarg(args, argv);
 		break;
 	case 'e':
 		eflag = 1;
@@ -280,7 +286,7 @@ parsemakefiles(char **argv)
 	hasmake = 0;
 	for ( ; *argv && **argv == '-'; ++argv) {
 		for (s = *argv; c = *s; ++s) {
-			if (c == 'f' || c == 'j')
+			if (hasargs(c))
 				arg = getarg(&s, &argv);
 
 			if (c == 'f') {
@@ -301,6 +307,28 @@ parsemakefiles(char **argv)
 		return;
 }
 
+/*
+ * We want to enable debug as earlier as possible,
+ * if we wait until we read the Makefiles then
+ * we are going to lose to much debug information.
+ */
+static void
+enadebug(char *argv[])
+{
+	int c;
+	char *p;
+
+	for ( ; *argv && **argv == '-'; ++argv) {
+		p = *argv;
+		for (++p; c = *p; ++p) {
+			if (hasargs(c))
+				getarg(&p, &argv);
+			if (c == 'd')
+				dflag = 1;
+		}
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -313,6 +341,7 @@ main(int argc, char *argv[])
 
 	arg0 = *argv++;
 
+	enadebug(argv);
 	inject(defaults);
 	parsemakefiles(argv);
 	parsemakeflags();
