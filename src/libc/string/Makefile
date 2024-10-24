@@ -29,5 +29,3 @@ OBJS =\
 	strxfrm.$O\
 
 all: $(OBJS)
-
-include deps.mk

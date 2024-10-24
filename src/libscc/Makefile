@@ -28,5 +28,3 @@ $(TARGET): $(OBJS)
 	$(AR) $(PROJ_ARFLAGS) $@ $?
 	$(RL) $(PROJ_RLFLAGS) $@
 	cp $@ $(LIBDIR)/scc
-
-include deps.mk

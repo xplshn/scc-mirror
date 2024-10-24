@@ -7,5 +7,3 @@ OBJS=\
 	_getheap.$O\
 
 all: $(OBJS)
-
-include deps.mk

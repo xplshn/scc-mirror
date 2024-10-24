@@ -25,5 +25,3 @@ OBJS =\
 	strcpy.$O\
 
 all: $(OBJS) $(SYS)
-
-include deps.mk

@@ -19,5 +19,3 @@ all: $(TARGET)
 $(TARGET): $(OBJS) $(LIBMACH) $(LIBSCC)
 	$(CC) $(PROJ_LDFLAGS) $(OBJS) -lmach -lscc $(PROJ_LDLIBS) -o $@
 	cp $@ $(BINDIR)
-
-include deps.mk

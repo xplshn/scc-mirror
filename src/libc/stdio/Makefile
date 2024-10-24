@@ -49,5 +49,3 @@ OBJS =\
 	_allocbuf.$O\
 
 all: $(OBJS)
-
-include deps.mk

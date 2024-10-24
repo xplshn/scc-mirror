@@ -10,5 +10,3 @@ OBJS =\
 	strtoumax.o\
 
 all: $(OBJS)
-
-include deps.mk

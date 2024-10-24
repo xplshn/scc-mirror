@@ -12,5 +12,3 @@ OBJS =\
 	setjmp.$O\
 
 all: $(OBJS) $(SYS)
-
-include deps.mk

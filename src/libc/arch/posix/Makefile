@@ -18,5 +18,3 @@ OBJS=\
 	tmpfile.$O\
 
 all: $(OBJS)
-
-include deps.mk

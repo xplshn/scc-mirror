@@ -30,5 +30,3 @@ all: cc1
 $(TARGET): $(LIBSCC) $(OBJS)
 	$(CC) $(PROJ_LDFLAGS) $(OBJS) -lscc $(PROJ_LDLIBS) -o $@
 	cp $@ $(LIBEXEC)/scc/cc1
-
-include deps.mk

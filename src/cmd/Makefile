@@ -25,5 +25,3 @@ all: $(TARGET) $(DIRS)
 	@cp $(TARGET) $(BINDIR)
 
 $(TARGET): $(LIBMACH) $(LIBSCC)
-
-include deps.mk

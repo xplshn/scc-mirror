@@ -7,5 +7,3 @@ OBJS =\
 	_sigaction.$O\
 
 all: $(OBJS)
-
-include deps.mk

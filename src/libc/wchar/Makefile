@@ -16,5 +16,3 @@ OBJS =\
 	_validutf8.$O\
 
 all: $(OBJS)
-
-include deps.mk

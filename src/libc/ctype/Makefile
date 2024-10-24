@@ -23,5 +23,3 @@ OBJS =\
 	toupper.$O\
 
 all: $(OBJS)
-
-include deps.mk

@@ -35,5 +35,3 @@ OBJS =\
 	wctomb.$O\
 
 all: $(OBJS)
-
-include deps.mk

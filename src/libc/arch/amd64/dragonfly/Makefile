@@ -33,5 +33,3 @@ $(GENSRC): syscall.lst
 
 clean:
 	rm -f $(GENSRC) _sys_errlist.c
-
-include deps.mk

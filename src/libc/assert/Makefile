@@ -8,5 +8,3 @@ OBJS =\
 	assert.$O\
 
 all: $(OBJS)
-
-include deps.mk

@@ -14,5 +14,3 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(AR) $(PROJ_ARFLAGS) $@ $?
 	$(RL) $(PROJ_RLFLAGS) $@
-
-include deps.mk

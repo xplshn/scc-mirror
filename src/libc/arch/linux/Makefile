@@ -10,5 +10,3 @@ OBJS=\
 	_waitpid.$O\
 
 all: $(OBJS)
-
-include deps.mk

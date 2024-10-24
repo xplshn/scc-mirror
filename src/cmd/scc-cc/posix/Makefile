@@ -23,5 +23,3 @@ scc: scc.sh
 	cp scc.sh $@
 	chmod +x $@
 	cp $@ $(BINDIR)
-
-include deps.mk

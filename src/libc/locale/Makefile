@@ -8,5 +8,3 @@ OBJS =\
 	setlocale.$O\
 
 all: $(OBJS)
-
-include deps.mk

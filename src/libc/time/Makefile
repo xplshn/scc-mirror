@@ -22,5 +22,3 @@ tz.c: timezone.lst
 
 clean:
 	rm -f tz.c
-
-include deps.mk
