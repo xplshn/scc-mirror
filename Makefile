@@ -1,6 +1,6 @@
 .POSIX:
 
-all tests install uninstall: check_config FORCE
+all dep tests install uninstall: check_config FORCE
 	+@$(MAKE) -f main.mk $@
 
 check_config: FORCE

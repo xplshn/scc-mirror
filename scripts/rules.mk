@@ -204,7 +204,6 @@ dep: inc-dep
 	@set -e; \
 	for i in $(DIRS); \
 	do \
-		test $$i = qbe && continue;\
 		test $$i = tests && continue;\
 		cd $$i; \
 		$(MAKE) $@; \

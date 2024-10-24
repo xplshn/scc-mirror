@@ -33,3 +33,4 @@ dirs
 /src/cmd/scc-ld/scc-ld
 /src/cmd/scc-make/scc-make
 /config.mk
+makefile

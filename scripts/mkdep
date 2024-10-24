@@ -2,11 +2,12 @@
 
 set -e
 
-echo '#deps' > deps.mk
+tmp=$$.tmp
+trap "rm -f $tmp" EXIT INT TERM HUP
 
-cat <<EOF | ed -s deps.mk
-a
-$(for i in `find . -name '*.c'`
+(cat Makefile
+printf "\n#deps\n"
+for i in `find . -name '*.c'`
 do
 	file=`basename $i | sed 's/\.c$/.o/'`
 	dir=`dirname $i`
@@ -16,10 +17,8 @@ do
 		s@\"\(.*\)\"@$dir/$file: $dir/\1@p
 		s@<\(scc/.*\)>@$dir/$file: \$(INCDIR)/bits/\1@p
 	}" $i
-done | LC_ALL=C sort -s)
-.
-g@^\./@ s///
-g@ \./@ s// /
-g/^$/d
-w
-EOF
+done |
+sed -e 's@^\./@@' -e 's@ \./@ @g' |
+LC_ALL=C sort -s) > $tmp
+
+mv $tmp makefile

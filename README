@@ -109,6 +109,13 @@ The main targets of the Makefile are:
 	  for all the available configurations based in the host
 	  architecture.
 
+	- dep:
+	  Generate inclusion dependencies, very useful while
+	  modifying the code. Beware that it creates files with
+	  the name `makefile` and changes to `Makefile` files
+	  are not reflected in the build proces until a `make distclean`
+	  or a `make dep` is executed again.
+
 	- config:
 	  Generate config.mk and the headers `include/bits/scc/sys.h`,
 	  `include/bits/scc/std.h` and `include/bits/scc/config.h`.
