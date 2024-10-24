@@ -22,9 +22,6 @@ dirs
 /src/cmd/scc-as/as-ppc64
 /src/cmd/scc-as/as-z80
 /src/cmd/scc-cc/cc1/cc1
-/src/cmd/scc-cc/cc1/cpp-bug.c
-/src/cmd/scc-cc/cc1/f.c
-/src/cmd/scc-cc/cc1/len-macro.c
 /src/cmd/scc-cc/cc2/cc2-amd64-sysv
 /src/cmd/scc-cc/cc2/cc2-i386-sysv
 /src/cmd/scc-cc/cc2/cc2-qbe_amd64-sysv
