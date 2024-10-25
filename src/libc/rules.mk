@@ -25,10 +25,10 @@ $(CRT): crt.$O
 clean: clean-libc
 
 clean-libc: FORCE
-	rm -f *.6? *.7 *.8 *.z *.q
+	rm -f *.6? *.7? *.8? *.z *.q
 
 .c.$O:
-	$(CC) $(PROJ_CPPFLAGS) $(PROJ_CFLAGS) -o $@ -c $<
+	$(CC) $(PROJ_CFLAGS) -o $@ -c $<
 
 .s.$O:
 	$(AS) $(PROJ_ASFLAGS) $< -o $@
