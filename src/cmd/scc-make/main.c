@@ -127,13 +127,14 @@ static void
 appendmakeflags(char *text)
 {
 	int n;
-	char *s, *t;
+	char *s, *t, *fmt;
 
 	s = getmacro("MAKEFLAGS");
-	n = snprintf(NULL, 0, "%s %s", s, text);
+	fmt = *s ? "%s %s" : "%s%s";
+	n = snprintf(NULL, 0, fmt, s, text);
 
 	t = emalloc(n+1);
-	snprintf(t, n+1, "%s %s", s, text);
+	snprintf(t, n+1, fmt, s, text);
 	setmacro("MAKEFLAGS", t, EXPORT);
 
 	free(t);
