@@ -22,11 +22,11 @@ config: FORCE
 
 install: all
 	$(SCRIPTDIR)/install $(ROOT)
-	+@$(MAKE) install-`uname -m`
+	+@$(MAKE) -f main.mk install-$(ARCH)
 
 uninstall:
 	$(SCRIPTDIR)/uninstall $(ROOT)
-	+@$(MAKE) uninstall-`uname -m`
+	+@$(MAKE) -f main.mk uninstall-$(ARCH)
 
 toolchain: src
 libc: src/libc
