@@ -350,6 +350,18 @@ nextc(void)
 	return input->buf[input->pos++];
 }
 
+/*
+ * This function only can be called after a call to nextc
+ * that didn't return EOF. It can return '\0', but as
+ * it is used only to check against '$' then it is not
+ * a problem.
+ */
+static int
+ahead(void)
+{
+	return input->buf[input->pos];
+}
+
 static int
 back(int c)
 {
@@ -386,28 +398,6 @@ validchar(int c)
 	if (c == EOF)
 		return 0;
 	return c == '.' || c == '/' || c == '_' || c == '-' || isalnum(c);
-}
-
-static int
-item(void)
-{
-	int c;
-	char *s;
-
-	for (s = token; s < &token[MAXTOKEN] - 1; *s++ = c) {
-		c = nextc();
-		if (!validchar(c))
-			break;
-	}
-
-	if (s >= &token[MAXTOKEN] - 1)
-		error("token too long");
-	if (s == token)
-		error("invalid empty token");
-	*s = '\0';
-	back(c);
-
-	return ITEM;
 }
 
 static void
@@ -609,23 +599,31 @@ expandstring(char *line, Target *tp)
 }
 
 static int
-readchar(void)
+item(void)
 {
 	int c;
+	char *s;
+	char buf[MAXTOKEN];
 
-	while ((c = nextc()) != EOF) {
-		if (c == ' ' || c == '\t')
-			continue;
-		if (c == '\\') {
-			if ((c = nextc()) == '\n')
-				continue;
-			back(c);
-			c = '\\';
-		}
-		break;
+	for (s = buf; s < &buf[MAXTOKEN] - 1; ) {
+		c = nextc();
+		if (c == '$' && ahead() != '$')
+			expansion(NULL);
+		else if (validchar(c))
+			*s++ = c;
+		else
+			break;
 	}
+	back(c);
 
-	return c;
+	if (s >= &buf[MAXTOKEN] - 1)
+		error("token too long");
+	if (s == buf)
+		error("invalid empty token");
+	*s++ = '\0';
+	memcpy(token, buf, s - buf);
+
+	return ITEM;
 }
 
 static int
@@ -634,7 +632,21 @@ next(void)
 	int c;
 
 repeat:
-	c = readchar();
+	/*
+	 * It is better to avoid skipspaces() here, because
+	 * it can generate the need for 2 calls to back(),
+	 * and we need the character anyway.
+	 */
+	c = nextc();
+	if (c == ' ' || c == '\t')
+		goto repeat;
+
+	if (c == '\\') {
+		if ((c = nextc()) == '\n')
+			goto repeat;
+		back(c);
+		c = '\\';
+	}
 
 	switch (c) {
 	case EOF:
