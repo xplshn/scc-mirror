@@ -135,7 +135,7 @@ adddep(char *target, char *dep)
 	tp->deps[tp->ndeps-1] = lookup(dep);
 	tp->deps[tp->ndeps] = NULL;
 
-	debug("Adding dependency %s <- %s", target, dep);
+	debug("adding dependency %s <- %s", target, dep);
 }
 
 void
