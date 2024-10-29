@@ -17,8 +17,9 @@ OBJS =\
 
 all: $(OBJS)
 
-tz.c: timezone.lst
-	awk -f gentz.awk $? >$@
+tz.$O: timezone.lst
+	awk -f gentz.awk $? > tz.c
+	$(CC) $(PROJ_CFLAGS) -c -o $@ tz.c
 
 clean:
 	rm -f tz.c
