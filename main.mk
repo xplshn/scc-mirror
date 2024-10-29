@@ -31,7 +31,6 @@ uninstall:
 toolchain: src
 libc: src/libc
 libcrt: src/libcrt
-src: include/bits/scc
 
 src src/libc src/libcrt: dirs
 
