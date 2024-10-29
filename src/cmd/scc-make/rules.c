@@ -448,19 +448,22 @@ static int
 rebuild(Target *tp, int *buildp)
 {
 	Target **p, *q;;
-	int r, need, build, err;
+	int r, need, build, err, def;
 
 	debug("checking rebuild of %s", tp->name);
 
 	tp->stamp = stamp(tp->name);
 
-	err = need = 0;
+	def = err = need = 0;
 	for (p = tp->deps; p && *p; ++p) {
 		if (stop)
 			cleanup(tp);
 
 		q = *p;
 		debug("checking dependency %s", q->name);
+
+		if (q->actions)
+			def = 1;
 
 		build = 0;
 		if (rebuild(q, &build) != 0) {
@@ -480,6 +483,8 @@ rebuild(Target *tp, int *buildp)
 	}
 
 	if (tp->stamp == -1)
+		need = 1;
+	else if (!def && inference(tp))
 		need = 1;
 
 	if (err) {
