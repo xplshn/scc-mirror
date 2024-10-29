@@ -19,6 +19,9 @@ CRT = $(LIBCDIR)/crt.o
 _sys_errlist.c: $(SYSERRNO)
 	../../mkerrstr $(SYSERRNO)
 
+_sys_errlist.$O: _sys_errlist.c
+	$(CC) $(PROJ_CFLAGS) -c -o $@ _sys_errlist.c
+
 $(CRT): crt.$O
 	cp crt.$O $@
 
