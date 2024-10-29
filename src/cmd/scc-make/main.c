@@ -258,7 +258,7 @@ parsemakeflags(void)
 	while (*flags == ' ' || *flags == '\t')
 		flags++;
 
-	if (flags[0] != '-') {
+	if (flags[0] != '-' && !strchr(flags, '=')) {
 		while (*flags) {
 			parseflag(*flags, &flags, NULL);
 			flags++;
@@ -273,7 +273,8 @@ parsemakeflags(void)
 			arr[n] = NULL;
 		}
 
-		parseargv(arr, NULL, NOEXPORT);
+		if (arr)
+			parseargv(arr, NULL, NOEXPORT);
 		free(arr);
 	}
 }
