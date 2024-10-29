@@ -31,8 +31,8 @@ TARGET  =\
 	cc2-z80-scc\
 
 all:
-	$(MAKE) $(DIRS)
-	$(MAKE) $(TARGET)
+	+@$(MAKE) $(DIRS)
+	+@$(MAKE) $(TARGET)
 	@cp $(TARGET) $(LIBEXEC)/scc
 
 main.o: error.h

@@ -27,8 +27,8 @@ TARGET =\
 MORE_LDLIBS =  -lscc -lmach
 
 all:
-	$(MAKE) $(DIRS)
-	$(MAKE) $(TARGET)
+	+@$(MAKE) $(DIRS)
+	+@$(MAKE) $(TARGET)
 	@cp as-* $(LIBEXEC)/scc
 	@cp scc-as $(BINDIR)
 
