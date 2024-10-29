@@ -3,9 +3,22 @@
 #include <unistd.h>
 
 #include <errno.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "make.h"
+
+void
+exportvar(char *var, char *value)
+{
+	int n;
+	char *buf;
+
+	n = snprintf(NULL, 0, "%s=%s", var, value);
+	buf = emalloc(n+1);
+	snprintf(buf, n+1, "%s=%s", var, value);
+	putenv(buf);
+}
 
 time_t
 stamp(char *name)

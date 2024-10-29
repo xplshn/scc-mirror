@@ -86,20 +86,14 @@ lookup(char *name)
 void
 setmacro(char *name, char *val, int export)
 {
-	int n;
-	char *buf;
 	Macro *mp;
 
 	mp = lookup(name);
 	free(mp->value);
 	mp->value = estrdup(val);
 
-	if (export && strcmp(name, "SHELL") != 0) {
-		n = snprintf(NULL, 0, "%s=%s", name, val);
-		buf = emalloc(n+1);
-		snprintf(buf, n+1, "%s=%s", name, val);
-		putenv(buf);
-	}
+	if (export && strcmp(name, "SHELL") != 0)
+		exportvar(name, val);
 }
 
 char *
