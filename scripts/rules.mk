@@ -36,7 +36,7 @@ include $(BUILDDIR)/host/$(HOST).mk
 
 # Locations for -I or -L in compiler, assembler or linker
 CPPINCLUDES = -I$(INCDIR)/bits
-ASINCLUDES  = -I$(INCDIR)bits
+ASINCLUDES  = -I$(INCDIR)/bits
 LDINCLUDES  = -L$(LIBDIR)/scc
 
 # Definition of command line for cc, as, ld and emu
