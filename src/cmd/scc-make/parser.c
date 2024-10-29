@@ -263,7 +263,6 @@ include(char *s)
 		push(FTFILE, t, fp);
 	}
 
-end:
 	free(fil);
 }
 
