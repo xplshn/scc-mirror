@@ -329,7 +329,7 @@ inference(Target *tp)
 	int tolen, r;
 	char *to, *from;
 	Target *q, **p, *suffixes;
-	char buf[20], fname[FILENAME_MAX];
+	char buf[FILENAME_MAX], fname[FILENAME_MAX];
 
 	debug("searching an inference rule for %s", tp->name);
 
