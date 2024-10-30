@@ -394,13 +394,18 @@ validchar(int c)
 	return c == '.' || c == '/' || c == '_' || c == '-' || isalnum(c);
 }
 
+static char *
+expandmacro(char *name)
+{
+	return expandstring(getmacro(name), NULL);
+}
+
+
 static void
-expandmacro(char *name, char *repl, char *to)
+replace(char *s, char *repl, char *to)
 {
 	int pos, siz, replsiz, tosiz;
-	char *s, *t, *p, *buf;
-
-	s = expandstring(getmacro(name), NULL);
+	char *t, *p, *buf;
 
 	pos = 0;
 	buf = NULL;
@@ -428,7 +433,6 @@ expandmacro(char *name, char *repl, char *to)
 		push(FTEXPAN, buf);
 		free(buf);
 	}
-	free(s);
 }
 
 static void
@@ -484,7 +488,9 @@ expandsimple(Target *tp)
 	default:
 		token[0] = c;
 		token[1] = '\0';
-		expandmacro(token, "", "");
+		s = expandmacro(token);
+		push(FTEXPAN, s);
+		free(s);
 		break;
 	}
 }
@@ -493,7 +499,7 @@ static void
 expansion(Target *tp)
 {
 	int delim, c, repli, toi, namei, st;
-	char name[MAXTOKEN], repl[MAXREPL], to[MAXREPL];
+	char *s, name[MAXTOKEN], repl[MAXREPL], to[MAXREPL];
 
 	c = nextc();
 	if (c == '(')
@@ -549,7 +555,9 @@ expansion(Target *tp)
 		name[namei] = '\0';
 		repl[repli] = '\0';
 		to[toi] = '\0';
-		expandmacro(name, repl, to);
+		s = expandmacro(name);
+		replace(s, repl, to);
+		free(s);
 	}
 }
 
