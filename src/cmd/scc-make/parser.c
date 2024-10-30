@@ -11,7 +11,7 @@
 
 #define MAXREPL  30
 #define TABSIZ   64
-#define MAXTOKEN 256
+#define MAXTOKEN FILENAME_MAX
 #define ITEM     128
 
 typedef struct macro Macro;
