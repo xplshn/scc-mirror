@@ -37,7 +37,7 @@ launch(char *cmd, int ignore)
 	int st;
 	pid_t pid;
 	char *name, *shell;
-	char *args[] = {NULL, "-ec" , cmd, (char *) 0};
+	char *args[] = {NULL, "-ec" , cmd, NULL};
 	extern char **environ;
 
 	switch (pid = fork()) {
