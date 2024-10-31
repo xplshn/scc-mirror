@@ -35,5 +35,24 @@ all:
 	@echo $(SRC)
 	@echo $(@:=)
 EOF
+diff $tmp1 $tmp2
 
+scc-make -f- <<'EOF' > $tmp2 2>&1
+O = o
+SRC = file1.c  file2.c
+OBJ = ${SRC:.c=.$O}
+O = e
+C = c
+
+all:
+	@echo ${SRC:.c=.o}
+	@echo ${@}
+	@echo ${@:l=p}
+	@echo ${@:=.o}
+	@echo ${OBJ:.$O=.$C}
+	@echo ${OBJ:.$O=}
+	@echo ${OBJ}
+	@echo ${SRC}
+	@echo ${@:=}
+EOF
 diff $tmp1 $tmp2
