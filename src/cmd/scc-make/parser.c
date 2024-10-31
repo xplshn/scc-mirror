@@ -21,6 +21,14 @@ enum inputype {
 	FTEXPAN,
 };
 
+enum {
+	STBEGIN,
+	STINTERNAL,
+	STREPLACE,
+	STTO,
+	STEND,
+};
+
 struct loc {
 	char *fname;
 	int lineno;
@@ -400,39 +408,54 @@ expandmacro(char *name)
 	return expandstring(getmacro(name), NULL);
 }
 
-
 static void
-replace(char *s, char *repl, char *to)
+replace(char *line, char *repl, char *to)
 {
-	int pos, siz, replsiz, tosiz;
-	char *t, *p, *buf;
+	int siz, at, len, replsiz, tosiz, sep, pos;
+	char *oline, *s, *cur, *buf;
 
-	pos = 0;
-	buf = NULL;
+	debug("replacing '%s', with '%s' to '%s'", line, repl, to);
+	oline = line;
 	tosiz = strlen(to);
 	replsiz = strlen(repl);
 
-	t = s;
-	for (pos = 0; *t; pos += siz) {
-		if (replsiz > 0 && strncmp(t, repl, replsiz) == 0) {
-			siz = tosiz;
-			p = to;
-			t += replsiz;
-		} else {
-			siz = 1;
-			p = t;
-			t++;
+	buf = NULL;
+	for (pos = 0; *line; pos += siz) {
+		cur = NULL;
+		siz = 0;
+
+		for (siz = 0; *line == ' ' || *line == '\t'; ++siz) {
+			cur = erealloc(cur, siz+1);
+			cur[siz] = *line++;
 		}
 
-		buf = erealloc(buf, pos + siz + 1);
-		memcpy(buf+pos, p, siz);
+		len = strcspn(line, " \t");
+		at = len - replsiz;
+		if (at < 0 || memcmp(line + at, repl, replsiz)) {
+			cur = erealloc(cur, siz + len);
+			memcpy(cur + siz, line, len);
+			siz += len;
+		} else {
+			cur = erealloc(cur, siz + at + tosiz);
+			memcpy(cur + siz, line, at);
+			memcpy(cur + siz + at, to, tosiz);
+			siz += at + tosiz;
+		}
+
+		line += len;
+		buf = erealloc(buf, pos + siz);
+		memcpy(buf + pos, cur, siz);
+		free(cur);
 	}
 
 	if (pos > 0) {
+		buf = erealloc(buf, pos + 1);
 		buf[pos] = '\0';
+		debug("\treplace '%s' with '%s'", oline, buf);
 		push(FTEXPAN, buf);
-		free(buf);
 	}
+
+	free(buf);
 }
 
 static void
@@ -495,11 +518,26 @@ expandsimple(Target *tp)
 	}
 }
 
+static int
+internal(int ch)
+{
+	switch (ch) {
+	case '@':
+	case '?':
+	case '*':
+	case '<':
+		return 1;
+	default:
+		return 0;
+	}
+}
+
 static void
 expansion(Target *tp)
 {
 	int delim, c, repli, toi, namei, st;
-	char *s, name[MAXTOKEN], repl[MAXREPL], to[MAXREPL];
+	char name[MAXTOKEN], repl[MAXREPL], to[MAXREPL];
+	char *s, *erepl;
 
 	c = nextc();
 	if (c == '(')
@@ -512,53 +550,89 @@ expansion(Target *tp)
 	if (!delim) {
 		back(c);
 		expandsimple(tp);
-	} else {
-		st = namei = repli = toi = 0;
-		while ((c = nextc()) != EOF) {
-			if (c == delim)
-				break;
+		return;
+	}
 
-			switch (st) {
-			case 0:
-				if (c == ':') {
-					st = 1;
-					continue;
-				}
-				if (!validchar(c))
-					error("invalid macro name in expansion");
-				if (namei == MAXTOKEN-1)
-					error("expansion text too long");
-				name[namei++] = c;
-				break;
-			case 1:
-				if (c == '=') {
-					st = 2;
-					continue;
-				}
-				if (repli == MAXREPL-1)
-					error("macro replacement too big");
-				repl[repli++] = c;
-				break;
-			case 2:
-				if (toi == MAXREPL-1)
-					error("macro substiturion too big");
-				to[toi++] = c;
+	namei = repli = toi = 0;
+	st = STBEGIN;
+
+	while (st != STEND && (c = nextc()) != EOF) {
+		switch (st) {
+		case STBEGIN:
+			if (c == ':') {
+				st = STREPLACE;
+				name[namei] = '\0';
+				s = expandmacro(name);
 				break;
 			}
+			if (c == delim) {
+				name[namei] = '\0';
+				s = expandmacro(name);
+				goto no_replace;
+			}
+			if (namei == MAXTOKEN-1)
+				error("expansion text too long");
+
+			if (namei == 0 && internal(c)) {
+				name[namei++] = '$';
+				name[namei++] = c;
+				name[namei] = '\0';
+				st = STINTERNAL;
+				s = expandstring(name, tp);
+				break;
+			}
+
+			if (!validchar(c))
+				error("invalid macro name in expansion");
+			name[namei++] = c;
+			break;
+		case STINTERNAL:
+			if (c == delim)
+				goto no_replace;
+			if (c != ':')
+				error("invalid internal macro in expansion");
+			st = STREPLACE;
+			break;
+		case STREPLACE:
+			if (c == '=') {
+				st = STTO;
+				break;
+			}
+			if (c == delim)
+				error("invalid replacement pattern in expansion");
+			if (repli == MAXREPL-1)
+				error("macro replacement too big");
+			repl[repli++] = c;
+			break;
+		case STTO:
+			if (c == delim) {
+				st = STEND;
+				break;
+			}
+
+			if (toi == MAXREPL-1)
+				error("macro substiturion too big");
+			to[toi++] = c;
+			break;
 		}
-
-		if (c == EOF)
-			error("found eof while parsing expansion");
-		if (st > 0 && (namei == 0 ||  repli == 0 || to == 0))
-			error("invalid macro expansion");
-
-		name[namei] = '\0';
-		repl[repli] = '\0';
-		to[toi] = '\0';
-		s = expandmacro(name);
-		replace(s, repl, to);
-		free(s);
 	}
+
+	if (c == EOF)
+		error("found eof while parsing expansion");
+
+	repl[repli] = '\0';
+	to[toi] = '\0';
+
+	erepl = expandstring(repl, tp);
+	replace(s, erepl, to);
+
+	free(erepl);
+	free(s);
+	return;
+
+no_replace:
+	push(FTEXPAN, s);
+	free(s);
 }
 
 /*
