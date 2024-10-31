@@ -24,14 +24,13 @@ OBJS =\
 	$(GENOBJS)\
 	_sys_errlist.$O\
 
-GENSRC = $(GENOBJS:.$O=.s)
-
 all: $(OBJS) $(CRT)
 
 crt.$O: ../crt-posix.s ../netbsd/crt.s
 
-$(GENSRC): syscall.lst
-	./gensys.sh $(@:.s=)
+$(GENOBJS): syscall.lst
+	./gensys.sh $(@:.$O=)
+	$(AS) $(PROJ_ASFLAGS) $(@:.$O=.s)
 
 clean:
-	rm -f $(GENSRC) _sys_errlist.c
+	rm -f $(GENOBJS:.$O=.s) _sys_errlist.c

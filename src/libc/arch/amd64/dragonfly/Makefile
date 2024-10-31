@@ -20,16 +20,13 @@ OBJS =\
 	$(GENOBJS)\
 	_sys_errlist.$O\
 
-GENSRC = $(GENOBJS:.$O=.s)
-
-# Rules
-
 all: $(OBJS) $(CRT)
 
-crt.$O: ../crt-posix.s
+$(CRT): ../crt-posix.s
 
-$(GENSRC): syscall.lst
-	./gensys.sh $(@:.s=)
+$(GENOBJS): syscall.lst
+	./gensys.sh $(@:.$O=)
+	$(AS) $(PROJ_ASFLAGS) $(@:.$O=.s)
 
 clean:
-	rm -f $(GENSRC) _sys_errlist.c
+	rm -f $(GENOBJS:.$O=.s) _sys_errlist.c
