@@ -17,7 +17,7 @@ and pass the required options the the config target. For example
 if we want to cross compile scc for aarch64-linux-musl target
 from a amd64-linux-gnu host system:
 
-	$ make config CROSS_COMPILE=aarch-linux-musl- CONF=arm64-linux
+	$ make CROSS_COMPILE=aarch64-linux-musl- CONF=arm64-linux config
 	$ make
 
 The build system of scc supports parallel builds that will reduce
