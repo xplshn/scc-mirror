@@ -50,6 +50,7 @@ struct input {
 struct macro {
 	char *name;
 	char *value;
+	int where;
 
 	struct macro *next;
 };
@@ -84,31 +85,19 @@ lookup(char *name)
 
 	mp = emalloc(sizeof(*mp));
 	mp->name = estrdup(name);
-	mp->value = NULL;
+	mp->value = estrdup("");
 	mp->next = htab[h];
+	mp->where = UNDEF;
 	htab[h] = mp;
 
 	return mp;
 }
 
-void
-setmacro(char *name, char *val, int export)
+static char *
+macroinfo(char *name, int *pwhere, Macro **mpp)
 {
-	Macro *mp;
-
-	mp = lookup(name);
-	free(mp->value);
-	mp->value = estrdup(val);
-
-	if (export && strcmp(name, "SHELL") != 0)
-		exportvar(name, val);
-}
-
-char *
-getmacro(char *name)
-{
-	int hide;
 	char *s, *t;
+	int hide, where;
 	Macro *mp = lookup(name);
 
 	hide = 0;
@@ -116,18 +105,86 @@ getmacro(char *name)
 		hide = 1;
 
 	s = mp->value;
-	if (!s && !hide)
+	where = mp->where;
+
+	if (!s && !hide) {
+		where = ENVIRON;
 		s = getenv(name);
-	if (!s)
-		s = "";
+	}
 
 	if (eflag && !hide) {
 		t = getenv(name);
-		if (t)
+		if (t) {
+			where = ENVIRON;
 			s = t;
+		}
 	}
 
+	if (pwhere)
+		*pwhere = where;
+	if (mpp)
+		*mpp = mp;
+
 	return s;
+}
+
+char *
+getmacro(char *name)
+{
+	return macroinfo(name, NULL, NULL);
+}
+
+void
+setmacro(char *name, char *val, int where, int export)
+{
+	int owhere, set;
+	char *s;
+	Macro *mp;
+
+	assert(where != ENVIRON);
+
+	s = macroinfo(name, &owhere, &mp);
+
+	/*
+	 *  Default values are defined before anything else, and marked
+	 *  as MAKEFILES because they are injected as parseable text, and
+	 *  MAKEFILE variables are always overriden. ENVIRON macros are
+	 *  generated in macroinfo() and this is why this function should
+	 *  not receive a where == ENVIRON ever.
+	 */
+
+	switch (owhere) {
+	case UNDEF:
+	case MAKEFILE:
+		set = 1;
+		break;
+	case ENVIRON:
+		set = (where == MAKEFLAGS || where == CMDLINE);
+		set |= (where == MAKEFILE && !eflag);
+		break;
+	case MAKEFLAGS:
+		set = (where == CMDLINE || where == MAKEFLAGS);
+		break;
+	case CMDLINE:
+		set = (where == CMDLINE);
+		break;
+	default:
+		abort();
+	}
+
+	if (!set) {
+		debug("hidding override of %s from '%s' to '%s'", name, s, val);
+	} else {
+		debug("override %s from '%s' to '%s'", name, s, val);
+		free(mp->value);
+		mp->value = estrdup(val);
+		mp->where = where;
+
+		if (export && strcmp(name, "SHELL") != 0) {
+			debug("exporting macro %s", name);
+			exportvar(name, val);
+		}
+	}
 }
 
 static struct loc *
@@ -883,7 +940,6 @@ rule(char *targets[], int ntargets)
 static void
 assign(char *macros[], int n)
 {
-	int len, c;
 	char *defs;
 
 	if (n != 1)
@@ -891,7 +947,7 @@ assign(char *macros[], int n)
 
 	skipspaces();
 	defs = readmacrodef();
-	setmacro(*macros, defs, NOEXPORT);
+	setmacro(*macros, defs, MAKEFILE, NOEXPORT);
 	free(defs);
 }
 

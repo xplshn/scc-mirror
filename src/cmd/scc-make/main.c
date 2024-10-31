@@ -135,7 +135,7 @@ appendmakeflags(char *text)
 
 	t = emalloc(n+1);
 	snprintf(t, n+1, fmt, s, text);
-	setmacro("MAKEFLAGS", t, EXPORT);
+	setmacro("MAKEFLAGS", t, MAKEFLAGS, EXPORT);
 
 	free(t);
 }
@@ -205,7 +205,7 @@ parseflag(int flag, char **args, char ***argv)
 }
 
 static int
-assign(char *s, int export)
+assign(char *s, int where, int export)
 {
 	int pos;
 	char *t;
@@ -219,20 +219,20 @@ assign(char *s, int export)
 	t = estrdup(s); 
 	t[pos] = '\0';
 
-	setmacro(t, t+pos+1, export);
+	setmacro(t, t+pos+1, where, export);
 	free(t);
 	return 1;
 }
 
 static void
-parseargv(char **argv, char ***targets, int export)
+parseargv(char **argv, char ***targets, int where, int export)
 {
 	char *s;
 
 	for ( ; *argv; ++argv) {
 		s = *argv;
 		if (s[0] != '-') {
-			if (!assign(s, export))
+			if (!assign(s, where, export))
 				break;
 			continue;
 		}
@@ -253,7 +253,7 @@ parsemakeflags(void)
 	if ((flags = getenv("MAKEFLAGS")) == NULL)
 		return;
 
-	setmacro("MAKEFLAGS", "", EXPORT);
+	setmacro("MAKEFLAGS", "", MAKEFLAGS, EXPORT);
 
 	while (*flags == ' ' || *flags == '\t')
 		flags++;
@@ -274,7 +274,7 @@ parsemakeflags(void)
 		}
 
 		if (arr)
-			parseargv(arr, NULL, NOEXPORT);
+			parseargv(arr, NULL, MAKEFLAGS, NOEXPORT);
 		free(arr);
 	}
 }
@@ -334,33 +334,34 @@ enadebug(char *argv[])
 int
 main(int argc, char *argv[])
 {
-	char *arg0;
+	char *arg0, **targets;
 
 	signal(SIGINT, sighandler);
 	signal(SIGHUP, sighandler);
 	signal(SIGTERM, sighandler);
 	signal(SIGQUIT, sighandler);
 
+	targets = NULL;
 	arg0 = *argv++;
 
 	enadebug(argv);
 	inject(defaults);
-	parsemakefiles(argv);
-	parsemakeflags();
-	parseargv(argv, &argv, EXPORT);
+	setmacro("MAKE", arg0, MAKEFILE, NOEXPORT);
 
-	setmacro("MAKE", arg0, NOEXPORT);
+	parsemakeflags();
+	parseargv(argv, &targets, CMDLINE, EXPORT);
+	parsemakefiles(argv);
 
 	if (pflag) {
 		dumpmacros();
 		dumprules();
 	}
 
-	if (!*argv) {
+	if (!*targets) {
 		build(NULL);
 	} else {
-		while (*argv)
-			build(*argv++);
+		while (*targets)
+			build(*targets++);
 	}
 
 	exit(exitstatus);

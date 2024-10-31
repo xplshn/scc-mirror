@@ -8,6 +8,14 @@ enum {
 	EXPORT,
 };
 
+enum {
+	UNDEF,
+	ENVIRON,
+	CMDLINE,
+	MAKEFILE,
+	MAKEFLAGS,
+};
+
 struct target {
 	char *name;
 	char *target;
@@ -44,7 +52,7 @@ extern void adddep(char *, char *);
 extern void addrule(char *, char **, int);
 
 extern char *getmacro(char *);
-extern void setmacro(char *, char *, int);
+extern void setmacro(char *, char *, int, int);
 
 /* system depdendant */
 extern time_t stamp(char *);
