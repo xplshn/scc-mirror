@@ -13,11 +13,12 @@ config: FORCE
 	./scripts/config
 	$(MAKE) -f main.mk config
 
-config-musl: config FORCE
+config-musl: FORCE
+	$(MAKE) LIBPROFILE=musl config
 	gcc -v 2>&1 |\
 	sed -En '/COLLECT_LTO_WRAPPER=/ s/.*=(.*)\/lto-wrapper/\1/p' |\
-	(read path; \
-	 printf "g/define GCCLIBPATH/ s@.*@#define GCCLIBPATH \"$$path\"@\nw\n") |\
+	(read -r path; \
+	 printf "g/define GCCLIBPATH/ s@.*@#define GCCLIBPATH \"$$path/\"@\nw\n") |\
 	ed -s include/bits/scc/sys.h
 
 clean: FORCE

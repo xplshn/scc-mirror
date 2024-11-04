@@ -252,42 +252,29 @@ Musl libc support
 =================
 The scc libc is a C99 library and cannot be used to compile POSIX compliant
 programs. Scc includes a template that can be used to use a musl libc
-compiled by gcc:
+compiled by gcc, and to make easier to get the correct values it also
+provides a specific target to configure scc for a correct support for musl:
 
-	$ make LIBPROFILE=musl config
-
-It will generate the files sys.h configured to be used with a musl
-libc. Beware that it is likely that those files have to be customized to
-fit your system because the macro GCCLIBPATH used by the musl template
-depends heavily of the toolchain used to compile musl. As the musl libc
-is likely installed in a different prefix the scc compilation must be
-modified to:
-
-	$ make LIBPREFIX=/usr/local/musl LIBPROFILE=musl config
-
-where `LIBPREFIX` points to the prefix used by your musl libc installation.
-
-If the helper scc shell script is used instead of scc-cc then the
-environment variable SCCLIBPREFIX must be set:
-
-	$ SCCLIBPREFIX=/usr/local/musl scc hello.c
-
-Be sure that you modified `include/bits/scc/sys.h` to accomodate it to
-your system, specially the macro `GCCLIBPATH` that is heavily system
-dependent. In order to simplify this process the top level Makefile
-has a helper target `config-musl` that uses the gcc output to set it
-correctly:
-
-	$ make LIBPREFIX=/usr/local/musl LIBPROFILE=musl config-musl
+	$ make LIBPREFIX=/usr/local/musl config-musl
 	$ make
-	$ LIBPREFIX=/usr/local/musl scc hello.c
+	$ make install
 
 or
 
-	$ make LIBPREFIX=/usr/local/musl LIBPROFILE=musl config-musl
-	$ make
-	$ make install
 	$ scc-cc hello.c
+	$ make LIBPREFIX=/usr/local/musl config-musl
+	$ make
+	$ SCCLIBPREFIX=/usr/local/musl scc hello.c
+
+where `LIBPREFIX` points to the prefix used by your musl libc
+installation.  If the helper scc shell script is used instead of scc-cc
+then the environment variable SCCLIBPREFIX must be set. The target
+config-musl uses the output of gcc -v to get a working sys.h with the
+correct paths (it basically extracts the correct value for the macro
+GCCLIBPATH used to locate the gcc crt object files). If you are not
+able to use scc with musl after these steps, please take a look to
+include/bits/scc/sys.h to see if it fits your system setup.
+
 
 Deviations from standard C
 ===========================
