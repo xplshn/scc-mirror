@@ -28,7 +28,7 @@ $(CRT): crt.$O
 clean: clean-libc
 
 clean-libc: FORCE
-	rm -f *.6? *.7? *.8? *.z *.q
+	rm -f *.5? *.6? *.7? *.8? *.z *.q
 
 .c.$O:
 	$(CC) $(PROJ_CFLAGS) -o $@ -c $<
