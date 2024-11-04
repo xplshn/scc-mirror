@@ -16,6 +16,16 @@ enum {
 	MAKEFLAGS,
 };
 
+struct loc {
+	char *fname;
+	int lineno;
+};
+
+struct action {
+	char *line;
+	struct loc loc;
+};
+
 struct target {
 	char *name;
 	char *target;
@@ -27,7 +37,7 @@ struct target {
 	struct target **deps;
 
 	int nactions;
-	char **actions;
+	struct action *actions;
 
 	struct target *next;
 };
@@ -39,7 +49,7 @@ extern char *estrdup(char *);
 extern void dumprules(void);
 extern void dumpmacros(void);
 
-extern char *expandstring(char *, Target *);
+extern char *expandstring(char *, Target *, struct loc *);
 extern void addtarget(char *, int);
 extern void inject(char *);
 extern int build(char *);
@@ -49,7 +59,8 @@ extern void debug(char *, ...);
 extern void error(char *, ...);
 extern void warning(char *, ...);
 extern void adddep(char *, char *);
-extern void addrule(char *, char **, int);
+extern void addrule(char *, struct action *, int);
+extern void freeloc(struct loc *);
 
 extern char *getmacro(char *);
 extern void setmacro(char *, char *, int, int);

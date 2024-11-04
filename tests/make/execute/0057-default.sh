@@ -6,7 +6,7 @@ tmp1=tmp1.$$
 tmp2=tmp2.$$
 
 cat > $tmp2 <<'EOF'
-make: error: <stdin>:4: DEFAULT rule with prerequisites
+make: error: <stdin>:3: DEFAULT rule with prerequisites
 EOF
 
 scc-make -f- <<EOF > $tmp1 2>&1

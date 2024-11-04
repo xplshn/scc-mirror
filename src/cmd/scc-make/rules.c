@@ -24,7 +24,7 @@ dumprules(void)
 				printf(" %s", (*q)->name);
 			putchar('\n');
 			for (i = 0; i < p->nactions; i++)
-				printf("\t%s\n", p->actions[i]);
+				printf("\t%s\n", p->actions[i].line);
 			putchar('\n');
 		}
 	}
@@ -138,11 +138,18 @@ adddep(char *target, char *dep)
 	debug("adding dependency %s <- %s", target, dep);
 }
 
+static void
+freeaction(struct action *act)
+{
+	free(act->line);
+	freeloc(&act->loc);
+}
+
 void
-addrule(char *target, char **actions, int n)
+addrule(char *target, struct action  *acts, int n)
 {
 	int i;
-	char **v;
+	struct action *v;
 	Target *tp = lookup(target);
 
 	debug("adding actions for target %s", target);
@@ -150,13 +157,16 @@ addrule(char *target, char **actions, int n)
 	if (tp->actions) {
 		debug("overring actions of target %s", target);
 		for (i = 0; i < tp->nactions; i++)
-			free(tp->actions[i]);
+			freeaction(&tp->actions[i]);
 		free(tp->actions);
 	}
 
-	v = emalloc(n * sizeof(char *));
-	for (i = 0; i < n; i++)
-		v[i] = estrdup(actions[i]);
+	v = emalloc(n * sizeof(*v));
+	for (i = 0; i < n; i++) {
+		v[i].line = estrdup(acts[i].line);
+		v[i].loc.lineno = acts[i].loc.lineno;
+		v[i].loc.fname = estrdup(acts[i].loc.fname);
+	}
 
 	tp->nactions = n;
 	tp->actions = v;
@@ -292,7 +302,8 @@ run(Target *tp)
 	}
 
 	for (i = 0; i < tp->nactions; i++) {
-		s = expandstring(tp->actions[i], tp);
+		struct action *p = &tp->actions[i];
+		s = expandstring(p->line, tp, &p->loc);
 		r = execline(tp, s, ignore, silent);
 		free(s);
 

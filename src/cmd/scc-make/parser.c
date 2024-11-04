@@ -29,11 +29,6 @@ enum {
 	STEND,
 };
 
-struct loc {
-	char *fname;
-	int lineno;
-};
-
 struct input {
 	int siz;
 	int type;
@@ -187,6 +182,12 @@ setmacro(char *name, char *val, int where, int export)
 	}
 }
 
+void
+freeloc(struct loc *loc)
+{
+	free(loc->fname);
+}
+
 static struct loc *
 getloc(void)
 {
@@ -241,8 +242,9 @@ pop(void)
 	struct input *ip = input->prev;
 
 	if (input->type == FTFILE) {
-		fclose(input->fp);
-		free(input->loc.fname);
+		if (input->fp)
+			fclose(input->fp);
+		freeloc(&input->loc);
 	}
 	free(input->buf);
 	free(input);
@@ -253,7 +255,7 @@ pop(void)
 static void
 push(int type, ...)
 {
-	int len, pos;
+	int line, len, pos;
 	FILE *fp = NULL;
 	char *buf, *s, *fname = NULL;
 	va_list va;
@@ -262,8 +264,9 @@ push(int type, ...)
 	va_start(va, type);
 	switch (type) {
 	case FTFILE:
-		s = va_arg(va, char *);
 		fp = va_arg(va, FILE *);
+		s = va_arg(va, char *);
+		line = va_arg(va, int);
 		fname = estrdup(s);
 		buf = emalloc(BUFSIZ);
 		pos = len = BUFSIZ;
@@ -271,7 +274,7 @@ push(int type, ...)
 	case FTEXPAN:
 		s = va_arg(va, char *);
 		buf = estrdup(s);
-		pos = 0;
+		line = pos = 0;
 		len = strlen(s);
 		break;
 	}
@@ -283,7 +286,7 @@ push(int type, ...)
 	ip->type = type;
 	ip->fp = fp;
 	ip->loc.fname = fname;
-	ip->loc.lineno = 1;
+	ip->loc.lineno = line;
 	ip->pos = pos;
 	ip->prev = input;
 
@@ -312,14 +315,14 @@ include(char *s)
 	char *fil, *t;
 
 	s = trim(s);
-	fil = expandstring(s, NULL);
+	fil = expandstring(s, NULL, getloc());
 
 	t = trim(fil);
 	if (strlen(t) != 0) {
 		debug("including '%s'", t);
 		if ((fp = fopen(t, "r")) == NULL)
 			error("opening %s:%s", t, strerror(errno));
-		push(FTFILE, t, fp);
+		push(FTFILE, fp, t, 0);
 	}
 
 	free(fil);
@@ -336,7 +339,7 @@ nextline(void)
 
 repeat:
 	fp = input->fp;
-	if (feof(fp))
+	if (!fp || feof(fp))
 		return NULL;
 
 	lim = &input->buf[input->siz];
@@ -462,7 +465,7 @@ validchar(int c)
 static char *
 expandmacro(char *name)
 {
-	return expandstring(getmacro(name), NULL);
+	return expandstring(getmacro(name), NULL, getloc());
 }
 
 static void
@@ -635,7 +638,7 @@ expansion(Target *tp)
 				name[namei++] = c;
 				name[namei] = '\0';
 				st = STINTERNAL;
-				s = expandstring(name, tp);
+				s = expandstring(name, tp, getloc());
 				break;
 			}
 
@@ -680,7 +683,7 @@ expansion(Target *tp)
 	repl[repli] = '\0';
 	to[toi] = '\0';
 
-	erepl = expandstring(repl, tp);
+	erepl = expandstring(repl, tp, getloc());
 	replace(s, erepl, to);
 
 	free(erepl);
@@ -700,13 +703,14 @@ no_replace:
  * it later.
  */
 char *
-expandstring(char *line, Target *tp)
+expandstring(char *line, Target *tp, struct loc *loc)
 {
 	int c, n;
 	char *s;
 	struct input *ip = input;
 
 	input = NULL;
+	push(FTFILE, NULL, loc->fname, loc->lineno);
 	push(FTEXPAN, line);
 
 	n = 0;
@@ -850,18 +854,23 @@ readmacrodef(void)
 	return line;
 }
 
-static char *
+static struct action
 readcmd(void)
 {
 	int n, c;
-	char *line;
+	struct loc *loc;
+	struct action act;
 
 	skipspaces();
 
+	loc = getloc();
+	act.loc.fname = estrdup(loc->fname);
+	act.loc.lineno = loc->lineno;
+
 	n = 0;
-	line = NULL;
+	act.line = NULL;
 	while ((c = nextc()) != EOF) {
-		line = erealloc(line, n+1);
+		act.line = erealloc(act.line, n+1);
 		if (c == '\n')
 			break;
 		if (c == '\\') {
@@ -873,20 +882,21 @@ readcmd(void)
 			back(c);
 			c = '\\';
 		}
-		line[n++] = c;
+		act.line[n++] = c;
 	}
 	if (c == EOF)
 		error("EOF while looking for end of command");
-	line[n] = '\0';
+	act.line[n] = '\0';
 
-	return line;
+	return act;
 }
 
 static void
 rule(char *targets[], int ntargets)
 {
 	int c, i, j, ndeps, nactions;
-	char **actions, **deps = NULL;
+	struct action *acts;
+	char **deps = NULL;
 
 	if (ntargets == 0)
 		error("missing target");
@@ -900,11 +910,11 @@ rule(char *targets[], int ntargets)
 		error("garbage at the end of the line");
 
 	nactions = 0;
-	actions = NULL;
+	acts = NULL;
 	if (tok == ';') {
 		nactions++;
-		actions = erealloc(actions, nactions * sizeof(char *));
-		actions[nactions-1] = readcmd();
+		acts = erealloc(acts, nactions * sizeof(*acts));
+		acts[nactions-1] = readcmd();
 	}
 
 	for (;;) {
@@ -915,8 +925,8 @@ rule(char *targets[], int ntargets)
 		if (c != '\t')
 			break;
 		nactions++;
-		actions = erealloc(actions, nactions * sizeof(char *));
-		actions[nactions-1] = readcmd();
+		acts = erealloc(acts, nactions * sizeof(*acts));
+		acts[nactions-1] = readcmd();
 	}
 	back(c);
 
@@ -925,16 +935,18 @@ rule(char *targets[], int ntargets)
 		for (j = 0; j < ndeps; j++)
 			adddep(targets[i], deps[j]);
 		if (nactions > 0)
-			addrule(targets[i], actions, nactions);
+			addrule(targets[i], acts, nactions);
 	}
 
 	for (i = 0; i < ndeps; i++)
 		free(deps[i]);
 	free(deps);
 
-	for (i = 0; i < nactions; i++)
-		free(actions[i]);
-	free(actions);
+	for (i = 0; i < nactions; i++) {
+		free(acts[i].line);
+		freeloc(&acts[i].loc);
+	}
+	free(acts);
 }
 
 static void
@@ -1002,7 +1014,7 @@ parse(char *fname)
 	}
 
 	debug("parsing %s", fname);
-	push(FTFILE, fname, fp);
+	push(FTFILE, fp, fname, 0);
 	parseinput();
 
 	return 1;
@@ -1011,6 +1023,7 @@ parse(char *fname)
 void
 inject(char *s)
 {
+	push(FTFILE, NULL, "<internal>", 0);
 	push(FTEXPAN, s);
 	parseinput();
 }
