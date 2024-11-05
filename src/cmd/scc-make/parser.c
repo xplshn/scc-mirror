@@ -613,6 +613,7 @@ expansion(Target *tp)
 		return;
 	}
 
+	s = NULL;
 	namei = repli = toi = 0;
 	st = STBEGIN;
 
