@@ -716,16 +716,20 @@ expandstring(char *line, Target *tp, struct loc *loc)
 	n = 0;
 	s = NULL;
 	while ((c = nextc()) != EOF) {
-		if (c == '$') {
-			if ((c = nextc()) != '$') {
-				back(c);
-				expansion(tp);
-				continue;
-			}
+		if (c != '$') {
+			s = erealloc(s, ++n);
+			s[n-1] = c;
+			continue;
 		}
 
-		s = erealloc(s, ++n);
-		s[n-1] = c;
+		if ((c = nextc()) == '$') {
+			s = erealloc(s, n += 2);
+			s[n-2] = '$';
+			s[n-1] = '$';
+		} else {
+			back(c);
+			expansion(tp);
+		}
 	}
 
 	s = erealloc(s, n+1);

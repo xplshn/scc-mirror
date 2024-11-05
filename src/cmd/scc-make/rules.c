@@ -175,9 +175,9 @@ addrule(char *target, struct action  *acts, int n)
 static int
 execline(Target *tp, char *line, int ignore, int silence)
 {
-	char *s;
+	char *s, *t;
 	Target *p, **q;
-	int r, at, plus, minus;
+	int r, at, plus, minus, l;
 
 	debug("executing '%s'", line);
 
@@ -199,6 +199,14 @@ execline(Target *tp, char *line, int ignore, int silence)
 	}
 
 out_loop:
+	/* unescape $$ */
+	for (l = strlen(s)+1, t = s; *t; --l, ++t) {
+		if (t[0] == '$' && t[1] == '$') {
+			memmove(t+1, t+2, l-2);
+			l--;
+		}
+	}
+
 	if (tflag && !plus)
 		return 0;
 
