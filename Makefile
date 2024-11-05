@@ -10,6 +10,11 @@ check_config: FORCE
 	fi
 
 config: FORCE
+	@if ! command -v qbe > /dev/null;\
+	then \
+		echo "qbe code generator is required to use scc" >&2;\
+		exit 1;\
+	fi
 	./scripts/config
 	$(MAKE) -f main.mk config
 
