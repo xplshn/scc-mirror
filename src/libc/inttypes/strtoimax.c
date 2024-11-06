@@ -9,7 +9,7 @@
 #undef strtoimax
 
 intmax_t
-strtol(const char * restrict ptr, char ** restrict end, int base)
+strtoimax(const char * restrict ptr, char ** restrict end, int base)
 {
 	int d, sign = -1;
 	intmax_t n;
