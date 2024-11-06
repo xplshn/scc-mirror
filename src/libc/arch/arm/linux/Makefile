@@ -15,7 +15,7 @@ GENOBJS =\
 	_lseek.$O\
 	_openat.$O\
 	_read.$O\
-	_sigaction.$O\
+	__sigaction.$O\
 	_sys_brk.$O\
 	_write.$O\
 	_wait4.$O\
@@ -29,11 +29,11 @@ OBJS =\
 
 all: $(OBJS) $(CRT)
 
-crt.o: ../crt-posix.s
+$(CRT): ../crt-posix.s
 
-$(GENSRC): syscall.lst
-	./gensys.sh $(@:.s=)
+$(GENOBJS): syscall.lst
+	./gensys.sh $(@:.$O=)
+	$(AS) $(PROJ_ASFLAGS) -o $@ $(@:.$O=.s)
 
 clean:
-	rm -f $(GENSRC)
-	rm -f syscall _sys_errlist.c
+	rm -f $(GENOBJS:.$O=.s) _sys_errlist.c

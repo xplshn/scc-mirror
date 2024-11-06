@@ -1,5 +1,5 @@
 ABI = sysv
-ARCH = arm32
+ARCH = arm
 SYS = linux
 FORMAT = elf
 O = 5l
