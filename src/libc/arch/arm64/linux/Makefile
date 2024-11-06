@@ -30,7 +30,7 @@ $(CRT): ../crt-posix.s
 
 $(GENOBJS): syscall.lst
 	./gensys.sh $(@:.$O=)
-	$(AS) $(PROJ_ASFLAGS) $(@:.$O=.s)
+	$(AS) $(PROJ_ASFLAGS) -o $@ $(@:.$O=.s)
 
 clean:
 	rm -f $(GENOBJS:.$O=.s) _sys_errlist.c
