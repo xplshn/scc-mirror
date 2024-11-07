@@ -3,7 +3,8 @@ libexec
 libexec/scc
 lib
 lib/scc
-lib/scc/ppc32-linux
+lib/scc/ppc-linux
+lib/scc/ppc64-linux
 lib/scc/i386-linux
 lib/scc/arm-linux
 lib/scc/arm64-linux

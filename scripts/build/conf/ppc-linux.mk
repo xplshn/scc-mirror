@@ -1,5 +1,5 @@
 ABI = sysv
-ARCH = ppc32
+ARCH = ppc
 SYS = linux
 FORMAT = elf
 O = ql
