@@ -1,10 +1,9 @@
 .POSIX:
 
-ROOT=../../..
-AR = $(ROOT)/bin/scc-ar
+BINDIR = ../../../bin/
 
 all: master.a
-	@AR=$(AR) ./chktest.sh
+	BINDIR=$(BINDIR) ./chktest.sh
 
 master.a: mkmaster.sh
 	@./mkmaster.sh

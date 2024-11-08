@@ -10,7 +10,7 @@ trap "rm -f file.a $tmp1 $tmp2" 0 2 3 15
 #and now with no members in command line
 
 cp master.a file.a
-$EXEC $AR -p file.a > $tmp1
+$EXEC ${BINDIR}scc-ar -p file.a > $tmp1
 
 cat <<! > $tmp2
 This is the first file,

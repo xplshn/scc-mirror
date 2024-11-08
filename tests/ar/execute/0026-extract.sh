@@ -11,7 +11,7 @@ trap "rm -f file* $tmp1 $tmp2" 0 2 3 15
 #extract all members
 
 cp master.a file.a
-$EXEC $AR -xv file.a file1 file2 file3
+$EXEC ${BINDIR}scc-ar -xv file.a file1 file2 file3
 
 cat <<EOF > $tmp1
 This is the first file,

@@ -11,7 +11,7 @@ trap "rm -f file* $tmp1 $tmp2" 0 2 3 15
 #extract 3rd member
 
 cp master.a file.a
-$EXEC $AR -xv file.a file3
+$EXEC ${BINDIR}scc-ar -xv file.a file3
 
 cat <<EOF > $tmp1
 and at the end, this is the last file

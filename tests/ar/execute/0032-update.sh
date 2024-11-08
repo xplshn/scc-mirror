@@ -13,9 +13,9 @@ trap "rm -f file* $tmp1 $tmp2" 0 2 3 15
 echo First > file1
 
 cp master.a file.a
-$EXEC $AR -rv file.a file1
+$EXEC ${BINDIR}scc-ar -rv file.a file1
 
-$EXEC $AR -p file.a file1 > $tmp1
+$EXEC ${BINDIR}scc-ar -p file.a file1 > $tmp1
 
 cat <<EOF > $tmp2
 First
