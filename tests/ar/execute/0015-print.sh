@@ -11,7 +11,7 @@ trap "rm -f file.a $tmp1 $tmp2" 0 2 3 15
 #print 2nd member with verbose
 
 cp master.a file.a
-scc-ar -pv file.a file2 >$tmp1
+$EXEC $AR -pv file.a file2 >$tmp1
 
 cat <<! > $tmp2
 

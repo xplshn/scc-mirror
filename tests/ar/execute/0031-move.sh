@@ -11,8 +11,8 @@ trap "rm -f file* $tmp1 $tmp2" 0 2 3 15
 #and now, test without parameters
 
 cp master.a file.a
-scc-ar -mv file.a
-scc-ar -t file.a > $tmp1
+$EXEC $AR -mv file.a
+$EXEC $AR -t file.a > $tmp1
 
 cat <<EOF > $tmp2
 file1

@@ -12,7 +12,7 @@ trap "rm -f file.a $tmp1 $tmp2" 0 2 3 15
 
 cp master.a file.a
 
-scc-ar -t file.a file1 > $tmp1
+$EXEC $AR -t file.a file1 > $tmp1
 
 cat <<! > $tmp2
 file1

@@ -5,6 +5,9 @@ ulimit -c 0
 rm -f test.log
 rm -rf file*
 
+export AR=${AR:-scc-ar}
+export TZ=${TZ:-UTC}
+
 for i in *-*.sh
 do
 	printf "Test: %s\n\n" $i >> test.log

@@ -15,9 +15,9 @@ echo Second > file-2
 echo Third > file-3
 
 cp master.a file.a
-scc-ar -qv file.a file-1 file-2 file-3
+$EXEC $AR -qv file.a file-1 file-2 file-3
 
-scc-ar -t file.a file-1 file-2 file-3 > $tmp1
+$EXEC $AR -t file.a file-1 file-2 file-3 > $tmp1
 
 cat <<EOF > $tmp2
 file-1
@@ -27,7 +27,7 @@ EOF
 
 cmp $tmp1 $tmp2
 
-scc-ar -p file.a file-1 file-2 file-3 > $tmp1
+$EXEC $AR -p file.a file-1 file-2 file-3 > $tmp1
 
 cat <<EOF > $tmp2
 First

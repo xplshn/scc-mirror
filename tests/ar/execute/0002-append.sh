@@ -15,10 +15,10 @@ echo Second > file2
 echo Third > file3
 
 rm -f file.a
-scc-ar -qv file.a file1
-scc-ar -qv file.a file2
-scc-ar -qv file.a file3
-scc-ar -t file.a > $tmp1
+$EXEC $AR -qv file.a file1
+$EXEC $AR -qv file.a file2
+$EXEC $AR -qv file.a file3
+$EXEC $AR -t file.a > $tmp1
 
 cat <<EOF > $tmp2
 file1
@@ -28,7 +28,7 @@ EOF
 
 cmp $tmp1 $tmp2
 
-scc-ar -p file.a > $tmp1
+$EXEC $AR -p file.a > $tmp1
 
 cat <<EOF > $tmp2
 First

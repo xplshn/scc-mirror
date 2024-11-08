@@ -1,9 +1,10 @@
 .POSIX:
 
 ROOT=../../..
+AR = $(ROOT)/bin/scc-ar
 
 all: master.a
-	@TZ=UTC PATH=$(ROOT)/bin:$$PATH ./chktest.sh
+	@AR=$(AR) ./chktest.sh
 
 master.a: mkmaster.sh
 	@./mkmaster.sh
