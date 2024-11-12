@@ -1,12 +1,12 @@
 .POSIX:
 
-ROOT=../../..
+BINDIR = ../../../bin/
 
 AS = z80-unknown-coff-as
 OUT = z80.out
 
 all: $(OUT)
-	@PATH=$(ROOT)/bin:$$PATH:. chktest.sh
+	PATH=$(BINDIR):$$PATH ./chktest.sh
 
 tests:
 	@if command -v $(AS) >/dev/null;\
@@ -21,7 +21,7 @@ tests:
 	printf '\tsize/execute\n'
 
 z80.out: master.s
-	z80-unknown-coff-as -o $@ master.s
+	$(AS) -o $@ master.s
 
 clean:
 	rm -f *.a *.out test.log
