@@ -1,13 +1,12 @@
 AS = z80-unknown-coff-as
-AR = ../../../bin/scc-ar
-LD = ../../../bin/scc-ld
-RL = ../../../bin/scc-ranlib
-SZ = ../../../bin/scc-size
+
+BINDIR = ../../../bin/
 
 OBJS   = f1.o f2.o
 OBJLIB = f3.o
 
-all: a.out
+all:
+	PATH=$(BINDIR):$$PATH $(MAKE) a.out
 
 tests:
 	@if command -v $(AS) >/dev/null;\
@@ -22,13 +21,13 @@ tests:
 	printf '\tld/execute\n'
 
 a.out: $(OBJS) f.a
-	$(LD) $(OBJS) f.a >/dev/null 2>&1 || true
+	scc ld $(OBJS) f.a >/dev/null 2>&1 || true
 
 f.a: $(OBJLIB)
-	$(AR) -rv $@ $? >/dev/null 2>&1
+	scc ar -rv $@ $? >/dev/null 2>&1
 
 size:
-	$(SZ) *.o *.a
+	scc size *.o *.a
 
 clean:
 	rm -f *.o *.a a.out core* *.dat
