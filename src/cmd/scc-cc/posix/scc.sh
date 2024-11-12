@@ -12,11 +12,13 @@ then
 	export SCCLIBPREFIX
 fi
 
-case $0 in
-*cpp)
-	exec $SCCPREFIX/bin/scc-cc -E $@
+case $1  in
+cc|cpp|as|ar|addr2line|ld|make|nm|objcopy|objdump|size|strip)
+	tool=$1
+	shift
+	exec $SCCPREFIX/bin/scc-$tool $@
 	;;
-*scc)
+*)
 	exec $SCCPREFIX/bin/scc-cc $@
 	;;
 esac

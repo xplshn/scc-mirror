@@ -29,8 +29,10 @@ After a successful install the following programs are installed:
 	  with the scc libc.
 
 	- scc: A wrapper shell script that allows the execution
-	  of scc-cc from any directory independently of the PREFIX
-	  used in the build.
+	  of any scc tool from any directory independently of the
+	  PREFIX used in the build. The tool can be selected as
+	  the first parameter (like for example `scc as` or `scc ar`)
+	  and by default is cc.
 
 	- scc-addr2line: A work in progress to implement a tool
 	  that is able to translate a hexadecimal address into
@@ -49,10 +51,8 @@ After a successful install the following programs are installed:
 	  library files. This value can be overriden by the
 	  `SCCPREFIX` environment variable.
 
-	- scc-cpp: A wrapper shell script that only preprocess
-	  the file, and it allows the execution from any
-	  directory independently of the PREFIX used in the
-	  build.
+	- scc-cpp: A wrapper shell script that uses scc-cc
+	  to preprocess a file without compiling it.
 
 	- scc-ld: A work in progress to implement a linker for
 	  the scc toolchain.
