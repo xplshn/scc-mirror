@@ -10,7 +10,7 @@ yeah!
 done
 EOF
 
-scc-make -f- <<'EOF' > $tmp1 2>&1
+scc make -f- <<'EOF' > $tmp1 2>&1
 VAR =\
         all\
         f1\

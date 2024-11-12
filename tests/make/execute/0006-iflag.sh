@@ -11,7 +11,7 @@ sh: no-valid-program: not found
 -i
 EOF
 
-scc-make -if test.mk error print-makeflags 2>&1 |
+scc make -if test.mk error print-makeflags 2>&1 |
 sed 's/sh:.*: *no-/sh: no-/' > $tmp1 2>&1
 
 diff $tmp1 $tmp2

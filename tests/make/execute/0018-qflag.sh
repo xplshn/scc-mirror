@@ -11,7 +11,7 @@ pass
 EOF
 
 (set -e
- scc-make -qf test.mk print-makeflags-always
+ scc make -qf test.mk print-makeflags-always
  echo pass) > $tmp1 2>&1
 
 diff $tmp1 $tmp2

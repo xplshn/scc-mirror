@@ -14,6 +14,6 @@ cat > $tmp2 <<EOF
 Hello World!, makefile!
 EOF
 
-scc-make > $tmp1 2>&1
+scc make > $tmp1 2>&1
 
 diff $tmp1 $tmp2

@@ -15,7 +15,7 @@ make: warning: target follow not remade because of errors
 EOF
 
 (set -e
- MAKEFLAGS=-k scc-make  -f test.mk print-makeflags follow
+ MAKEFLAGS=-k scc make  -f test.mk print-makeflags follow
  echo fail) 2>&1 |
 sed 's/:.*: *no-/: no-/' > $tmp1
 

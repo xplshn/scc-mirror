@@ -17,7 +17,7 @@ file1.c file2.c
 all
 EOF
 
-scc-make -f- <<'EOF' > $tmp2 2>&1
+scc make -f- <<'EOF' > $tmp2 2>&1
 O = o
 SRC = file1.c  file2.c
 OBJ = $(SRC:.c=.$O)
@@ -37,7 +37,7 @@ all:
 EOF
 diff $tmp1 $tmp2
 
-scc-make -f- <<'EOF' > $tmp2 2>&1
+scc make -f- <<'EOF' > $tmp2 2>&1
 O = o
 SRC = file1.c  file2.c
 OBJ = ${SRC:.c=.$O}

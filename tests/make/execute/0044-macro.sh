@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo Hello World! > $tmp2
 
-scc-make -f - <<'EOF' > $tmp1 2>&1
+scc make -f - <<'EOF' > $tmp1 2>&1
 # Generic rules
 .SUFFIXES:
 .SUFFIXES: .c .map .dump .elf .bin\

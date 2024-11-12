@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo file1.o file2.o > $tmp2
 
-scc-make -f- <<'EOF' > $tmp1 2>&1
+scc make -f- <<'EOF' > $tmp1 2>&1
 SRC = file1.c file2.c
 
 all:

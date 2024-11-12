@@ -10,6 +10,6 @@ cat > $tmp2 <<EOF
 touch print-makeflags-always
 EOF
 
-MAKEFLAGS=-t scc-make -f test.mk print-makeflags-always > $tmp1 2>&1
+MAKEFLAGS=-t scc make -f test.mk print-makeflags-always > $tmp1 2>&1
 
 diff -u $tmp1 $tmp2 && test -f print-makeflags-always 

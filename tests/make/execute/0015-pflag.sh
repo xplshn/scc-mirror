@@ -73,7 +73,7 @@ all:
 
 EOF
 
-(scc-make -pf - > $tmp1 2>&1) <<'EOF'
+(scc make -pf - > $tmp1 2>&1) <<'EOF'
 all:
 EOF
 

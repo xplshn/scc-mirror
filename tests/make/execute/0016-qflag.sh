@@ -10,7 +10,7 @@ pass
 EOF
 
 (set -e
- scc-make -qf test.mk test.mk
+ scc make -qf test.mk test.mk
  echo pass) > $tmp1 2>&1
 
 diff $tmp1 $tmp2

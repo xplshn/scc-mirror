@@ -17,8 +17,8 @@ all: f.o
 EOF
 
 (touch f.c f.h
-scc-make -f $tmp2
+scc make -f $tmp2
 touch f.c
-scc-make -f $tmp2) > $tmp3
+scc make -f $tmp2) > $tmp3
 
 diff $tmp1 $tmp3

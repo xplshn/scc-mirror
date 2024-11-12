@@ -12,7 +12,7 @@ sh: no-valid-program: not found
 make: error: target error: error 32512
 EOF
 
-MAKEFLAGS=-k scc-make -Sf test.mk print-makeflags follow 2>&1 |
+MAKEFLAGS=-k scc make -Sf test.mk print-makeflags follow 2>&1 |
 sed 's/:.*: no-/: no-/' > $tmp1
 
 diff $tmp1 $tmp2

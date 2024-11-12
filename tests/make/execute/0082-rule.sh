@@ -11,7 +11,7 @@ cat > $tmp2 <<EOF
 make: error: don't know how to make f
 EOF
 
-scc-make -sf- <<'EOF' > $tmp1 2>&1
+scc make -sf- <<'EOF' > $tmp1 2>&1
 
 .SUFFIXES:
 

@@ -8,7 +8,7 @@ tmp2=tmp2.$$
 echo Hello World! > $tmp2
 
 (set -e
- scc-make -f- <<'EOF'
+ scc make -f- <<'EOF'
 .POSIX:
 
 all:

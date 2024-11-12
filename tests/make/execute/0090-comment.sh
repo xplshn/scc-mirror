@@ -9,7 +9,7 @@ cat >$tmp2 <<EOF
 Hello World!
 EOF
 
-scc-make -f- <<'EOF' > $tmp1 2>&1
+scc make -f- <<'EOF' > $tmp1 2>&1
 all:     # This is a comment
 	@echo Hello World!
 EOF

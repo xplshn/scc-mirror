@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo Hello World! > $tmp2
 
-scc-make -f- <<'EOF' > $tmp1 2>&1
+scc make -f- <<'EOF' > $tmp1 2>&1
 VAR1 = one
 VAR = $(VAR1)
 VAR1 = print

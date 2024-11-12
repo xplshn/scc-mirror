@@ -10,6 +10,6 @@ touch $tmp2
 touch file2
 touch file3
 
-scc-make -f test.mk file3  > $tmp1 2>&1
+scc make -f test.mk file3  > $tmp1 2>&1
 
 diff $tmp1 $tmp2

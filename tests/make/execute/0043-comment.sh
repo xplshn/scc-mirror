@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo Hello World! > $tmp2
 
-scc-make -f - <<'EOF' > $tmp1
+scc make -f - <<'EOF' > $tmp1
 all:
 	@echo Hello World!
 # blank line

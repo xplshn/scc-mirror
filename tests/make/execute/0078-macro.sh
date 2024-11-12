@@ -6,7 +6,7 @@ tmp1=tmp1.$$
 tmp2=tmp2.$$
 
 echo SHELL=/bin/sh > $tmp2
-SHELL=foo scc-make -f- SHELL=/bin/sh <<'EOF'
+SHELL=foo scc make -f- SHELL=/bin/sh <<'EOF'
 all:
 	@echo $$SHELL
 EOF

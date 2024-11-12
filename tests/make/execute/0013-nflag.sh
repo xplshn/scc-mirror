@@ -12,7 +12,7 @@ correct
 EOF
 
 (set -e
- MAKEFLAGS=-n scc-make -f test.mk print-makeflags error
+ MAKEFLAGS=-n scc make -f test.mk print-makeflags error
  echo correct) > $tmp1 2>&1
 
 diff $tmp1 $tmp2 

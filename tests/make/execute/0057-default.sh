@@ -9,7 +9,7 @@ cat > $tmp2 <<'EOF'
 make: error: <stdin>:3: DEFAULT rule with prerequisites
 EOF
 
-scc-make -f- <<EOF > $tmp1 2>&1
+scc make -f- <<EOF > $tmp1 2>&1
 .DEFAULT: all
 	@echo Hello World!
 EOF

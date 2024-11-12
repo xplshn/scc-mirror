@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo Bye world! > $tmp2
 
-scc-make -f test.mk -f - hello <<EOF > $tmp1 2>&1
+scc make -f test.mk -f - hello <<EOF > $tmp1 2>&1
 hello:
 	@echo Bye world!
 EOF

@@ -14,7 +14,7 @@ Hello World!
 make: warning: target follow not remade because of errors
 EOF
 
-MAKEFLAGS=-S scc-make -kf test.mk print-makeflags follow 2>&1 |
+MAKEFLAGS=-S scc make -kf test.mk print-makeflags follow 2>&1 |
 sed 's/:.*: *no-/: no-/' > $tmp1
 
 diff $tmp1 $tmp2

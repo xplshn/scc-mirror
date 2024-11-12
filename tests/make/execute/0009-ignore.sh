@@ -11,7 +11,7 @@ sh: no-valid-program: not found
 make: error: don't know how to make hello
 EOF
 
-(scc-make -f - error hello 2>&1 |
+(scc make -f - error hello 2>&1 |
 sed 's/sh:.*: *no-/sh: no-/' > $tmp1) <<EOF
 .IGNORE:
 

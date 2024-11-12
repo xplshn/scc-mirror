@@ -9,7 +9,7 @@ cat > $tmp1 <<EOF
 Hello World!
 EOF
 
-scc-make -f- MK=test.mk hello <<'EOF' > $tmp2 2>&1
+scc make -f- MK=test.mk hello <<'EOF' > $tmp2 2>&1
 MK = fail.mk
 include $(MK)
 EOF

@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo Hello World!> $tmp2
 
-scc-make -f- all <<'EOF' > $tmp1 2>&1
+scc make -f- all <<'EOF' > $tmp1 2>&1
 TARGET = print
 
 all: $(TARGET)

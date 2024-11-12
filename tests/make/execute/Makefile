@@ -1,9 +1,9 @@
 .POSIX:
 
-ROOT=../../..
+BINDIR = ../../../bin/
 
 all:
-	@PATH=$(ROOT)/bin:$$PATH ./chktest.sh
+	PATH=$(BINDIR):$$PATH ./chktest.sh
 
 tests:
 	@$(MAKE) |\

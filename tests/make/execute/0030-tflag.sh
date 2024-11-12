@@ -12,6 +12,6 @@ touch file.c
 touch file.o
 EOF
 
-scc-make -tf test.mk file.o > $tmp1 2>&1
+scc make -tf test.mk file.o > $tmp1 2>&1
 
 diff $tmp1 $tmp2 && test -f file.c -a -f file.o

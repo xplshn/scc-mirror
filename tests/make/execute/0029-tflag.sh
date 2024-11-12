@@ -8,6 +8,6 @@ tmp2=tmp2.$$
 cat > $tmp2 <<EOF
 EOF
 
-scc-make -tf test.mk file2 > $tmp1 2>&1
+scc make -tf test.mk file2 > $tmp1 2>&1
 
 diff $tmp1 $tmp2 && ! test -f file2

@@ -9,6 +9,6 @@ cat > $tmp2 <<EOF
 touch file1
 EOF
 
-scc-make -tf test.mk file1 > $tmp1 2>&1
+scc make -tf test.mk file1 > $tmp1 2>&1
 
 diff $tmp1 $tmp2 && test -f file1

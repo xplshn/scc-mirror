@@ -10,6 +10,6 @@ cat > $tmp2 <<EOF
 EOF
 touch file.c
 
-scc-make -rf test.mk file.o print-makeflags > $tmp1 2>&1
+scc make -rf test.mk file.o print-makeflags > $tmp1 2>&1
 
 diff $tmp1 $tmp2

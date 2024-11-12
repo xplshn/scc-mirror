@@ -7,6 +7,6 @@ tmp2=tmp2.$$
 
 echo > $tmp2
 
-MAKEFLAGS='-S CC=pcc' scc-make -f test.mk print-env-cc > $tmp1 2>&1
+MAKEFLAGS='-S CC=pcc' scc make -f test.mk print-env-cc > $tmp1 2>&1
 
 diff $tmp1 $tmp2

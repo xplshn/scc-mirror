@@ -11,7 +11,7 @@ touch t1
 touch t2
 EOF
 
-scc-make -f- <<'EOF' > $tmp1 2>&1
+scc make -f- <<'EOF' > $tmp1 2>&1
 all: t1 t2
 
 t1 t2: t

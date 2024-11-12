@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo hello-hello > $tmp2
 
-scc-make -f- <<'EOF' > $tmp1 2>&1
+scc make -f- <<'EOF' > $tmp1 2>&1
 VAR = hello
 all:
 	@echo ${VAR}-$(VAR)

@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo Hello World! > $tmp2
 
-scc-make -f- no-target <<EOF > $tmp1 2>&1
+scc make -f- no-target <<EOF > $tmp1 2>&1
 .DEFAULT:
 	@echo Hello World!
 EOF

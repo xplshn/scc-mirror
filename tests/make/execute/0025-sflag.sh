@@ -10,6 +10,6 @@ cat >$tmp2 <<EOF
 Hello World!
 EOF
 
-MAKEFLAGS=-s scc-make -f test.mk print-makeflags echo-hello > $tmp1 2>&1
+MAKEFLAGS=-s scc make -f test.mk print-makeflags echo-hello > $tmp1 2>&1
 
 diff $tmp1 $tmp2

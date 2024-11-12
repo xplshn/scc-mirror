@@ -10,7 +10,7 @@ touch $tmp3
 
 echo Hello World! > $tmp2
 
-scc-make -f- hello <<EOF > $tmp1 2>&1
+scc make -f- hello <<EOF > $tmp1 2>&1
 FILE = test.mk
 F = $tmp3
 

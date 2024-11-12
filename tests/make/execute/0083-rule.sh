@@ -8,7 +8,7 @@ tmp2=tmp2.$$
 echo dude > f.c
 echo hello > $tmp2
 
-(scc-make -f- <<'EOF'
+(scc make -f- <<'EOF'
 f.o:
 	@echo hello > $@
 

@@ -7,7 +7,7 @@ tmp2=tmp2.$$
 
 echo CC=tcc > $tmp2
 
-CC=dcc scc-make -f- <<'EOF' > $tmp1 2>&1
+CC=dcc scc make -f- <<'EOF' > $tmp1 2>&1
 CC=tcc
 
 all:

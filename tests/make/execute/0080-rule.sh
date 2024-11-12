@@ -8,7 +8,7 @@ echo hello > $tmp
 
 echo hello > f.c
 
-scc-make -sf- <<'EOF'
+scc make -sf- <<'EOF'
 .c.o:
 	cp $< $@
 

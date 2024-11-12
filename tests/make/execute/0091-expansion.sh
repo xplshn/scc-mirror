@@ -10,7 +10,7 @@ But before!
 Hello World!
 EOF
 
-scc-make -f- <<'EOF' > $tmp1 2>&1
+scc make -f- <<'EOF' > $tmp1 2>&1
 STARGET = all
 
 b.$(STARGET): b$(STARGET)

@@ -12,7 +12,7 @@ fail
 EOF
 
 (set -e
- scc-make -if- <<'EOF'
+ scc make -if- <<'EOF'
 .POSIX:
 
 all:
