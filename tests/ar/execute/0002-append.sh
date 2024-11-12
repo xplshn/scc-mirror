@@ -15,10 +15,10 @@ echo Second > file2
 echo Third > file3
 
 rm -f file.a
-$EXEC ${BINDIR}scc-ar -qv file.a file1
-$EXEC ${BINDIR}scc-ar -qv file.a file2
-$EXEC ${BINDIR}scc-ar -qv file.a file3
-$EXEC ${BINDIR}scc-ar -t file.a > $tmp1
+$EXEC scc ar -qv file.a file1
+$EXEC scc ar -qv file.a file2
+$EXEC scc ar -qv file.a file3
+$EXEC scc ar -t file.a > $tmp1
 
 cat <<EOF > $tmp2
 file1
@@ -28,7 +28,7 @@ EOF
 
 cmp $tmp1 $tmp2
 
-$EXEC ${BINDIR}scc-ar -p file.a > $tmp1
+$EXEC scc ar -p file.a > $tmp1
 
 cat <<EOF > $tmp2
 First

@@ -11,8 +11,8 @@ trap "rm -f file* $tmp1 $tmp2" 0 2 3 15
 #move 1st without specifier
 
 cp master.a file.a
-$EXEC ${BINDIR}scc-ar -mv file.a file1
-$EXEC ${BINDIR}scc-ar -t file.a > $tmp1
+$EXEC scc ar -mv file.a file1
+$EXEC scc ar -t file.a > $tmp1
 
 cat <<EOF > $tmp2
 file2

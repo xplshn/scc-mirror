@@ -10,9 +10,9 @@ trap "rm -f file.a" 0 2 3 15
 
 cp master.a file.a
 
-$EXEC ${BINDIR}scc-ar -dv file.a file2
+$EXEC scc ar -dv file.a file2
 
-if $EXEC ${BINDIR}scc-ar -tv file.a file2
+if $EXEC scc ar -tv file.a file2
 then
 	echo file-2 was not deleted >&2
 	exit 1

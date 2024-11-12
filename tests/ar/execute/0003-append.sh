@@ -15,9 +15,9 @@ echo Second > file-2
 echo Third > file-3
 
 cp master.a file.a
-$EXEC ${BINDIR}scc-ar -qv file.a file-1 file-2 file-3
+$EXEC scc ar -qv file.a file-1 file-2 file-3
 
-$EXEC ${BINDIR}scc-ar -t file.a file-1 file-2 file-3 > $tmp1
+$EXEC scc ar -t file.a file-1 file-2 file-3 > $tmp1
 
 cat <<EOF > $tmp2
 file-1
@@ -27,7 +27,7 @@ EOF
 
 cmp $tmp1 $tmp2
 
-$EXEC ${BINDIR}scc-ar -p file.a file-1 file-2 file-3 > $tmp1
+$EXEC scc ar -p file.a file-1 file-2 file-3 > $tmp1
 
 cat <<EOF > $tmp2
 First

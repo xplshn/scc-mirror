@@ -11,7 +11,7 @@ trap "rm -f file.a $tmp1 $tmp2" 0 2 3 15
 #print 3rd member
 
 cp master.a file.a
-$EXEC ${BINDIR}scc-ar -t file.a file3 > $tmp1
+$EXEC scc ar -t file.a file3 > $tmp1
 
 cat <<! > $tmp2
 file3

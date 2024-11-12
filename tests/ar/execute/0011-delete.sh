@@ -11,7 +11,7 @@ cp master.a file.a
 
 last=`ls -l file.a | awk '{print $6,$7,$8}'`
 
-if ! $EXEC ${BINDIR}scc-ar -dv file.a
+if ! $EXEC scc ar -dv file.a
 then
 	echo ar returned with error when no members
 	exit 1
