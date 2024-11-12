@@ -1,9 +1,10 @@
 .POSIX:
 
 ROOT=../../../
+BINDIR=$(ROOT)/bin
 
 all:
-	@PATH=$(ROOT)/libexec/scc/:$(ROOT)/bin:$$PATH ./chktest.sh
+	@BINDIR=$(BINDIR) ./chktest.sh
 
 tests:
 	@$(MAKE) |\

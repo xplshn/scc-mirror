@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -e
-cpu=${1?}
+cpu=${1?'missed cpu argument'}
 exec >>test.log
 exec 2>&1
 
@@ -11,7 +11,7 @@ file=$cpu.s
 
 trap "rm -f a.out $tmp1 $tmp2" 0 2 3
 
-as-$cpu $file
+$(BINDIR)scc-as -m $cpu $file
 
 sed -n '/^\#/ ! {
 	/\#/ ! d
