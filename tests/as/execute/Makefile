@@ -4,7 +4,7 @@ ROOT=../../../
 BINDIR=$(ROOT)/bin
 
 all:
-	@BINDIR=$(BINDIR) ./chktest.sh
+	PATH=$(BINDIR):$$PATH ./chktest.sh
 
 tests:
 	@$(MAKE) |\

@@ -11,7 +11,7 @@ file=$cpu.s
 
 trap "rm -f a.out $tmp1 $tmp2" 0 2 3
 
-$(BINDIR)scc-as -m $cpu $file
+scc as -m $cpu $file
 
 sed -n '/^\#/ ! {
 	/\#/ ! d
