@@ -10,7 +10,7 @@ rm -f f.a
 scc-ar -qv f.a z80.out
 cp z80.out f.out
 scc-ar -qv f.a f.out
-scc-nm -A f.a z80.out > $tmp1
+scc nm -A f.a z80.out > $tmp1
 
 cat <<! > $tmp2
 f.a[z80.out]: 0000000000000000 b .bss

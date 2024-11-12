@@ -1,12 +1,12 @@
 .POSIX:
 
-ROOT=../../..
+BINDIR = ../../../bin/
 
 OUT = z80.out
 AS = z80-unknown-coff-as
 
 all: $(OUT)
-	@PATH=$(ROOT)/bin:$$PATH:. chktest.sh
+	PATH=$(BINDIR):$$PATH ./chktest.sh
 
 tests:
 	@if command -v $(AS) >/dev/null;\
