@@ -256,6 +256,9 @@ secflags(char *attr)
 		case 'a':
 			flags |= SABS;
 			break;
+		/* TODO: What happens with SRELOC ? */
+		default:
+			abort();
 		}
 	}
 

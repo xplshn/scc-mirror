@@ -16,6 +16,7 @@ coff32setsec(Obj *obj, int *idx, Section *sec)
 	Coff32 *coff = obj->data;
 	FILHDR *hdr = &coff->hdr;
 
+	/* TODO: what happens with SABS? */
 	switch (sec->type) {
 	case 'D':
 		switch (sec->flags) {
