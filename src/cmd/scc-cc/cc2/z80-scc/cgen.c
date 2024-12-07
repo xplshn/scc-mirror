@@ -26,8 +26,7 @@ lhs(Node *np)
 	switch (np->op) {
 	case OMEM:
 	case OAUTO:
-		*new = *np;
-		return new;
+		return np;
 	case OPTR:
 		return rhs(np->left);
 	case OFIELD:
@@ -90,7 +89,7 @@ cgen(Node *np)
 		code(ASRET, NULL, p, NULL);
 		break;
 	case OBSWITCH:
-		swtch(rhs(np->left);
+		swtch(rhs(np->left));
 		break;
 	default:
 		rhs(np);
