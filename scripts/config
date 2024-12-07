@@ -10,7 +10,8 @@ case $sys in
 openbsd)
 	echo TOOL=${TOOL:-clang}
 	echo HOST=obsd
-	echo ARFLAGS="${ARFLAGS:--rv}" NOPIE_LDFLAGS=-no-pie
+	echo ARFLAGS="${ARFLAGS:--rv}"
+	echo NOPIE_LDFLAGS=-no-pie
 	;;
 netbsd)
 	#TODO: send a patch to NetBSD to solve this problem
