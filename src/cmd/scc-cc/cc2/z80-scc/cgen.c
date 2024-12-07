@@ -11,17 +11,17 @@ swtch(Node *idx)
 }
 
 static Node *
-rhs(Node *np, Node *ret)
+rhs(Node *np)
 {
 }
 
 static Node *
-field(Node *np, Node *ret, int islhs)
+field(Node *np, int islhs)
 {
 }
 
 static Node *
-lhs(Node *np, Node *new)
+lhs(Node *np)
 {
 	switch (np->op) {
 	case OMEM:
@@ -29,9 +29,9 @@ lhs(Node *np, Node *new)
 		*new = *np;
 		return new;
 	case OPTR:
-		return rhs(np->left, new);
+		return rhs(np->left);
 	case OFIELD:
-		return field(np, new, 1);
+		return field(np, 1);
 	default:
 		abort();
 	}
@@ -63,7 +63,7 @@ bool(Node *np, Symbol *true, Symbol *false)
 	default:
 		label2node(&ifyes, true);
 		label2node(&ifno, false);
-		code(ASBRANCH, rhs(np, &ret), &ifyes, &ifno);
+		code(ASBRANCH, rhs(np), &ifyes, &ifno);
 		break;
 	}
 }
@@ -86,16 +86,14 @@ cgen(Node *np)
 		bool(np->left, np->u.sym, next->label);
 		break;
 	case ORET:
-		p = np->left;
-		if (p)
-			p = rhs(np->left, &aux);
+		p = (np->left) ? rhs(np->left) : NULL;
 		code(ASRET, NULL, p, NULL);
 		break;
 	case OBSWITCH:
-		swtch(rhs(np->left, &aux));
+		swtch(rhs(np->left);
 		break;
 	default:
-		rhs(np, &aux);
+		rhs(np);
 		break;
 	}
 	return NULL;
