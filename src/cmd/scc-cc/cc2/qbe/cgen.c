@@ -121,8 +121,6 @@ static unsigned char i2f_conv[4][4][2] = {
 	}
 };
 
-extern Type int32type, uint32type, ptrtype;
-
 /*
  * This is strongly influenced by
  * http://plan9.bell-labs.com/sys/doc/compiler.ps (/sys/doc/compiler.ps)
