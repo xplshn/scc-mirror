@@ -171,7 +171,7 @@ setlabel(Symbol *sym)
 {
 	if (!sym)
 		return;
-	code(0, NULL, NULL, NULL);
+	code(ASLABEL, NULL, NULL, NULL);
 	pc->label = sym;
 	sym->u.inst = pc;
 }

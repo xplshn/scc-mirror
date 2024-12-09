@@ -2,8 +2,8 @@
 
 #include <scc/scc.h>
 
-#include "arch.h"
 #include "../cc2.h"
+#include "arch.h"
 
 static void
 swtch(Node *idx)

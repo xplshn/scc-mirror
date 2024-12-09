@@ -1,6 +1,5 @@
 enum asmop {
-	ASLABEL = 0,
-	ASSTB,
+	ASSTB = ASLABEL + 1,
 	ASSTH,
 	ASSTW,
 	ASSTL,

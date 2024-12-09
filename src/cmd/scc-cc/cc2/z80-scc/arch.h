@@ -1,5 +1,5 @@
 enum asmop {
-	ASJMP = 0,
+	ASJMP = ASLABEL + 1,
 	ASRET,
 	ASBRANCH,
 };

@@ -1,3 +1,5 @@
+#define ASLABEL 0
+
 enum iflags {
 	BBENTRY =    1,        /* basic block entry */
 };

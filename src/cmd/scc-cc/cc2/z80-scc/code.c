@@ -4,8 +4,8 @@
 #include <scc/cstd.h>
 #include <scc/scc.h>
 
-#include "arch.h"
 #include "../cc2.h"
+#include "arch.h"
 
 enum segment {
 	CODESEG,
