@@ -193,11 +193,6 @@ defvar(Symbol *sym)
 }
 
 void
-newfun(void)
-{
-}
-
-void
 writeout(void)
 {
 }

@@ -155,11 +155,7 @@ size2asm(Type *tp)
 	printf(s, tp->size);
 }
 
-void
-newfun()
-{
-	offpar = offvar = 0;
-}
+/* TODO: how are initialized offpar and offvar??? */
 
 void
 defpar(Symbol *sym)
