@@ -119,6 +119,11 @@ enum asmop {
 	ASEXTS,
 	ASTRUNCD,
 
+	ASNEGL,
+	ASNEGW,
+	ASNEGS,
+	ASNEGD,
+
 	ASJMP,
 	ASBRANCH,
 	ASRET,

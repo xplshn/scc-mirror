@@ -147,6 +147,11 @@ static struct opdata {
 	[ASEXTS] = {.fun = unary, .txt = "exts", .letter = 'd'},
 	[ASTRUNCD] = {.fun = unary, .txt = "truncd", .letter = 's'},
 
+	[ASNEGL] = {.fun = unary, .txt = "neg", .letter ='l'},
+	[ASNEGW] = {.fun = unary, .txt = "neg", .letter ='w'},
+	[ASNEGS] = {.fun = unary, .txt = "neg", .letter ='s'},
+	[ASNEGD] = {.fun = unary, .txt = "neg", .letter ='d'},
+
 	[ASBRANCH] = {.fun = branch},
 	[ASJMP]  = {.fun = jmp},
 	[ASRET]  = {.fun = ret},

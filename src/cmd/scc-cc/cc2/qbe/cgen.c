@@ -29,6 +29,7 @@ static unsigned char opasmw[][2] = {
 	[OBAND] = {ASBANDW, ASBANDW},
 	[OBOR] = {ASBORW, ASBORW},
 	[OBXOR] = {ASBXORW, ASBXORW},
+	[OSNEG] = {ASNEGW, ASNEGW},
 };
 
 static unsigned char opasml[][2] = {
@@ -48,6 +49,7 @@ static unsigned char opasml[][2] = {
 	[OBAND] = {ASBANDL, ASBANDL},
 	[OBOR] = {ASBORL, ASBORL},
 	[OBXOR] = {ASBXORL, ASBXORL},
+	[OSNEG] = {ASNEGL, ASNEGL},
 };
 
 static unsigned char opasms[][2] = {
@@ -61,6 +63,7 @@ static unsigned char opasms[][2] = {
 	[OGE] = {ASGES, ASGES},
 	[OEQ] = {ASEQS, ASEQS},
 	[ONE] = {ASNES, ASNES},
+	[OSNEG] = {ASNEGS, ASNEGS},
 };
 
 static unsigned char opasmd[][2] = {
@@ -74,6 +77,7 @@ static unsigned char opasmd[][2] = {
 	[OGE] = {ASGED, ASGED},
 	[OEQ] = {ASEQD, ASEQD},
 	[ONE] = {ASNED, ASNED},
+	[OSNEG] = {ASNEGD, ASNEGD},
 };
 
 static unsigned char (*opbin[][2])[2] = {
@@ -183,12 +187,6 @@ sethi(Node *np)
 		np->op = OBXOR;
 		rp = constnode(NULL, ~(TUINT) 0, &np->type);
 		goto binary;
-	case OSNEG:
-		np->op = OSUB;
-		rp = lp;
-		lp = constnode(NULL, 0, &np->type);
-		if ((np->type.flags & INTF) == 0)
-			lp->u.f = 0.0;
 	default:
 	binary:
 		lp = sethi(lp);
@@ -719,6 +717,14 @@ rhs(Node *np)
 	case OCOMMA:
 		rhs(l);
 		return rhs(r);
+	case OSNEG:
+		sign = (tp->flags & SIGNF) == 0;
+		size = tp->size == 8;
+		isfloat = (tp->flags & FLOATF) != 0;
+		op = opbin[isfloat][size][np->op][sign];
+		tmp = tmpnode(tp);
+		code(op, tmp, rhs(l), NULL);
+		return tmp;
 	case OPTR:
 		return load(tp, rhs(l));
 	case OADDR:
