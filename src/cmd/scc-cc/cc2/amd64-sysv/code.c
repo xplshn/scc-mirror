@@ -164,7 +164,7 @@ label(Symbol *sym)
 		break;
 	}
 	if (sym->type.align != 1)
-		printf("\t.align\t%lu\n", sym->type.align );
+		printf("\t.align\t%d\n", sym->type.align);
 	printf("%s:\n", name);
 }
 

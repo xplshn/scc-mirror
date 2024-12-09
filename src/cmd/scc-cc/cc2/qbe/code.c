@@ -559,7 +559,7 @@ asalloc(void)
 	Type *tp = &sym->type;
 	extern Type ptrtype;
 
-	printf("\t%s =%s\talloc%lu\t%lu\n",
+	printf("\t%s =%s\talloc%d\t%lu\n",
 	       symname(sym), size2asm(&ptrtype), tp->align+3 & ~3, tp->size);
 }
 

@@ -154,7 +154,7 @@ typedef struct inst Inst;
 
 struct type {
 	unsigned long size;
-	unsigned long align;
+	unsigned align;
 	unsigned short id;
 	short flags;
 };
