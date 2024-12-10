@@ -195,12 +195,13 @@ struct node {
 };
 
 struct addr {
-        char kind;
-        union {
-                char reg;
-                TUINT i;
-                Symbol *sym;
-        } u;
+	char kind;
+	union {
+		int reg;
+		TUINT i;
+		Symbol *sym;
+		long off;
+	} u;
 };
 
 struct inst {
