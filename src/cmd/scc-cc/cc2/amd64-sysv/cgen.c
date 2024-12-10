@@ -2,8 +2,8 @@
 #include <scc/scc.h>
 #include "../cc2.h"
 
-Node *
-cgen(Node *np)
+void
+genasm(void)
 {
 }
 

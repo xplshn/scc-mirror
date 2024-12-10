@@ -145,3 +145,5 @@ enum asmop {
 	ASVSTAR,
 	ASVARG,
 };
+
+extern void getbblocks(void);

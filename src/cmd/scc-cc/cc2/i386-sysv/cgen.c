@@ -3,8 +3,8 @@
 #include "arch.h"
 #include "../cc2.h"
 
-Node *
-cgen(Node *np)
+void
+genasm(void)
 {
 }
 

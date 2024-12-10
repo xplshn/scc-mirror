@@ -12,6 +12,8 @@
 #define I4BYTES 2
 #define I8BYTES 3
 
+static Node *cgen(Node *);
+
 static unsigned char opasmw[][2] = {
 	[OADD] = {ASADDW, ASADDW},
 	[OSUB] = {ASSUBW, ASSUBW},
@@ -753,7 +755,7 @@ rhs(Node *np)
 	abort();
 }
 
-Node *
+static Node *
 cgen(Node *np)
 {
 	Node aux, *p, *next;
@@ -783,4 +785,11 @@ cgen(Node *np)
 		break;
 	}
 	return NULL;
+}
+
+void
+genasm(void)
+{
+	apply(cgen);
+	getbblocks();
 }

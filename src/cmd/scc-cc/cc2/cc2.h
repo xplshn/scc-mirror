@@ -222,7 +222,7 @@ extern Node *optm_dep(Node *np), *optm_ind(Node *np);
 
 /* cgen.c */
 extern Node *sethi(Node *np);
-extern Node *cgen(Node *np);
+extern void genasm(void);
 
 /* peep.c */
 extern void peephole(void);
@@ -232,7 +232,7 @@ extern void data(Node *np);
 extern void writeout(void), endinit(void);
 extern void code(int op, Node *to, Node *from1, Node *from2);
 extern void defvar(Symbol *), defpar(Symbol *), defglobal(Symbol *);
-extern void setlabel(Symbol *sym), getbblocks(void);
+extern void setlabel(Symbol *);
 extern Node *label2node(Node *np, Symbol *sym);
 extern Node *constnode(Node *np, TUINT n, Type *tp);
 extern Node *tmpnode(Type *);

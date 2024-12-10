@@ -60,8 +60,7 @@ main(int argc, char *argv[])
 		apply(optm_ind);
 		apply(optm_dep);
 		apply(sethi);
-		apply(cgen);
-		getbblocks();  /* TODO: run apply over asm ins too */
+		genasm();
 		peephole();
 		writeout();
 	}
