@@ -15,13 +15,12 @@ include $(PROJECTDIR)/scripts/rules.mk
 MORE_LDLIBS = -lscc
 
 OBJS =\
-	main.o\
-	parser.o\
-	peep.o\
-	symbol.o\
-	node.o\
 	code.o\
+	main.o\
+	node.o\
 	optm.o\
+	parser.o\
+	symbol.o\
 
 TARGET  =\
 	cc2-amd64-sysv\
