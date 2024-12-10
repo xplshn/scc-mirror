@@ -57,8 +57,6 @@ main(int argc, char *argv[])
 
 	while (moreinput()) {
 		parse();
-		apply(optm_ind);
-		apply(optm_dep);
 		apply(sethi);
 		genasm();
 		peephole();

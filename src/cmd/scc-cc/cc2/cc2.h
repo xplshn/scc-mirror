@@ -217,9 +217,6 @@ extern void error(unsigned nerror, ...);
 /* parse.c */
 extern void parse(void);
 
-/* optm.c */
-extern Node *optm_dep(Node *np), *optm_ind(Node *np);
-
 /* cgen.c */
 extern Node *sethi(Node *np);
 extern void genasm(void);

@@ -18,7 +18,6 @@ OBJS =\
 	code.o\
 	main.o\
 	node.o\
-	optm.o\
 	parser.o\
 	symbol.o\
 
