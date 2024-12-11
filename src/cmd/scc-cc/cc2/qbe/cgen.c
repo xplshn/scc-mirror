@@ -484,7 +484,7 @@ function(void)
 }
 
 static void
-swtch_if(Node *idx)
+swtch(Node *idx)
 {
 	Node aux1, aux2, *np;
 	Symbol *deflabel = NULL;
@@ -778,7 +778,7 @@ cgen(Node *np)
 		break;
 	case OBSWITCH:
 		p = rhs(np->left);
-		swtch_if(p);
+		swtch(p);
 		break;
 	default:
 		rhs(np);
