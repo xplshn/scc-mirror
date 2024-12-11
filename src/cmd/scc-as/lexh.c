@@ -97,9 +97,9 @@ phash(char *toks[], int ntok)
 found:
 	printf("unsigned long K=%lu, M=%lu, S=%lu;\n", K, M, S);
 
-	printf("short hashmap[%ld] = {\n", 1<<i);
+	printf("short hashmap[%d] = {\n", 1<<i);
 	for (i = 0; i < ntok; i++)
-		printf("\t[%d] = %d,\n", (th[i]*K >> S) & M, i+1);
+		printf("\t[%ld] = %d,\n", (th[i]*K >> S) & M, i+1);
 	puts("};");
 }
 

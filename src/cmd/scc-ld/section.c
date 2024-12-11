@@ -147,7 +147,7 @@ debugsec(void)
 		for (sp = *spp; sp; sp = sp->hash) {
 			sec = &sp->sec;
 			fprintf(stderr,
-			        "sec: %s - %c (%#llx,%#lx)\n",
+			        "sec: %s - %c (%#llx,%#llx)\n",
 			        sec->name,
 			        sec->type,
 			        sec->base,
