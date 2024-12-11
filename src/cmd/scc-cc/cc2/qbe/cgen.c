@@ -843,5 +843,4 @@ genasm(void)
 {
 	apply(norm);
 	apply(cgen);
-	getbblocks();
 }

@@ -374,6 +374,31 @@ deftype(Type *tp)
 	       tp->id, tp->align, tp->size);
 }
 
+static void
+getbblocks(void)
+{
+	Inst *i;
+
+	if (!prog)
+		return;
+
+	prog->flags |= BBENTRY;
+	for (pc = prog; pc; pc = pc->next) {
+		switch (pc->op) {
+		case ASBRANCH:
+			i = pc->from2.u.sym->u.inst;
+			i->flags |= BBENTRY;
+		case ASJMP:
+			i = pc->from1.u.sym->u.inst;
+			i->flags |= BBENTRY;
+		case ASRET:
+			if (pc->next)
+				pc->next->flags |= BBENTRY;
+			break;
+		}
+	}
+}
+
 void
 writeout(void)
 {
@@ -384,6 +409,8 @@ writeout(void)
 
 	if (!curfun)
 		return;
+	getbblocks();
+
 	if (curfun->kind == SGLOB)
 		fputs("export ", stdout);
 	printf("function %s %s(", size2stack(&curfun->rtype), symname(curfun));
@@ -582,29 +609,4 @@ void
 endinit(void)
 {
 	puts("}");
-}
-
-void
-getbblocks(void)
-{
-	Inst *i;
-
-	if (!prog)
-		return;
-
-	prog->flags |= BBENTRY;
-	for (pc = prog; pc; pc = pc->next) {
-		switch (pc->op) {
-		case ASBRANCH:
-			i = pc->from2.u.sym->u.inst;
-			i->flags |= BBENTRY;
-		case ASJMP:
-			i = pc->from1.u.sym->u.inst;
-			i->flags |= BBENTRY;
-		case ASRET:
-			if (pc->next)
-				pc->next->flags |= BBENTRY;
-			break;
-		}
-	}
 }
