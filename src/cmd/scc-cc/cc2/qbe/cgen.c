@@ -643,13 +643,6 @@ rhs(Node *np)
 	tp = &np->type;
 
 	switch (np->op) {
-	case OBFUN:
-		return function();
-	case ONOP:
-	case OBLOOP:
-	case OELOOP:
-	case OEFUN:
-		return NULL;
 	case OTMP:
 	case OCONST:
 		return np;
@@ -762,6 +755,13 @@ cgen(Node *np)
 
 	setlabel(np->label);
 	switch (np->op) {
+	case OBFUN:
+		return function();
+	case ONOP:
+	case OBLOOP:
+	case OELOOP:
+	case OEFUN:
+		break;
 	case OJMP:
 		label2node(&aux, np->u.sym);
 		code(ASJMP, NULL, &aux, NULL);
