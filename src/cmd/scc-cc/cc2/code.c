@@ -43,6 +43,10 @@ addr(Node *np, Addr *addr)
 		/* TODO: Add support for more type of constants */
 		addr->u.i = np->u.i;
 		break;
+	case OINDEX:
+		addr->kind = SINDEX;
+		addr->u.off = np->u.off;
+		break;
 	case OREG:
 	case OTMP:
 	case OLABEL:
@@ -154,13 +158,24 @@ tmpnode(Type *tp)
 }
 
 Node *
+idxnode(Node *np, long off)
+{
+	if (!np)
+		np = node(OINDEX);
+	np->op = OINDEX;
+	np->left = np->right = NULL;
+	np->type = ptrtype;
+	np->u.off = off;
+	return np;
+}
+
+Node *
 constnode(Node *np, TUINT n, Type *tp)
 {
 	if (!np)
 		np = node(OCONST);
 	np->op = OCONST;
-	np->left = NULL;
-	np->right = NULL;
+	np->left = np->right = NULL;
 	np->type = *tp;
 	np->u.i = n;
 	return np;

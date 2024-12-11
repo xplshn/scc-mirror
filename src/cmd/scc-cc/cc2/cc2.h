@@ -60,6 +60,7 @@ enum op {
 	/* kind of operand */
 	/* operands */
 	OMEM     = 'M',
+	OINDEX   = 'I',
 	OTMP     = 'N',
 	OAUTO    = 'A',
 	OREG     = 'R',
@@ -167,7 +168,7 @@ struct symbol {
 	char *name;
 	char kind;
 	union {
-		unsigned long off;
+		long off;
 		Node *stmt;
 		Inst *inst;
 	} u;
@@ -178,16 +179,17 @@ struct symbol {
 struct node {
 	char op;
 	Type type;
-	char complex;
-	char address;
-	unsigned char flags;
+	int complex;
+	int address;
+	unsigned flags;
 	union {
 		TUINT i;
 		TFLOAT f;
-		char reg;
 		char *s;
 		Symbol *sym;
-		char subop;
+		int reg;
+		int subop;
+		long off;
 	} u;
 	Symbol *label;
 	Node *left, *right;
@@ -234,6 +236,7 @@ extern void setlabel(Symbol *);
 extern Node *label2node(Node *np, Symbol *sym);
 extern Node *constnode(Node *np, TUINT n, Type *tp);
 extern Node *tmpnode(Type *);
+extern Node *idxnode(Node *, long);
 extern Symbol *newlabel(void);
 extern void pprint(char *s);
 extern void deftype(Type *);
