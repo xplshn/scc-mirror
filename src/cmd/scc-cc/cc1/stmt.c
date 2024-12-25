@@ -13,6 +13,21 @@ Symbol *curfun;
 static void stmt(Symbol *lbreak, Symbol *lcont, Switch *lswitch);
 
 static void
+branch(Symbol *label, Node *np)
+{
+	if (!np) {
+		emit(OJUMP, label);
+	} else if ((np->flags & NCONST) == 0) {
+		emit(OBRANCH, label);
+		emit(OEXPR, np);
+	} else {
+		if (np->sym->u.i != 0)
+			emit(OJUMP, label);
+		freetree(np);
+	}
+}
+
+static void
 label(void)
 {
 	Symbol *sym;
@@ -85,8 +100,7 @@ While(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 	emit(OLABEL, begin);
 	stmt(lbreak, lcont, lswitch);
 	emit(OLABEL, lcont);
-	emit(OBRANCH, begin);
-	emit(OEXPR, np);
+	branch(begin, np);
 	emit(OELOOP, NULL);
 
 	emit(OLABEL, lbreak);
@@ -133,8 +147,7 @@ For(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 	emit(OLABEL, lcont);
 	emit(OEXPR, einc);
 	emit(OLABEL, cond);
-	emit((econd) ? OBRANCH : OJUMP, begin);
-	emit(OEXPR, econd);
+	branch(begin, econd);
 	emit(OELOOP, NULL);
 
 	emit(OLABEL, lbreak);
@@ -163,8 +176,7 @@ Dowhile(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 	expect(';');
 
 	emit(OLABEL, lcont);
-	emit(OBRANCH, begin);
-	emit(OEXPR, np);
+	branch(begin, np);
 	emit(OELOOP, NULL);
 
 	emit(OLABEL, lbreak);
@@ -311,8 +323,7 @@ If(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 	lelse = newlabel();
 	expect(IF);
 	np = condition(NEGATE);
-	emit(OBRANCH, lelse);
-	emit(OEXPR, np);
+	branch(lelse, np);
 	stmt(lbreak, lcont, lswitch);
 	if (accept(ELSE)) {
 		end = newlabel();
