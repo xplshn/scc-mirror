@@ -48,6 +48,9 @@ int
 main(int argc, char *argv[])
 {
 	ARGBEGIN {
+	case 'd':
+		DBGON();
+		break;
 	default:
 		usage();
 	} ARGEND
