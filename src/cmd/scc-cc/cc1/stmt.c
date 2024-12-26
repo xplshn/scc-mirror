@@ -96,12 +96,12 @@ While(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 
 	emit(OJUMP, lcont);
 
-	emit(OBLOOP, NULL);
 	emit(OLABEL, begin);
+	emit(OBLOOP, NULL);
 	stmt(lbreak, lcont, lswitch);
 	emit(OLABEL, lcont);
-	branch(begin, np);
 	emit(OELOOP, NULL);
+	branch(begin, np);
 
 	emit(OLABEL, lbreak);
 }
@@ -142,14 +142,14 @@ For(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 	if (econd)
 		emit(OJUMP, cond);
 
-	emit(OBLOOP, NULL);
 	emit(OLABEL, begin);
+	emit(OBLOOP, NULL);
 	stmt(lbreak, lcont, lswitch);
 	emit(OLABEL, lcont);
 	emit(OEXPR, einc);
 	emit(OLABEL, cond);
-	branch(begin, econd);
 	emit(OELOOP, NULL);
+	branch(begin, econd);
 
 	emit(OLABEL, lbreak);
 
@@ -168,8 +168,8 @@ Dowhile(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 
 	expect(DO);
 
-	emit(OBLOOP, NULL);
 	emit(OLABEL, begin);
+	emit(OBLOOP, NULL);
 
 	stmt(lbreak, lcont, lswitch);
 	expect(WHILE);
@@ -177,8 +177,8 @@ Dowhile(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 	expect(';');
 
 	emit(OLABEL, lcont);
-	branch(begin, np);
 	emit(OELOOP, NULL);
+	branch(begin, np);
 
 	emit(OLABEL, lbreak);
 }
