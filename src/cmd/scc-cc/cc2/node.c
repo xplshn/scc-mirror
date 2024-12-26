@@ -43,6 +43,16 @@ prnode(Node *np)
 void
 prtree(Node *np)
 {
+	Block *bb;
+
+	bb = np->bb;
+
+	if (np->flags & BBENTRY)
+		putc('>', stderr);
+	fprintf(stderr, "(%d)",  bb ? bb->id : 0);
+	if (np->flags & BBEXIT)
+		putc('>', stderr);
+
 	prnode(np);
 	putc('\n', stderr);
 }
@@ -55,7 +65,7 @@ prforest(char *msg)
 	if (!curfun)
 		return;
 
-	fprintf(stderr, "%s {\n", msg);
+	fprintf(stderr, "tree %s {\n", msg);
 	for (np = curfun->u.stmt; np; np = np->next)
 		prtree(np);
 	fputs("}\n", stderr);

@@ -2,6 +2,7 @@
 
 enum iflags {
 	BBENTRY =    1,        /* basic block entry */
+	BBEXIT  =    2,        /* basic block exit */
 };
 
 enum tflags {
@@ -152,6 +153,7 @@ typedef struct type Type;
 typedef struct symbol Symbol;
 typedef struct addr Addr;
 typedef struct inst Inst;
+typedef struct block Block;
 
 struct type {
 	unsigned long size;
@@ -193,8 +195,17 @@ struct node {
 		long off;
 	} u;
 	Symbol *label;
+	Block *bb;
 	Node *left, *right;
 	Node *next, *prev;
+};
+
+struct block {
+	int id;
+	int printed, visited;
+	Node *entryp, *exitp;
+	Block *true, *false;
+	Block *next;
 };
 
 struct addr {
