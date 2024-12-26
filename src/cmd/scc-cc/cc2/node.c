@@ -16,7 +16,6 @@ static Alloc *arena;
 Node *
 node(int op)
 {
-	struct arena *ap;
 	Node *np;
 
 	if (!arena)
