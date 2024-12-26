@@ -165,6 +165,7 @@ struct symbol {
 	Type rtype;
 	unsigned short id;
 	unsigned short numid;
+	int refcnt;
 	char *name;
 	char kind;
 	union {

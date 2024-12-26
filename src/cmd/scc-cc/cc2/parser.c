@@ -413,6 +413,7 @@ ocase(char *token, union tokenop u)
 static void
 jump(char *token, union tokenop u)
 {
+	Symbol *label;
 	Node *aux, *np = node(u.op);
 
 	eval(strtok(NULL, "\t\n"));
@@ -420,7 +421,9 @@ jump(char *token, union tokenop u)
 	if (u.op == OBRANCH || u.op == OCASE)
 		np->left = pop();
 	aux = pop();
-	np->u.sym = aux->u.sym;
+	label = aux->u.sym;
+	label->refcnt++;
+	np->u.sym = label;
 	delnode(aux);
 	push(np);
 }
