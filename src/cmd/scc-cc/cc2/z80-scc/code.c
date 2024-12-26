@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <scc/cstd.h>
 #include <scc/scc.h>
@@ -7,11 +8,34 @@
 #include "../cc2.h"
 #include "arch.h"
 
+#define ADDR_LEN (INTIDENTSIZ+64)
+
 enum segment {
 	CODESEG,
 	DATASEG,
 	BSSSEG,
 	NOSEG
+};
+
+static void src(void), dst(void), bin(void), lit(void), jmp(void);
+
+static struct opdata {
+	void (*fun)(void);
+	char *txt;
+} optbl[] = {
+	[ASPUSH] = {.fun = src, .txt = "push"},
+	[ASPOP] = {.fun = dst, .txt = "pop"},
+
+	[ASRET] = {.fun = lit, .txt = "ret"},
+	[ASJP] = {.fun = jmp, .txt = "jp"},
+	[ASJP] = {.fun = jmp, .txt = "jr"},
+	[ASBRANCH] = {0},
+
+	[ASMOV] = {.fun = bin, .txt = "ld"},
+	[ASEXHL] = {.fun = bin, .txt = "ex"},
+
+	[ASADD] = {.fun = bin, .txt = "add"},
+	[ASLD] = {.fun = bin, .txt = "ld"},
 };
 
 static int curseg = NOSEG;
@@ -21,9 +45,9 @@ static void
 segment(int seg)
 {
 	static char *txt[] = {
-		[CODESEG] = "\tCSEG\n",
-		[DATASEG] = "\tDSEG\n",
-		[BSSSEG] = "\tASEG\n",
+		[CODESEG] = "\t.text\n",
+		[DATASEG] = "\t.data\n",
+		[BSSSEG] = "\t.bss\n",
 	};
 
 	if (seg == curseg)
@@ -35,7 +59,7 @@ segment(int seg)
 static char *
 symname(Symbol *sym)
 {
-	static char name[INTIDENTSIZ+1];
+	static char name[ADDR_LEN];
 
 	if (sym->name) {
 		switch (sym->kind) {
@@ -69,10 +93,10 @@ label(Symbol *sym)
 
 	switch (sym->kind) {
 	case SEXTRN:
-		printf("\tEXTRN\t%s\n", name);
+		printf("\t.extrn\t%s\n", name);
 		return;
 	case SGLOB:
-		printf("\tPUBLIC\t%s\n", name);
+		printf("\t.globl\t%s\n", name);
 		break;
 	}
 
@@ -155,40 +179,6 @@ size2asm(Type *tp)
 	printf(s, tp->size);
 }
 
-/* TODO: how are initialized offpar and offvar??? */
-
-void
-defpar(Symbol *sym)
-{
-	unsigned long align, size;
-
-	if (sym->kind != SREG && sym->kind != SAUTO)
-		return;
-	align = sym->type.align;
-	size = sym->type.size;
-
-	offpar -= align-1 & ~align;
-	sym->u.off = offpar;
-	offpar -= size;
-	sym->kind = SAUTO;
-}
-
-void
-defvar(Symbol *sym)
-{
-	unsigned long align, size;
-
-	if (sym->kind != SREG && sym->kind != SAUTO)
-		return;
-	align = sym->type.align;
-	size = sym->type.size;
-
-	offvar += align-1 & ~align;
-	sym->u.off = offvar;
-	offvar += size;
-	sym->kind = SAUTO;
-}
-
 void
 deftype(Type *tp)
 {
@@ -215,9 +205,111 @@ data(Node *np)
 void
 writeout(void)
 {
+	if (!curfun)
+		return;
+	label(curfun);
+
+	for (pc = prog; pc; pc = pc->next) {
+		if (pc->label)
+			printf("%s:\n", symname(pc->label));
+		if (pc->op == ASLABEL)
+			continue;
+		(*optbl[pc->op].fun)();
+	}
 }
 
 void
 endinit(void)
 {
+}
+
+static char *
+addr2txt(Addr *a)
+{
+	static char *regnames[] = {
+		[A] = "a",
+		[B] = "b",
+		[C] = "c",
+		[D] = "d",
+		[E] = "e",
+		[H] = "h",
+		[L] = "l",
+		[IYL] = "iyl",
+		[IYH] = "iyh",
+		[AF] = "af",
+		[HL] = "hl",
+		[DE] = "de",
+		[BC] = "bc",
+		[IY] = "iy",
+		[SP] = "sp",
+		[IX] = "ix",
+	};
+	static char addr[INTIDENTSIZ+1];
+
+	switch (a->kind) {
+	case SREG:
+		return regnames[a->u.reg];
+	case SINDEX:
+		sprintf(addr,"%ld(ix)", a->u.off);
+		return addr;
+	case SLABEL:
+	case STMP:
+	case SGLOB:
+	case SEXTRN:
+	case SPRIV:
+	case SLOCAL:
+		return symname(a->u.sym);
+	case SCONST:
+		sprintf(addr, "%lld", a->u.i);
+		return addr;
+	default:
+		abort();
+	}
+}
+
+static void
+lit(void)
+{
+	struct opdata *p = &optbl[pc->op];
+
+	printf("\t%s\n", p->txt);
+}
+
+static void
+bin(void)
+{
+	struct opdata *p = &optbl[pc->op];
+	char to[ADDR_LEN], from[ADDR_LEN];
+
+	strcpy(from, addr2txt(&pc->from1));
+	strcpy(to, addr2txt(&pc->to));
+	printf("\t%s\t%s,%s\n", p->txt, from, to);
+}
+
+static void
+src(void)
+{
+	struct opdata *p = &optbl[pc->op];
+	char from[ADDR_LEN];
+
+	strcpy(from, addr2txt(&pc->from1));
+	printf("\t%s\t%s\n", p->txt, from);
+}
+
+static void
+dst(void)
+{
+	struct opdata *p = &optbl[pc->op];
+	char to[ADDR_LEN];
+
+	strcpy(to, addr2txt(&pc->to));
+	printf("\t%s\t%s\n", p->txt, to);
+}
+
+static void
+jmp(void)
+{
+	struct opdata *p = &optbl[pc->op];
+
+	printf("\t%s\t%s\n", p->txt, addr2txt(&pc->from1));
 }
