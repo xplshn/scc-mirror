@@ -237,6 +237,7 @@ extern Node *label2node(Node *np, Symbol *sym);
 extern Node *constnode(Node *np, TUINT n, Type *tp);
 extern Node *tmpnode(Type *);
 extern Node *idxnode(Node *, long);
+extern void delcode(void);
 extern Symbol *newlabel(void);
 extern void pprint(char *s);
 extern void deftype(Type *);

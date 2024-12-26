@@ -211,8 +211,7 @@ delcode(void)
 
         free(pc);
         if (!prev) {
-                pc = next;
-                prog = NULL;
+                prog = pc = next;
         } else {
                 pc = prev;
                 prev->next = next;
