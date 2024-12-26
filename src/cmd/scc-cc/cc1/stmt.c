@@ -139,7 +139,8 @@ For(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 	einc = (yytoken != ')') ? simplify(expr()) : NULL;
 	expect(')');
 
-	emit(OJUMP, cond);
+	if (econd)
+		emit(OJUMP, cond);
 
 	emit(OBLOOP, NULL);
 	emit(OLABEL, begin);
