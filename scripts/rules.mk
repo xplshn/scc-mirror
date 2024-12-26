@@ -212,3 +212,8 @@ dep: inc-dep
 
 inc-dep: FORCE
 	test -n "$(NODEP)" || $(MKDEP)
+
+distclean: clean del-inc-dep
+
+del-inc-dep: FORCE
+	find . -name makefile | xargs rm -f
