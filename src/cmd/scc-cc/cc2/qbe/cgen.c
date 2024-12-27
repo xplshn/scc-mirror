@@ -159,7 +159,7 @@ complex(Node *np)
 	return np;
 }
 
-Node *
+static Node *
 sethi(Node *np)
 {
 	Node *lp, *rp;
@@ -843,4 +843,10 @@ genasm(void)
 {
 	apply(norm);
 	apply(cgen);
+}
+
+void
+genaddr(void)
+{
+	apply(sethi);
 }

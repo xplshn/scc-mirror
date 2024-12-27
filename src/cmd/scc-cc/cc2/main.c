@@ -60,7 +60,7 @@ main(int argc, char *argv[])
 
 	while (moreinput()) {
 		parse();
-		apply(sethi);
+		genaddr();
 		genasm();
 		peephole();
 		writeout();

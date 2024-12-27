@@ -558,12 +558,6 @@ cgen(Node *np)
 	return np;
 }
 
-void
-genasm(void)
-{
-	apply(cgen);
-}
-
 /*
  * This is strongly influenced by
  * http://plan9.bell-labs.com/sys/doc/compiler.ps (/sys/doc/compiler.ps)
@@ -573,7 +567,7 @@ genasm(void)
  *     STATIC => 12        (value)
  *     CONST => 20         $value
  */
-Node *
+static Node *
 sethi(Node *np)
 {
 	Node *lp, *rp;
@@ -619,4 +613,16 @@ sethi(Node *np)
 	if (np->complex == 0)
 		++np->complex;
 	return np;
+}
+
+void
+genasm(void)
+{
+	apply(cgen);
+}
+
+void
+genaddr(void)
+{
+	apply(sethi);
 }

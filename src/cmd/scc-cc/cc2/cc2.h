@@ -241,7 +241,7 @@ extern void error(unsigned nerror, ...);
 extern void parse(void);
 
 /* cgen.c */
-extern Node *sethi(Node *np);
+extern void genaddr(void);
 extern void genasm(void);
 
 /* peep.c */
