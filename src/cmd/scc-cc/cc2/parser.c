@@ -712,9 +712,9 @@ endfun(void)
 void
 parse(void)
 {
-	cleannodes();  /* remove code of previous function */
-	popctx();  /* remove context of previous function */
-	curfun = NULL;
+	/* clean from previous function */
+	cleannodes();
+	popctx();
 	endf = 0;
 
 	while (!endf && nextline())

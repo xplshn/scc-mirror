@@ -7,11 +7,16 @@
 
 #define NNODES   32
 
+struct function {
+	Node *begin;
+	Node *end;
+};
+
 Node *curstmt;
 Symbol *curfun;
 
 static Alloc *arena;
-
+static struct function fn;
 
 Node *
 node(int op)
@@ -66,25 +71,33 @@ prforest(char *msg)
 		return;
 
 	fprintf(stderr, "tree %s {\n", msg);
-	for (np = curfun->u.stmt; np; np = np->next)
+	for (np = fn.begin; np; np = np->next)
 		prtree(np);
 	fputs("}\n", stderr);
 }
 #endif
 
 Node *
-addstmt(Node *np, int flag)
+addstmt(Node *np, int mode)
 {
-	if (curstmt)
-		np->next = curstmt->next;
+	Node *next;
+
+	next = NULL;
+	if (curstmt) {
+		next = curstmt->next;
+		if (next)
+			next->prev = np;
+		curstmt->next = np;
+	}
+	np->next = next;
 	np->prev = curstmt;
 
-	if (!curfun->u.stmt)
-		curfun->u.stmt = np;
-	else
-		curstmt->next = np;
+	if (!fn.begin)
+		fn.begin = np;
+	if (!fn.end || !np->next)
+		fn.end = np;
 
-	if (flag == SETCUR)
+	if (mode == SETCUR)
 		curstmt = np;
 
 	return np;
@@ -95,14 +108,20 @@ delstmt(void)
 {
 	Node *next, *prev;
 
+	if (!curstmt)
+		return NULL;
+
 	next = curstmt->next;
 	prev = curstmt->prev;
 	if (next)
 		next->prev = prev;
 	if (prev)
 		prev->next = next;
-	else
-		curfun->u.stmt = next;
+
+	if (fn.begin == curstmt)
+		fn.begin = next;
+	if (fn.end == curstmt)
+		fn.end = prev;
 	deltree(curstmt);
 
 	return curstmt = next;
@@ -138,6 +157,8 @@ cleannodes(void)
 		arena = NULL;
 	}
 	curstmt = NULL;
+	curfun = NULL;
+	memset(&fn, 0, sizeof(fn));
 }
 
 void
