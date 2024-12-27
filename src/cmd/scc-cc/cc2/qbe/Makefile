@@ -7,7 +7,7 @@ include $(PROJECTDIR)/scripts/rules.mk
 OBJS =\
 	cgen.o \
 	code.o \
-	peep.o \
+	stubs.o \
 
 all: builtin.o
 
