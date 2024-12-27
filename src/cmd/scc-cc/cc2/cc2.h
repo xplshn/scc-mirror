@@ -154,12 +154,19 @@ typedef struct symbol Symbol;
 typedef struct addr Addr;
 typedef struct inst Inst;
 typedef struct block Block;
+typedef struct range Range;
 
 struct type {
 	unsigned long size;
 	unsigned align;
 	unsigned short id;
 	short flags;
+};
+
+struct range {
+	Node *begin;
+	Node *end;
+	Node *cur;
 };
 
 struct symbol {
@@ -174,6 +181,7 @@ struct symbol {
 		long off;
 		Node *stmt;
 		Inst *inst;
+		Range *body;
 	} u;
 	Symbol *next, *prev;
 	Symbol *h_next;
@@ -257,6 +265,7 @@ extern void deftype(Type *);
 /* node.c */
 #define SETCUR  1
 #define KEEPCUR 0
+extern void newfun(Symbol *);
 extern void apply(Node *(*fun)(Node *));
 extern void cleannodes(void);
 extern void delnode(Node *np);

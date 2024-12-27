@@ -7,16 +7,10 @@
 
 #define NNODES   32
 
-struct function {
-	Node *begin;
-	Node *end;
-	Node *cur;
-};
-
 Symbol *curfun;
 
 static Alloc *arena;
-static struct function fn;
+static Range body;
 
 Node *
 node(int op)
@@ -71,7 +65,7 @@ prforest(char *msg)
 		return;
 
 	fprintf(stderr, "tree %s {\n", msg);
-	for (np = fn.begin; np; np = np->next)
+	for (np = body.begin; np; np = np->next)
 		prtree(np);
 	fputs("}\n", stderr);
 }
@@ -87,14 +81,14 @@ insstmt(Node *np, Node *at, int mode)
 {
 	Node *save;
 
-	save = fn.cur;
-	fn.cur = at;
+	save = body.cur;
+	body.cur = at;
 	addstmt(np, KEEPCUR);
 
 	if (mode == KEEPCUR)
-		fn.cur = save;
+		body.cur = save;
 	else
-		fn.cur = (save == at) ? np : save;
+		body.cur = (save == at) ? np : save;
 
 	return np;
 }
@@ -105,22 +99,22 @@ addstmt(Node *np, int mode)
 	Node *next;
 
 	next = NULL;
-	if (fn.cur) {
-		next = fn.cur->next;
+	if (body.cur) {
+		next = body.cur->next;
 		if (next)
 			next->prev = np;
-		fn.cur->next = np;
+		body.cur->next = np;
 	}
 	np->next = next;
-	np->prev = fn.cur;
+	np->prev = body.cur;
 
-	if (!fn.begin)
-		fn.begin = np;
-	if (!fn.end || !np->next)
-		fn.end = np;
+	if (!body.begin)
+		body.begin = np;
+	if (!body.end || !np->next)
+		body.end = np;
 
 	if (mode == SETCUR)
-		fn.cur = np;
+		body.cur = np;
 
 	return np;
 }
@@ -130,29 +124,29 @@ delstmt(void)
 {
 	Node *next, *prev;
 
-	if (!fn.cur)
+	if (!body.cur)
 		return NULL;
 
-	next = fn.cur->next;
-	prev = fn.cur->prev;
+	next = body.cur->next;
+	prev = body.cur->prev;
 	if (next)
 		next->prev = prev;
 	if (prev)
 		prev->next = next;
 
-	if (fn.begin == fn.cur)
-		fn.begin = next;
-	if (fn.end == fn.cur)
-		fn.end = prev;
-	deltree(fn.cur);
+	if (body.begin == body.cur)
+		body.begin = next;
+	if (body.end == body.cur)
+		body.end = prev;
+	deltree(body.cur);
 
-	return fn.cur = next;
+	return body.cur = next;
 }
 
 Node *
 nextstmt(void)
 {
-	return fn.cur = fn.cur->next;
+	return body.cur = body.cur->next;
 }
 
 void
@@ -178,9 +172,16 @@ cleannodes(void)
 		dealloc(arena);
 		arena = NULL;
 	}
-	fn.cur = NULL;
+	body.cur = NULL;
 	curfun = NULL;
-	memset(&fn, 0, sizeof(fn));
+	memset(&body, 0, sizeof(body));
+}
+
+void
+newfun(Symbol *sym)
+{
+	curfun = sym;
+	curfun->u.body = memset(&body, 0, sizeof(body));
 }
 
 void
@@ -188,7 +189,7 @@ apply(Node *(*fun)(Node *))
 {
 	if (!curfun)
 		return;
-	fn.cur = fn.begin;
-	while (fn.cur)
-		(*fun)(fn.cur) ? nextstmt() : delstmt();
+	body.cur = body.begin;
+	while (body.cur)
+		(*fun)(body.cur) ? nextstmt() : delstmt();
 }

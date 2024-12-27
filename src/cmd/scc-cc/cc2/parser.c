@@ -683,7 +683,7 @@ stmt(void)
 static void
 beginfun(void)
 {
-	curfun = lastfun;
+	newfun(lastfun);
 	inpars = 1;
 	pushctx();
 	addstmt(node(OBFUN), SETCUR);
