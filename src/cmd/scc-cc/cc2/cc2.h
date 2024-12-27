@@ -266,6 +266,7 @@ extern Node *node(int op);
 extern Node *addstmt(Node *np, int flags);
 extern Node *delstmt(void);
 extern Node *nextstmt(void);
+extern Node *insstmt(Node *, Node *, int);
 
 /* symbol.c */
 #define TMPSYM  0

@@ -12,11 +12,11 @@ struct function {
 	Node *end;
 };
 
-Node *curstmt;
 Symbol *curfun;
 
 static Alloc *arena;
 static struct function fn;
+static Node *curstmt;
 
 Node *
 node(int op)
@@ -76,6 +76,28 @@ prforest(char *msg)
 	fputs("}\n", stderr);
 }
 #endif
+
+/*
+ * Insert a node after `at' and if mode is SETCUR
+ * update the current statement if `at' was the
+ * current statement
+ */
+Node *
+insstmt(Node *np, Node *at, int mode)
+{
+	Node *save;
+
+	save = curstmt;
+	curstmt = at;
+	addstmt(np, KEEPCUR);
+
+	if (mode == KEEPCUR)
+		curstmt = save;
+	else
+		curstmt = (save == at) ? np : save;
+
+	return np;
+}
 
 Node *
 addstmt(Node *np, int mode)

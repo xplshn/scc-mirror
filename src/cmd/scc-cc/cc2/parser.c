@@ -341,34 +341,21 @@ oreturn(char *token, union tokenop u)
 
 /*
  * Move np (which is a OCASE/ODEFAULT/OESWITCH) to be contigous with
- * the last switch table. It is a bit ugly to touch directly curstmt
- * here, but moving this function to node.c is worse, because we are
- * putting knowledge of how the text is parsed into the node
- * represtation module.
+ * the last switch table.
  */
 static void
 waft(Node *np)
 {
 	Node *lastcase, *next;
 	struct swtch *cur;
-	extern Node *curstmt;
 
 	if (swp == swtbl)
 		error(EWTACKU);
 
 	cur = swp - 1;
 	lastcase = cur->last;
-	next = lastcase->next;
+	insstmt(np, cur->last, SETCUR);
 
-	np->next = next;
-	np->prev = lastcase;
-
-	if (next)
-		next->prev = np;
-	lastcase->next = np;
-
-	if (curstmt == cur->last)
-		curstmt = np;
 	cur->last = np;
 	cur->nr++;
 }
