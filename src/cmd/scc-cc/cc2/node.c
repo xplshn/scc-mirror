@@ -10,13 +10,13 @@
 struct function {
 	Node *begin;
 	Node *end;
+	Node *cur;
 };
 
 Symbol *curfun;
 
 static Alloc *arena;
 static struct function fn;
-static Node *curstmt;
 
 Node *
 node(int op)
@@ -87,14 +87,14 @@ insstmt(Node *np, Node *at, int mode)
 {
 	Node *save;
 
-	save = curstmt;
-	curstmt = at;
+	save = fn.cur;
+	fn.cur = at;
 	addstmt(np, KEEPCUR);
 
 	if (mode == KEEPCUR)
-		curstmt = save;
+		fn.cur = save;
 	else
-		curstmt = (save == at) ? np : save;
+		fn.cur = (save == at) ? np : save;
 
 	return np;
 }
@@ -105,14 +105,14 @@ addstmt(Node *np, int mode)
 	Node *next;
 
 	next = NULL;
-	if (curstmt) {
-		next = curstmt->next;
+	if (fn.cur) {
+		next = fn.cur->next;
 		if (next)
 			next->prev = np;
-		curstmt->next = np;
+		fn.cur->next = np;
 	}
 	np->next = next;
-	np->prev = curstmt;
+	np->prev = fn.cur;
 
 	if (!fn.begin)
 		fn.begin = np;
@@ -120,7 +120,7 @@ addstmt(Node *np, int mode)
 		fn.end = np;
 
 	if (mode == SETCUR)
-		curstmt = np;
+		fn.cur = np;
 
 	return np;
 }
@@ -130,29 +130,29 @@ delstmt(void)
 {
 	Node *next, *prev;
 
-	if (!curstmt)
+	if (!fn.cur)
 		return NULL;
 
-	next = curstmt->next;
-	prev = curstmt->prev;
+	next = fn.cur->next;
+	prev = fn.cur->prev;
 	if (next)
 		next->prev = prev;
 	if (prev)
 		prev->next = next;
 
-	if (fn.begin == curstmt)
+	if (fn.begin == fn.cur)
 		fn.begin = next;
-	if (fn.end == curstmt)
+	if (fn.end == fn.cur)
 		fn.end = prev;
-	deltree(curstmt);
+	deltree(fn.cur);
 
-	return curstmt = next;
+	return fn.cur = next;
 }
 
 Node *
 nextstmt(void)
 {
-	return curstmt = curstmt->next;
+	return fn.cur = fn.cur->next;
 }
 
 void
@@ -178,7 +178,7 @@ cleannodes(void)
 		dealloc(arena);
 		arena = NULL;
 	}
-	curstmt = NULL;
+	fn.cur = NULL;
 	curfun = NULL;
 	memset(&fn, 0, sizeof(fn));
 }
@@ -188,7 +188,7 @@ apply(Node *(*fun)(Node *))
 {
 	if (!curfun)
 		return;
-	curstmt = curfun->u.stmt;
-	while (curstmt)
-		(*fun)(curstmt) ? nextstmt() : delstmt();
+	fn.cur = fn.begin;
+	while (fn.cur)
+		(*fun)(fn.cur) ? nextstmt() : delstmt();
 }
