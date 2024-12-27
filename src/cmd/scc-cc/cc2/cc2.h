@@ -276,6 +276,8 @@ extern Node *addstmt(Node *np, int flags);
 extern Node *delstmt(void);
 extern Node *nextstmt(void);
 extern Node *insstmt(Node *, Node *, int);
+extern void delrange(Range *);
+extern Range range(Node *, Node *);
 
 /* symbol.c */
 #define TMPSYM  0

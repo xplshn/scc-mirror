@@ -185,6 +185,37 @@ newfun(Symbol *sym)
 }
 
 void
+delrange(Range *rp)
+{
+	Node *lprev, *rnext, *next, *np;
+
+	lprev = rp->begin->prev;
+	rnext = rp->end->next;
+
+	if (lprev)
+		lprev->next = rnext;
+	if (rnext)
+		rnext->prev = lprev;
+
+	for (np = rp->begin; np != rnext; np = next) {
+		next = np->next;
+		deltree(np);
+	}
+
+	rp->begin = rp->end = rp->cur = NULL;
+}
+
+Range
+range(Node *begin, Node *end)
+{
+	Range r;
+
+	r.cur = r.begin = begin;
+	r.end = end;
+	return r;
+}
+
+void
 apply(Node *(*fun)(Node *))
 {
 	if (!curfun)
