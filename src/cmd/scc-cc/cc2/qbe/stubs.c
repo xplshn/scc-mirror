@@ -10,3 +10,13 @@ void
 peephole(void)
 {
 }
+
+void
+gencfg(void)
+{
+}
+
+void
+cleancfg(void)
+{
+}

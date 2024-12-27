@@ -700,6 +700,7 @@ void
 parse(void)
 {
 	/* clean from previous function */
+	cleancfg();
 	cleannodes();
 	popctx();
 	endf = 0;

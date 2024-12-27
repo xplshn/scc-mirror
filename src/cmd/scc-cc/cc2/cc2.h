@@ -286,6 +286,10 @@ extern void popctx(void);
 extern void pushctx(void);
 extern void freesym(Symbol *sym);
 
+/* bb.c */
+extern void gencfg(void);
+extern void cleancfg(void);
+
 /* globals */
 extern Symbol *curfun;
 extern Symbol *locals;

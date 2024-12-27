@@ -61,6 +61,7 @@ main(int argc, char *argv[])
 	while (moreinput()) {
 		parse();
 		genaddr();
+		gencfg();
 		genasm();
 		peephole();
 		writeout();

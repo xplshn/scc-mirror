@@ -14,12 +14,36 @@ include $(PROJECTDIR)/scripts/rules.mk
 
 MORE_LDLIBS = -lscc
 
-OBJS =\
+QBE_OBJS =\
 	code.o\
 	main.o\
 	node.o\
 	parser.o\
 	symbol.o\
+
+OBJS =\
+	cfg.o\
+	$(QBE_OBJS)\
+
+AMD64_SYSV_OBJS =\
+	amd64-sysv/builtin.o\
+	$(OBJS) \
+
+I386_SYSV_OBJS =\
+	i386-sysv/builtin.o\
+	$(OBJS)
+
+QBE_AMD64_SYSV_OBJS=\
+	qbe_amd64-sysv/builtin.o\
+	$(QBE_OBJS)\
+
+QBE_ARM64_SYSV_OBJS=\
+	qbe_arm64-sysv/builtin.o\
+	$(QBE_OBJS)\
+
+Z80_SCC_OBJS =\
+	z80-scc/builtin.o\
+	$(OBJS) \
 
 TARGET  =\
 	cc2-amd64-sysv\
@@ -43,20 +67,20 @@ error.h: cc2.h
 	trap 'rm -f $$$$.h' EXIT INT QUIT TERM HUP;\
 	awk -f generror.awk cc2.h > $$$$.h && mv $$$$.h $@
 
-cc2-amd64-sysv: $(LIBSCC) $(OBJS) amd64-sysv/builtin.o
-	$(CC) $(PROJ_LDFLAGS) $(OBJS) amd64-sysv/builtin.o $(PROJ_LDLIBS) -o $@
+cc2-amd64-sysv: $(LIBSCC) $(AMD64_SYSV_OBJS)
+	$(CC) $(PROJ_LDFLAGS) $(AMD64_SYSV_OBJS) $(PROJ_LDLIBS) -o $@
 
-cc2-i386-sysv: $(LIBSCC) $(OBJS) i386-sysv/builtin.o
-	$(CC) $(PROJ_LDFLAGS) $(OBJS) i386-sysv/builtin.o $(PROJ_LDLIBS) -o $@
+cc2-i386-sysv: $(LIBSCC) $(I386_SYSV_OBJS)
+	$(CC) $(PROJ_LDFLAGS) $(I386_SYSV_OBJS) $(PROJ_LDLIBS) -o $@
 
-cc2-qbe_amd64-sysv: $(LIBSCC) $(OBJS) qbe_amd64-sysv/builtin.o
-	$(CC) $(PROJ_LDFLAGS) $(OBJS) qbe_amd64-sysv/builtin.o $(PROJ_LDLIBS) -o $@
+cc2-qbe_amd64-sysv: $(LIBSCC) $(QBE_AMD64_SYSV_OBJS)
+	$(CC) $(PROJ_LDFLAGS) $(QBE_AMD64_SYSV_OBJS) $(PROJ_LDLIBS) -o $@
 
-cc2-qbe_arm64-sysv: $(LIBSCC) $(OBJS) qbe_arm64-sysv/builtin.o
-	$(CC) $(PROJ_LDFLAGS) $(OBJS) qbe_arm64-sysv/builtin.o $(PROJ_LDLIBS) -o $@
+cc2-qbe_arm64-sysv: $(LIBSCC) $(QBE_ARM64_SYSV_OBJS)
+	$(CC) $(PROJ_LDFLAGS) $(QBE_ARM64_SYSV_OBJS) $(PROJ_LDLIBS) -o $@
 
-cc2-z80-scc: $(LIBSCC) $(OBJS) z80-scc/builtin.o
-	$(CC) $(PROJ_LDFLAGS) $(OBJS) z80-scc/builtin.o $(PROJ_LDLIBS) -o $@
+cc2-z80-scc: $(LIBSCC) $(Z80_SCC_OBJS)
+	$(CC) $(PROJ_LDFLAGS) $(Z80_SCC_OBJS) $(PROJ_LDLIBS) -o $@
 
 clean:
 	rm -f error.h
