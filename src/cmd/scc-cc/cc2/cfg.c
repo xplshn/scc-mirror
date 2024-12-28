@@ -102,7 +102,7 @@ newbb(Node *np)
 }
 
 static Node *
-mkcfg(Node *np)
+mkcfg(Range *rp, Node *np)
 {
 	if ((np->flags & (BBENTRY|BBEXIT)) == 0)
 		return np;
@@ -123,7 +123,7 @@ mkcfg(Node *np)
 		cfg.exitb = cfg.cur;
 		break;
 	case ORET:
-		cfg.cur->true = curfun->u.body->end->bb;
+		cfg.cur->true = fbody()->end->bb;
 		break;
 	case OBRANCH:
 		cfg.cur->false = np->next->bb;
@@ -136,7 +136,7 @@ mkcfg(Node *np)
 }
 
 static Node *
-mkbb(Node *np)
+mkbb(Range *rp, Node *np)
 {
 	if (np->flags & BBENTRY)
 		newbb(np);
@@ -157,14 +157,14 @@ newentry(Node *np)
 }
 
 static Node *
-markbb(Node *np)
+markbb(Range *rp, Node *np)
 {
 	switch (np->op) {
 	case OBFUN:
 		newentry(np);
 		break;
 	case ORET:
-		newentry(curfun->u.body->end);
+		newentry(rp->end);
 		newentry(np->next);
 		break;
 	case OBRANCH:
@@ -209,17 +209,17 @@ buildcfg(void)
 {
 	int nr;
 
-	apply(markbb);
+	apply(fbody(), markbb);
 	PRTREE("bb_mark");
 
 	cfg.blocks = xcalloc(cfg.nr, sizeof(Block));
 	nr = cfg.nr;
 	cfg.nr = 0;
-	apply(mkbb);
+	apply(fbody(), mkbb);
 	assert(cfg.nr == nr);
 
 	PRTREE("bb_mk");
-	apply(mkcfg);
+	apply(fbody(), mkcfg);
 	PRCFG("cfg");
 }
 
@@ -233,7 +233,7 @@ gencfg(void)
 }
 
 static Node *
-cleanbb(Node *np)
+cleanbb(Range *rp, Node *np)
 {
 	np->flags &= ~(BBENTRY | BBEXIT);
 	return np;
@@ -244,5 +244,6 @@ cleancfg(void)
 {
 	free(cfg.blocks);
 	memset(&cfg, 0, sizeof(cfg));
-	apply(cleanbb);
+	if (curfun)
+		apply(fbody(), cleanbb);
 }

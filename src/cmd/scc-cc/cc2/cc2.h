@@ -1,4 +1,5 @@
 #define ASLABEL 0
+#define fbody() (curfun->u.body)
 
 enum iflags {
 	BBENTRY =    1,        /* basic block entry */
@@ -267,16 +268,16 @@ extern void deftype(Type *);
 #define SETCUR  1
 #define KEEPCUR 0
 extern void newfun(Symbol *);
-extern void apply(Node *(*fun)(Node *));
+extern void apply(Range *, Node *(*fun)(Range *, Node *));
 extern void cleannodes(void);
 extern void delnode(Node *np);
 extern void deltree(Node *np);
 extern void prtree(Node *np), prforest(char *msg);
 extern Node *node(int op);
-extern Node *addstmt(Node *np, int flags);
-extern Node *delstmt(void);
-extern Node *nextstmt(void);
-extern Node *insstmt(Node *, Node *, int);
+extern Node *addstmt(Range *, Node *np, int flags);
+extern Node *delstmt(Range *);
+extern Node *nextstmt(Range *, int);
+extern Node *insstmt(Range *, Node *, Node *, int);
 extern void delrange(Range *);
 extern Range range(Node *, Node *);
 

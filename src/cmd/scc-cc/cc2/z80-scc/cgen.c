@@ -519,7 +519,7 @@ ret(Node *np)
 }
 
 static Node *
-cgen(Node *np)
+cgen(Range *rp, Node *np)
 {
 	Node aux, *p, *next;
 
@@ -568,7 +568,7 @@ cgen(Node *np)
  *     CONST => 20         $value
  */
 static Node *
-sethi(Node *np)
+sethi(Range *rp, Node *np)
 {
 	Node *l, *r;
 
@@ -593,8 +593,8 @@ sethi(Node *np)
 		np->address = 20;
 		break;
 	default:
-		sethi(l);
-		sethi(r);
+		sethi(rp, l);
+		sethi(rp, r);
 		break;
 	}
 
@@ -618,11 +618,11 @@ sethi(Node *np)
 void
 genasm(void)
 {
-	apply(cgen);
+	apply(fbody(), cgen);
 }
 
 void
 genaddr(void)
 {
-	apply(sethi);
+	apply(fbody(), sethi);
 }

@@ -12,6 +12,13 @@ Symbol *curfun;
 static Alloc *arena;
 static Range body;
 
+/*
+ * This file defines all the functions required to deal with nodes,
+ * and statement ranges. It is usually safe to deal with a subrange
+ * of a function because all the functions have an initial beginning
+ * statement and an ending statement that are never removed and
+ * the begin and end pointer always point to them.
+ */
 Node *
 node(int op)
 {
@@ -74,76 +81,80 @@ prforest(char *msg)
  * current statement
  */
 Node *
-insstmt(Node *np, Node *at, int mode)
+insstmt(Range *rp, Node *np, Node *at, int mode)
 {
 	Node *save;
 
-	save = body.cur;
-	body.cur = at;
-	addstmt(np, KEEPCUR);
+	save = rp->cur;
+	rp->cur = at;
+	addstmt(rp, np, KEEPCUR);
 
 	if (mode == KEEPCUR)
-		body.cur = save;
+		rp->cur = save;
 	else
-		body.cur = (save == at) ? np : save;
+		rp->cur = (save == at) ? np : save;
 
 	return np;
 }
 
 Node *
-addstmt(Node *np, int mode)
+addstmt(Range *rp, Node *np, int mode)
 {
 	Node *next;
 
 	next = NULL;
-	if (body.cur) {
-		next = body.cur->next;
+	if (rp->cur) {
+		next = rp->cur->next;
 		if (next)
 			next->prev = np;
-		body.cur->next = np;
+		rp->cur->next = np;
 	}
 	np->next = next;
-	np->prev = body.cur;
+	np->prev = rp->cur;
 
-	if (!body.begin)
-		body.begin = np;
-	if (!body.end || !np->next)
-		body.end = np;
+	if (!rp->begin)
+		rp->begin = np;
+	if (!rp->end || !np->next)
+		rp->end = np;
 
 	if (mode == SETCUR)
-		body.cur = np;
+		rp->cur = np;
 
 	return np;
 }
 
 Node *
-delstmt(void)
+delstmt(Range *rp)
 {
 	Node *next, *prev;
 
-	if (!body.cur)
-		return NULL;
-
-	next = body.cur->next;
-	prev = body.cur->prev;
+	next = rp->cur->next;
+	prev = rp->cur->prev;
 	if (next)
 		next->prev = prev;
 	if (prev)
 		prev->next = next;
 
-	if (body.begin == body.cur)
-		body.begin = next;
-	if (body.end == body.cur)
-		body.end = prev;
-	deltree(body.cur);
+	if (rp->begin == rp->cur)
+		rp->begin = next;
+	if (rp->end == rp->cur)
+		rp->end = prev;
+	deltree(rp->cur);
 
-	return body.cur = next;
+	if (rp->cur == rp->end)
+		return rp->cur = NULL;
+	return rp->cur = next;
 }
 
 Node *
-nextstmt(void)
+nextstmt(Range *rp, int mode)
 {
-	return body.cur = body.cur->next;
+	Node *next;
+
+	next = (rp->cur == rp->end) ? NULL : rp->cur->next;
+	if (mode == SETCUR)
+		rp->cur = next;
+	return next;
 }
 
 void
@@ -169,16 +180,15 @@ cleannodes(void)
 		dealloc(arena);
 		arena = NULL;
 	}
-	body.cur = NULL;
 	curfun = NULL;
-	memset(&body, 0, sizeof(body));
 }
 
 void
 newfun(Symbol *sym)
 {
 	curfun = sym;
-	curfun->u.body = memset(&body, 0, sizeof(body));
+	body = range(NULL, NULL);
+	curfun->u.body = &body;
 }
 
 void
@@ -213,9 +223,18 @@ range(Node *begin, Node *end)
 }
 
 void
-apply(Node *(*fun)(Node *))
+apply(Range *rp, Node *(*fun)(Range *, Node *))
 {
-	body.cur = body.begin;
-	while (body.cur)
-		(*fun)(body.cur) ? nextstmt() : delstmt();
+	Node *np;
+
+	rp->cur = rp->begin;
+	while (rp->cur) {
+		np = (*fun)(rp, rp->cur);
+		if (!np) {
+			delstmt(rp);
+		} else {
+			rp->cur = np;
+			nextstmt(rp, SETCUR);
+		}
+	}
 }

@@ -354,7 +354,7 @@ waft(Node *np)
 
 	cur = swp - 1;
 	lastcase = cur->last;
-	insstmt(np, cur->last, SETCUR);
+	insstmt(fbody(), np, cur->last, SETCUR);
 
 	cur->last = np;
 	cur->nr++;
@@ -661,7 +661,7 @@ labeldcl(void)
 	sym->kind = SLABEL;
 	sym->u.stmt = np;
 	np->label = sym;
-	addstmt(np, SETCUR);
+	addstmt(fbody(), np, SETCUR);
 }
 
 static void
@@ -677,7 +677,7 @@ stmt(void)
 		deltree(np);
 		return;
 	}
-	addstmt(np, SETCUR);
+	addstmt(fbody(), np, SETCUR);
 }
 
 static void
@@ -686,14 +686,14 @@ beginfun(void)
 	newfun(lastfun);
 	beginf = inpars = 1;
 	pushctx();
-	addstmt(node(OBFUN), SETCUR);
+	addstmt(fbody(), node(OBFUN), SETCUR);
 }
 
 static void
 endfun(void)
 {
 	endf = 1;
-	addstmt(node(OEFUN), SETCUR);
+	addstmt(fbody(), node(OEFUN), SETCUR);
 }
 
 void
