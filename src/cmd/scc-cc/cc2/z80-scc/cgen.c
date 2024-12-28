@@ -521,7 +521,7 @@ ret(Node *np)
 static Node *
 cgen(Range *rp, Node *np)
 {
-	Node aux, *p, *next;
+	Node aux, *next;
 
 	setlabel(np->label);
 	switch (np->op) {
@@ -540,7 +540,7 @@ cgen(Range *rp, Node *np)
 		code(ASJP, NULL, &aux, NULL);
 		break;
 	case OBRANCH:
-		next = np->next;
+		next = nextstmt(rp, KEEPCUR);
 		if (!next->label)
 			next->label = newlabel();
 		bool(np->left, np->u.sym, next->label);
