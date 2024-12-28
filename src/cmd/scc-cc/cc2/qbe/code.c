@@ -407,8 +407,6 @@ writeout(void)
 	char *sep;
 	int haslabel = 0;
 
-	if (!curfun)
-		return;
 	getbblocks();
 
 	if (curfun->kind == SGLOB)

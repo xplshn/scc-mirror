@@ -145,6 +145,7 @@ enum nerrors {
 	ENOSWTC,       /* Out of switch statement */
 	EBBUILT,       /* Unknown builtin */
 	EOVERFL,       /* Numerical overflow */
+	EBAFFUN,       /* Function body not finished */
 	ENUMERR
 };
 

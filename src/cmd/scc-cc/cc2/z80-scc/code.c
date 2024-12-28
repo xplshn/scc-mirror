@@ -205,8 +205,6 @@ data(Node *np)
 void
 writeout(void)
 {
-	if (!curfun)
-		return;
 	label(curfun);
 
 	for (pc = prog; pc; pc = pc->next) {

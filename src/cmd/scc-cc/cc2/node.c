@@ -61,9 +61,6 @@ prforest(char *msg)
 {
 	Node *np;
 
-	if (!curfun)
-		return;
-
 	fprintf(stderr, "tree %s {\n", msg);
 	for (np = body.begin; np; np = np->next)
 		prtree(np);
@@ -218,8 +215,6 @@ range(Node *begin, Node *end)
 void
 apply(Node *(*fun)(Node *))
 {
-	if (!curfun)
-		return;
 	body.cur = body.begin;
 	while (body.cur)
 		(*fun)(body.cur) ? nextstmt() : delstmt();

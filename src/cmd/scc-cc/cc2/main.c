@@ -29,6 +29,8 @@ moreinput(void)
 	int c;
 
 repeat:
+	if (ferror(stdin))
+		error(EFERROR, strerror(errno));
 	if (feof(stdin))
 		return 0;
 	if ((c = getchar()) == '\n' || c == EOF)
@@ -60,11 +62,13 @@ main(int argc, char *argv[])
 
 	while (moreinput()) {
 		parse();
-		genaddr();
-		gencfg();
-		genasm();
-		peephole();
-		writeout();
+		if (curfun) {
+			genaddr();
+			gencfg();
+			genasm();
+			peephole();
+			writeout();
+		}
 	}
 	return 0;
 }

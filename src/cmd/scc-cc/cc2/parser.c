@@ -139,7 +139,7 @@ static struct decoc {
 	['s']   = {     NULL, bswitch, .u.op =      OBSWITCH},
 };
 
-static int sclass, inpars, ininit, endf, lineno;
+static int sclass, inpars, ininit, beginf, endf, lineno;
 static void *stack[STACKSIZ], **sp = stack;
 
 static Node *
@@ -511,7 +511,7 @@ einit(char *token, union tokenop u)
 static void
 endpars(void)
 {
-	if (!curfun || !inpars)
+	if (!inpars)
 		error(ESYNTAX);
 	inpars = 0;
 }
@@ -584,7 +584,7 @@ decl(Symbol *sym)
 			break;
 		case SAUTO:
 		case SREG:
-			if (!curfun)
+			if (!beginf)
 				error(ESYNTAX);
 			((inpars) ? defpar : defvar)(sym);
 			break;
@@ -684,7 +684,7 @@ static void
 beginfun(void)
 {
 	newfun(lastfun);
-	inpars = 1;
+	beginf = inpars = 1;
 	pushctx();
 	addstmt(node(OBFUN), SETCUR);
 }
@@ -703,10 +703,15 @@ parse(void)
 	cleancfg();
 	cleannodes();
 	popctx();
-	endf = 0;
+
+	inpars = ininit = beginf = endf = 0;
 
 	while (!endf && nextline())
 		;
+
 	if (ferror(stdin))
 		error(EFERROR, strerror(errno));
+
+	if (beginf && !endf)
+		error(EBAFFUN);
 }
