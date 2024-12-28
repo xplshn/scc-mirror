@@ -570,15 +570,15 @@ cgen(Node *np)
 static Node *
 sethi(Node *np)
 {
-	Node *lp, *rp;
+	Node *l, *r;
 
 	if (!np)
 		return np;
 
 	np->complex = 0;
 	np->address = 0;
-	lp = np->left;
-	rp = np->right;
+	l = np->left;
+	r = np->right;
 	switch (np->op) {
 	case OAUTO:
 		np->address = 11;
@@ -593,22 +593,22 @@ sethi(Node *np)
 		np->address = 20;
 		break;
 	default:
-		sethi(lp);
-		sethi(rp);
+		sethi(l);
+		sethi(r);
 		break;
 	}
 
 	if (np->address > 10)
 		return np;
-	if (lp)
-		np->complex = lp->complex;
-	if (rp) {
-		int d = np->complex - rp->complex;
+	if (l)
+		np->complex = l->complex;
+	if (r) {
+		int d = np->complex - r->complex;
 
 		if (d == 0)
 			++np->complex;
 		else if (d < 0)
-			np->complex = rp->complex;
+			np->complex = r->complex;
 	}
 	if (np->complex == 0)
 		++np->complex;

@@ -139,19 +139,19 @@ static unsigned char i2f_conv[4][4][2] = {
 static Node *
 complex(Node *np)
 {
-	Node *lp = np->left, *rp = np->right;
+	Node *l = np->left, *r = np->right;
 
 	if (np->address > 10)
 		return np;
-	if (lp)
-		np->complex = lp->complex;
-	if (rp) {
-		int d = np->complex - rp->complex;
+	if (l)
+		np->complex = l->complex;
+	if (r) {
+		int d = np->complex - r->complex;
 
 		if (d == 0)
 			++np->complex;
 		else if (d < 0)
-			np->complex = rp->complex;
+			np->complex = r->complex;
 	}
 	if (np->complex == 0)
 		++np->complex;
@@ -162,15 +162,15 @@ complex(Node *np)
 static Node *
 sethi(Node *np)
 {
-	Node *lp, *rp;
+	Node *l, *r;
 
 	if (!np)
 		return np;
 
 	np->complex = 0;
 	np->address = 0;
-	lp = np->left;
-	rp = np->right;
+	l = np->left;
+	r = np->right;
 
 	switch (np->op) {
 	case OAUTO:
@@ -180,21 +180,21 @@ sethi(Node *np)
 		np->address = 11;
 		break;
 	case OASSIG:
-		assert(lp->op != OCAST);
+		assert(l->op != OCAST);
 		goto binary;
 	case OCPL:
 		assert(np->type.flags & INTF);
 		np->op = OBXOR;
-		rp = constnode(NULL, ~(TUINT) 0, &np->type);
+		r = constnode(NULL, ~(TUINT) 0, &np->type);
 		goto binary;
 	default:
 	binary:
-		lp = sethi(lp);
-		rp = sethi(rp);
+		l = sethi(l);
+		r = sethi(r);
 		break;
 	}
-	np->left = lp;
-	np->right = rp;
+	np->left = l;
+	np->right = r;
 
 	return complex(np);
 }
@@ -547,9 +547,9 @@ assignop(Type *tp)
 }
 
 static void
-rhs_rhs(Node **lp, Node **rp)
+rhs_rhs(Node **lpp, Node **rpp)
 {
-	Node *l = *lp, *r = *rp;
+	Node *l = *lpp, *r = *rpp;
 
 	if (l->complex >= r->complex) {
 		l = rhs(l);
@@ -559,13 +559,13 @@ rhs_rhs(Node **lp, Node **rp)
 		l = rhs(l);
 	}
 
-	*lp = l, *rp = r;
+	*lpp = l, *rpp = r;
 }
 
 static void
-lhs_rhs(Node **lp, Node **rp)
+lhs_rhs(Node **lpp, Node **rpp)
 {
-	Node *l = *lp, *r = *rp;
+	Node *l = *lpp, *r = *rpp;
 
 	if (l->complex >= r->complex) {
 		l = lhs(l);
@@ -575,7 +575,7 @@ lhs_rhs(Node **lp, Node **rp)
 		l = lhs(l);
 	}
 
-	*lp = l, *rp = r;
+	*lpp = l, *rpp = r;
 }
 
 static Node *
