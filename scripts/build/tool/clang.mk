@@ -1,5 +1,6 @@
 include $(BUILDDIR)/tool/gnu.mk
 
+NOCARET = -fno-caret-diagnostics
 TOOL_ASFLAGS = -c
 
 COMP = clang
