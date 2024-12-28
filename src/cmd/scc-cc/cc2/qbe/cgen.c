@@ -816,24 +816,6 @@ norm(Range *rp, Node *np)
 			sym->kind = SLABEL;
 			next->label = sym;
 		}
-	case OJMP:
-		for (;;) {
-			dst = np->u.sym->u.stmt;
-			if (dst->op != OJMP)
-				break;
-			np->u.sym = dst->u.sym;
-		}
-		for (p = np->next; p; p = p->next) {
-			if (p == dst)
-				return NULL;
-			if (p->op == ONOP ||
-			    p->op == OBLOOP ||
-			    p->op == OELOOP) {
-				continue;
-			}
-			break;
-		}
-		break;
 	}
 	return np;
 }
