@@ -223,13 +223,82 @@ buildcfg(void)
 	PRCFG("cfg");
 }
 
+static Node *
+optlabels(Range *rp, Node *np)
+{
+	if (np->op == ONOP && np->label->refcnt == 0) {
+		cfg.dirty = 1;
+		return NULL;
+	}
+	return np;
+}
+
+static Node *
+optjmps(Range *rp, Node *np)
+{
+	Range r;
+	Symbol *label;
+	Node *p, *stmt, *last;
+
+	switch (np->op) {
+	case OBRANCH:
+		label = np->u.sym;
+		stmt = label->u.stmt;
+		goto chain_jumps;
+	case OJMP:
+		label = np->u.sym;
+		stmt = label->u.stmt;
+
+		/* Avoid jump over a set of NOPs */
+		r = range(np, rp->end);
+		for (p = nextstmt(&r, SETCUR); p; p = nextstmt(&r, SETCUR)) {
+			if (p == stmt) {
+				cfg.dirty = 1;
+				label->refcnt--;
+				return NULL;
+			}
+			if (p->op != ONOP)
+				break;
+		}
+
+	chain_jumps:
+		/* avoid chain of jumps to jumps */
+		r = range(stmt, rp->end);
+		for (p = stmt; p && p->op == ONOP; p = nextstmt(&r, SETCUR))
+			;
+		if (p && p != np && p->op == OJMP) {
+			cfg.dirty = 1;
+			label->refcnt--;
+			label = p->u.sym;
+			stmt = label->u.stmt;
+			np->u.sym = label;
+			goto chain_jumps;
+		}
+	}
+}
+
 void
 gencfg(void)
 {
-	PRTREE("before_cfgopt");
-	buildcfg();
-	trimcfg();
-	PRTREE("after_cfgopt");
+	PRTREE("before_gencfg");
+
+	cfg.dirty = 1;
+	while (cfg.dirty) {
+		DBG("new cfg");
+		cleancfg();
+		buildcfg();
+		trimcfg();
+
+		/*
+		 * Jump optimizations only can happen after trimming the cfg,
+		 * because any change in the jumps make invalid the cfg
+		 * automatically
+		 */
+		apply(fbody(), optjmps);
+		apply(fbody(), optlabels);
+	}
+
+	PRTREE("after_gencfg");
 }
 
 static Node *
