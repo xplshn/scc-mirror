@@ -75,24 +75,26 @@ prforest(char *msg)
 }
 #endif
 
-/*
- * Insert a node after `at' and if mode is SETCUR
- * update the current statement if `at' was the
- * current statement
- */
 Node *
-insstmt(Range *rp, Node *np, Node *at, int mode)
+insstmt(Range *rp, Node *np, Node *at)
 {
-	Node *save;
+	Node *next;
 
-	save = rp->cur;
-	rp->cur = at;
-	addstmt(rp, np, KEEPCUR);
+	next = NULL;
+	if (at) {
+		next = at->next;
+		if (next)
+			next->prev = np;
+		at->next = np;
+	}
 
-	if (mode == KEEPCUR)
-		rp->cur = save;
-	else
-		rp->cur = (save == at) ? np : save;
+	np->next = next;
+	np->prev = at;
+
+	if (!rp->begin)
+		rp->begin = np;
+	if (!rp->end || !next)
+		rp->end = np;
 
 	return np;
 }
@@ -100,26 +102,9 @@ insstmt(Range *rp, Node *np, Node *at, int mode)
 Node *
 addstmt(Range *rp, Node *np, int mode)
 {
-	Node *next;
-
-	next = NULL;
-	if (rp->cur) {
-		next = rp->cur->next;
-		if (next)
-			next->prev = np;
-		rp->cur->next = np;
-	}
-	np->next = next;
-	np->prev = rp->cur;
-
-	if (!rp->begin)
-		rp->begin = np;
-	if (!rp->end || !np->next)
-		rp->end = np;
-
+	insstmt(rp, np, rp->cur);
 	if (mode == SETCUR)
 		rp->cur = np;
-
 	return np;
 }
 

@@ -346,15 +346,17 @@ oreturn(char *token, union tokenop u)
 static void
 waft(Node *np)
 {
-	Node *lastcase, *next;
+	Range *rp;
 	struct swtch *cur;
 
 	if (swp == swtbl)
 		error(EWTACKU);
 
 	cur = swp - 1;
-	lastcase = cur->last;
-	insstmt(fbody(), np, cur->last, SETCUR);
+	rp = fbody();
+	insstmt(rp, np, cur->last);
+	if (rp->cur == cur->last)
+		rp->cur = np;
 
 	cur->last = np;
 	cur->nr++;

@@ -277,7 +277,7 @@ extern Node *node(int op);
 extern Node *addstmt(Range *, Node *np, int flags);
 extern Node *delstmt(Range *);
 extern Node *nextstmt(Range *, int);
-extern Node *insstmt(Range *, Node *, Node *, int);
+extern Node *insstmt(Range *, Node *, Node *);
 extern void delrange(Range *);
 extern Range range(Node *, Node *);
 
