@@ -116,12 +116,10 @@ waftstmt(Node *at)
 }
 
 Node *
-addstmt(Node *np, int mode)
+addstmt(Node *np)
 {
 	insstmt(np, curstmt);
-	if (mode == SETCUR)
-		curstmt = np;
-	return np;
+	return curstmt = np;
 }
 
 Node *

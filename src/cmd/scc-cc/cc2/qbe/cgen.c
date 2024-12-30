@@ -808,7 +808,7 @@ norm(Node *np)
 		 */
 		op = (np->prev) ? np->prev->op : 0;
 		if (!op || op == ONOP || op == OBRANCH || (op != ORET && op != OJMP))
-			addstmt(node(ORET), KEEPCUR);
+			addstmt(node(ORET));
 		break;
 	case OBRANCH:
 		if (!next->label) {

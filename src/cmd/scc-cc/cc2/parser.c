@@ -353,7 +353,7 @@ waft(Node *np)
 		error(EWTACKU);
 
 	cur = swp - 1;
-	addstmt(np, SETCUR);
+	addstmt(np);
 	waftstmt(cur->last);
 	cur->last = np;
 	cur->nr++;
@@ -660,7 +660,7 @@ labeldcl(void)
 	sym->kind = SLABEL;
 	sym->u.stmt = np;
 	np->label = sym;
-	addstmt(np, SETCUR);
+	addstmt(np);
 }
 
 static void
@@ -676,7 +676,7 @@ stmt(void)
 		deltree(np);
 		return;
 	}
-	addstmt(np, SETCUR);
+	addstmt(np);
 }
 
 static void
@@ -691,7 +691,7 @@ static void
 endfun(void)
 {
 	endf = 1;
-	laststmt = addstmt(node(OEFUN), SETCUR);
+	laststmt = addstmt(node(OEFUN));
 }
 
 void

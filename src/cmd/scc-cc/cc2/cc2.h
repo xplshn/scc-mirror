@@ -256,8 +256,6 @@ extern void pprint(char *s);
 extern void deftype(Type *);
 
 /* node.c */
-#define SETCUR  1
-#define KEEPCUR 0
 extern void newfun(Symbol *, Node *);
 extern void apply(Node *(*fun)(Node *));
 extern void cleannodes(void);
@@ -265,7 +263,7 @@ extern void delnode(Node *np);
 extern void deltree(Node *np);
 extern void prtree(Node *np), prforest(char *msg);
 extern Node *node(int op);
-extern Node *addstmt(Node *np, int flags);
+extern Node *addstmt(Node *);
 extern Node *delstmt(void);
 extern Node *insstmt(Node *, Node *);
 extern void delrange(Node *, Node *);
