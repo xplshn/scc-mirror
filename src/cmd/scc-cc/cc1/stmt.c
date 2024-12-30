@@ -367,11 +367,8 @@ compound(Symbol *lbreak, Symbol *lcont, Switch *lswitch)
 		error("too many nesting levels of compound statements");
 
 	++nested;
-	for (;;) {
-		if (yytoken == '}')
-			break;
+	while (yytoken != '}')
 		blockit(lbreak, lcont, lswitch);
-	}
 	--nested;
 
 	popctx();
