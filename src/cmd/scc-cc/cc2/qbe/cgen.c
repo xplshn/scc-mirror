@@ -12,7 +12,7 @@
 #define I4BYTES 2
 #define I8BYTES 3
 
-static Node *cgen(Range *, Node *);
+static Node *cgen(Node *);
 
 static unsigned char opasmw[][2] = {
 	[OADD] = {ASADDW, ASADDW},
@@ -160,7 +160,7 @@ complex(Node *np)
 }
 
 static Node *
-sethi(Range *rp, Node *np)
+sethi(Node *np)
 {
 	Node *l, *r;
 
@@ -189,8 +189,8 @@ sethi(Range *rp, Node *np)
 		goto binary;
 	default:
 	binary:
-		l = sethi(rp, l);
-		r = sethi(rp, r);
+		l = sethi(l);
+		r = sethi(r);
 		break;
 	}
 	np->left = l;
@@ -490,7 +490,7 @@ swtch(Node *idx)
 	Symbol *deflabel = NULL;
 
 	for (;;) {
-		np = delstmt(fbody());
+		np = delstmt();
 		setlabel(np->label);
 
 		switch (np->op) {
@@ -500,7 +500,7 @@ swtch(Node *idx)
 			aux1.op = OJMP;
 			aux1.label = NULL;
 			aux1.u.sym = deflabel;
-			cgen(fbody(), &aux1);
+			cgen(&aux1);
 			return;
 		case OCASE:
 			aux1 = *np;
@@ -513,7 +513,7 @@ swtch(Node *idx)
 			aux2.left = np->left;
 			aux2.right = idx;
 
-			cgen(fbody(), &aux1);
+			cgen(&aux1);
 			break;
 		case ODEFAULT:
 			deflabel = np->u.sym;
@@ -599,7 +599,7 @@ assign(Node *np)
 		aux.left = ret;
 		aux.right = r;
 		aux.type = np->type;
-		r = rhs(sethi(fbody(), &aux));
+		r = rhs(sethi(&aux));
 		break;
 	default:
 		/* assign abbreviation */
@@ -611,7 +611,7 @@ assign(Node *np)
 			aux.right = r;
 			aux.type = int32type;
 			aux.address = np->address;
-			ret = r = sethi(fbody(), rhs(&aux));
+			ret = r = sethi(rhs(&aux));
 			break;
 		}
 
@@ -620,7 +620,7 @@ assign(Node *np)
 		aux.right = r;
 		aux.type = np->type;
 		aux.address = np->address;
-		r = sethi(fbody(), &aux);
+		r = sethi(&aux);
 	case 0:
 		lhs_rhs(&l, &r);
 		ret = r;
@@ -749,7 +749,7 @@ rhs(Node *np)
 }
 
 static Node *
-cgen(Range *rp, Node *np)
+cgen(Node *np)
 {
 	Node aux, *p, *next;
 
@@ -788,7 +788,7 @@ cgen(Range *rp, Node *np)
 }
 
 static Node *
-norm(Range *rp, Node *np)
+norm(Node *np)
 {
 	int op = np->op;
 	Node *p, *dst, *next = np->next;
@@ -808,7 +808,7 @@ norm(Range *rp, Node *np)
 		 */
 		op = (np->prev) ? np->prev->op : 0;
 		if (!op || op == ONOP || op == OBRANCH || (op != ORET && op != OJMP))
-			addstmt(rp, node(ORET), KEEPCUR);
+			addstmt(node(ORET), KEEPCUR);
 		break;
 	case OBRANCH:
 		if (!next->label) {
@@ -823,12 +823,12 @@ norm(Range *rp, Node *np)
 void
 genasm(void)
 {
-	apply(fbody(), norm);
-	apply(fbody(), cgen);
+	apply(norm);
+	apply(cgen);
 }
 
 void
 genaddr(void)
 {
-	apply(fbody(), sethi);
+	apply(sethi);
 }

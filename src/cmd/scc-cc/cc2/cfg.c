@@ -96,13 +96,13 @@ newbb(Node *np)
 	bb->true = bb->false = NULL;
 	bb->id = cfg.nr++;
 	bb->visited = 0;
-	np->bb = bb;
+	cfg.cur = bb;
 
 	return bb;
 }
 
 static Node *
-mkcfg(Range *rp, Node *np)
+mkcfg(Node *np)
 {
 	if ((np->flags & (BBENTRY|BBEXIT)) == 0)
 		return np;
@@ -123,7 +123,7 @@ mkcfg(Range *rp, Node *np)
 		cfg.exitb = cfg.cur;
 		break;
 	case ORET:
-		cfg.cur->true = fbody()->end->bb;
+		cfg.cur->true = laststmt->bb;
 		break;
 	case OBRANCH:
 		cfg.cur->false = np->next->bb;
@@ -136,10 +136,12 @@ mkcfg(Range *rp, Node *np)
 }
 
 static Node *
-mkbb(Range *rp, Node *np)
+mkbb(Node *np)
 {
 	if (np->flags & BBENTRY)
 		newbb(np);
+	np->bb = cfg.cur;
+
 	return np;
 }
 
@@ -157,14 +159,14 @@ newentry(Node *np)
 }
 
 static Node *
-markbb(Range *rp, Node *np)
+markbb(Node *np)
 {
 	switch (np->op) {
 	case OBFUN:
 		newentry(np);
 		break;
 	case ORET:
-		newentry(rp->end);
+		newentry(laststmt);
 		newentry(np->next);
 		break;
 	case OBRANCH:
@@ -190,15 +192,12 @@ static void
 trimcfg(void)
 {
 	Block *bb, *prev, *next;
-	Range r;
 
 	visit(cfg.entryb);
 	for (bb = cfg.blocks; bb < &cfg.blocks[cfg.nr]; ++bb) {
 		if (bb->visited)
 			continue;
-
-		r = range(bb->entryp, bb->exitp);
-		delrange(&r);
+		delrange(bb->entryp, bb->exitp);
 		bb->id = -1;
 	}
 	PRCFG("trimmed_cfg");
@@ -209,22 +208,22 @@ buildcfg(void)
 {
 	int nr;
 
-	apply(fbody(), markbb);
+	apply(markbb);
 	PRTREE("bb_mark");
 
 	cfg.blocks = xcalloc(cfg.nr, sizeof(Block));
 	nr = cfg.nr;
 	cfg.nr = 0;
-	apply(fbody(), mkbb);
+	apply(mkbb);
 	assert(cfg.nr == nr);
 
 	PRTREE("bb_mk");
-	apply(fbody(), mkcfg);
+	apply(mkcfg);
 	PRCFG("cfg");
 }
 
 static Node *
-optlabels(Range *rp, Node *np)
+optlabels(Node *np)
 {
 	if (np->op == ONOP && np->label->refcnt == 0) {
 		cfg.dirty = 1;
@@ -234,9 +233,8 @@ optlabels(Range *rp, Node *np)
 }
 
 static Node *
-optjmps(Range *rp, Node *np)
+optjmps(Node *np)
 {
-	Range r;
 	Symbol *label;
 	Node *p, *stmt, *last;
 
@@ -250,8 +248,7 @@ optjmps(Range *rp, Node *np)
 		stmt = label->u.stmt;
 
 		/* Avoid jump over a set of NOPs */
-		r = range(np, rp->end);
-		for (p = nextstmt(&r, SETCUR); p; p = nextstmt(&r, SETCUR)) {
+		for (p = np->next; p; p = p->next) {
 			if (p == stmt) {
 				cfg.dirty = 1;
 				label->refcnt--;
@@ -263,8 +260,7 @@ optjmps(Range *rp, Node *np)
 
 	chain_jumps:
 		/* avoid chain of jumps to jumps */
-		r = range(stmt, rp->end);
-		for (p = stmt; p && p->op == ONOP; p = nextstmt(&r, SETCUR))
+		for (p = stmt; p && p->op == ONOP; p = p->next)
 			;
 		if (p && p != np && p->op == OJMP) {
 			cfg.dirty = 1;
@@ -275,6 +271,8 @@ optjmps(Range *rp, Node *np)
 			goto chain_jumps;
 		}
 	}
+
+	return np;
 }
 
 void
@@ -294,17 +292,18 @@ gencfg(void)
 		 * because any change in the jumps make invalid the cfg
 		 * automatically
 		 */
-		apply(fbody(), optjmps);
-		apply(fbody(), optlabels);
+		apply(optjmps);
+		apply(optlabels);
 	}
 
 	PRTREE("after_gencfg");
 }
 
 static Node *
-cleanbb(Range *rp, Node *np)
+cleanbb(Node *np)
 {
 	np->flags &= ~(BBENTRY | BBEXIT);
+	np->bb = NULL;
 	return np;
 }
 
@@ -314,5 +313,5 @@ cleancfg(void)
 	free(cfg.blocks);
 	memset(&cfg, 0, sizeof(cfg));
 	if (curfun)
-		apply(fbody(), cleanbb);
+		apply(cleanbb);
 }

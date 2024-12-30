@@ -1,5 +1,4 @@
 #define ASLABEL 0
-#define fbody() (curfun->u.body)
 
 enum iflags {
 	BBENTRY =    1,        /* basic block entry */
@@ -156,19 +155,12 @@ typedef struct symbol Symbol;
 typedef struct addr Addr;
 typedef struct inst Inst;
 typedef struct block Block;
-typedef struct range Range;
 
 struct type {
 	unsigned long size;
 	unsigned align;
 	unsigned short id;
 	short flags;
-};
-
-struct range {
-	Node *begin;
-	Node *end;
-	Node *cur;
 };
 
 struct symbol {
@@ -183,7 +175,6 @@ struct symbol {
 		long off;
 		Node *stmt;
 		Inst *inst;
-		Range *body;
 	} u;
 	Symbol *next, *prev;
 	Symbol *h_next;
@@ -267,19 +258,18 @@ extern void deftype(Type *);
 /* node.c */
 #define SETCUR  1
 #define KEEPCUR 0
-extern void newfun(Symbol *);
-extern void apply(Range *, Node *(*fun)(Range *, Node *));
+extern void newfun(Symbol *, Node *);
+extern void apply(Node *(*fun)(Node *));
 extern void cleannodes(void);
 extern void delnode(Node *np);
 extern void deltree(Node *np);
 extern void prtree(Node *np), prforest(char *msg);
 extern Node *node(int op);
-extern Node *addstmt(Range *, Node *np, int flags);
-extern Node *delstmt(Range *);
-extern Node *nextstmt(Range *, int);
-extern Node *insstmt(Range *, Node *, Node *);
-extern void delrange(Range *);
-extern Range range(Node *, Node *);
+extern Node *addstmt(Node *np, int flags);
+extern Node *delstmt(void);
+extern Node *insstmt(Node *, Node *);
+extern void delrange(Node *, Node *);
+extern Node *waftstmt(Node *);
 
 /* symbol.c */
 #define TMPSYM  0
@@ -296,6 +286,7 @@ extern void cleancfg(void);
 extern Symbol *curfun;
 extern Symbol *locals;
 extern Inst *pc, *prog;
+extern Node *laststmt;
 
 /* target */
 extern Type int8type, int16type, int32type, int64type,

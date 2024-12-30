@@ -30,6 +30,7 @@ struct swtch {
 	Node *last;
 };
 
+Node *laststmt;
 static struct swtch swtbl[NR_BLOCK], *swp = swtbl;
 static Symbol *lastfun;
 
@@ -346,18 +347,14 @@ oreturn(char *token, union tokenop u)
 static void
 waft(Node *np)
 {
-	Range *rp;
 	struct swtch *cur;
 
 	if (swp == swtbl)
 		error(EWTACKU);
 
 	cur = swp - 1;
-	rp = fbody();
-	insstmt(rp, np, cur->last);
-	if (rp->cur == cur->last)
-		rp->cur = np;
-
+	addstmt(np, SETCUR);
+	waftstmt(cur->last);
 	cur->last = np;
 	cur->nr++;
 }
@@ -663,7 +660,7 @@ labeldcl(void)
 	sym->kind = SLABEL;
 	sym->u.stmt = np;
 	np->label = sym;
-	addstmt(fbody(), np, SETCUR);
+	addstmt(np, SETCUR);
 }
 
 static void
@@ -679,23 +676,22 @@ stmt(void)
 		deltree(np);
 		return;
 	}
-	addstmt(fbody(), np, SETCUR);
+	addstmt(np, SETCUR);
 }
 
 static void
 beginfun(void)
 {
-	newfun(lastfun);
+	newfun(lastfun, node(OBFUN));
 	beginf = inpars = 1;
 	pushctx();
-	addstmt(fbody(), node(OBFUN), SETCUR);
 }
 
 static void
 endfun(void)
 {
 	endf = 1;
-	addstmt(fbody(), node(OEFUN), SETCUR);
+	laststmt = addstmt(node(OEFUN), SETCUR);
 }
 
 void

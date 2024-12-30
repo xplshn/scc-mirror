@@ -519,7 +519,7 @@ ret(Node *np)
 }
 
 static Node *
-cgen(Range *rp, Node *np)
+cgen(Node *np)
 {
 	Node aux, *next;
 
@@ -540,7 +540,7 @@ cgen(Range *rp, Node *np)
 		code(ASJP, NULL, &aux, NULL);
 		break;
 	case OBRANCH:
-		next = nextstmt(rp, KEEPCUR);
+		next = np->next;
 		if (!next->label)
 			next->label = newlabel();
 		bool(np->left, np->u.sym, next->label);
@@ -568,7 +568,7 @@ cgen(Range *rp, Node *np)
  *     CONST => 20         $value
  */
 static Node *
-sethi(Range *rp, Node *np)
+sethi(Node *np)
 {
 	Node *l, *r;
 
@@ -593,8 +593,8 @@ sethi(Range *rp, Node *np)
 		np->address = 20;
 		break;
 	default:
-		sethi(rp, l);
-		sethi(rp, r);
+		sethi(l);
+		sethi(r);
 		break;
 	}
 
@@ -624,5 +624,5 @@ genasm(void)
 void
 genaddr(void)
 {
-	apply(fbody(), sethi);
+	apply(sethi);
 }
