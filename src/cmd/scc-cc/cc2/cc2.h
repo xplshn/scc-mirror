@@ -268,6 +268,7 @@ extern Node *delstmt(void);
 extern Node *insstmt(Node *, Node *);
 extern void delrange(Node *, Node *);
 extern Node *waftstmt(Node *);
+extern Node *unlinkstmt(Node *);
 
 /* symbol.c */
 #define TMPSYM  0

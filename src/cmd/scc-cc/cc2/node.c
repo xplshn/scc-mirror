@@ -84,8 +84,8 @@ insstmt(Node *np, Node *at)
 	return np;
 }
 
-static Node *
-unlink(Node *np)
+Node *
+unlinkstmt(Node *np)
 {
 	Node *next, *prev;
 
@@ -112,7 +112,7 @@ waftstmt(Node *at)
 	if (prev == at)
 		return np;
 	curstmt = prev;
-	return insstmt(unlink(np), at);
+	return insstmt(unlinkstmt(np), at);
 }
 
 Node *
@@ -128,7 +128,7 @@ delstmt(void)
 	Node *next;
 
 	next = curstmt->next;
-	deltree(unlink(curstmt));
+	deltree(unlinkstmt(curstmt));
 	return curstmt = next;
 }
 
