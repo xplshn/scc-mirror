@@ -4,6 +4,7 @@
  * code is not needed in qbe targets.
  */
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,9 +19,6 @@
 #define PRCFG(msg) (enadebug ? prcfg(msg) : NULL)
 #define PRTREE(msg) (enadebug ? prforest(msg) : NULL)
 #endif
-
-/* TODO: ignore OCASE, OBSWITCH, ODEFAULT for now */
-#define NBLOCKS 10
 
 struct cfg {
 	int nr;
@@ -289,4 +287,113 @@ cleancfg(void)
 {
 	free(cfg.blocks);
 	memset(&cfg, 0, sizeof(cfg));
+}
+
+static Node *
+swtch_if(Node *idx)
+{
+	Node *tmpvar, *next, *tmp, *np;
+	Symbol *deflabel = NULL;
+
+	tmpvar = tmpnode(&idx->type);
+	idx->right = idx->left;
+	idx->right = tmpvar;
+	idx->op = OASSIG;
+
+	for (np = idx->next; ; np = next) {
+		next = np->next;
+		switch (np->op) {
+		case OESWITCH:
+			if (!deflabel)
+				deflabel = np->u.sym;
+			np->op = OJMP;
+			np->u.sym = deflabel;
+			return sethi(idx);
+		case OCASE:
+			np->op = OBRANCH;
+			tmp = node(OEQ);
+			tmp->type = idx->type;
+			tmp->left = np->left;
+			tmp->right = tmpvar;
+			np->left = tmp;
+			break;
+		case ODEFAULT:
+			deflabel = np->u.sym;
+			deltree(unlinkstmt(np));
+			break;
+		default:
+			abort();
+		}
+	}
+}
+
+static Node *
+swtch(Node *np)
+{
+	int n;
+	TINT min, max, val;
+	Node *p, *def = NULL;
+
+	min = TINT_MAX;
+	min = max = n = 0;
+	for (p = np->next; p->op != OESWITCH; p = p->next) {
+		if (p->op == ODEFAULT) {
+			def = np;
+		} else {
+			val = np->left->u.i;
+			if (val > max)
+				max = val;
+			if (val < min)
+				min = val;
+		}
+		++n;
+	}
+
+	return swtch_if(np);
+}
+
+Node *
+sethi(Node *np)
+{
+	Node *l, *r;
+
+	if (!np)
+		return np;
+
+	np->complex = 0;
+	np->address = 0;
+
+	switch (np->op) {
+	case OBSWITCH:
+		np = swtch(np);
+		break;
+	default:
+		np = tsethi(np);
+	}
+
+	l = np->left;
+	r = np->right;
+
+	if (np->address > 10)
+		return np;
+	if (l)
+		np->complex = l->complex;
+	if (r) {
+		int d = np->complex - r->complex;
+
+		if (d == 0)
+			++np->complex;
+		else if (d < 0)
+			np->complex = r->complex;
+	}
+	if (np->complex == 0)
+		++np->complex;
+
+	return np;
+}
+
+void
+genaddr(void)
+{
+	apply(sethi);
 }

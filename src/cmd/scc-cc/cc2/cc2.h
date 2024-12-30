@@ -160,7 +160,7 @@ struct type {
 	unsigned long size;
 	unsigned align;
 	unsigned short id;
-	short flags;
+	unsigned short flags;
 };
 
 struct symbol {
@@ -236,6 +236,7 @@ extern void parse(void);
 /* cgen.c */
 extern void genaddr(void);
 extern void genasm(void);
+extern Node *tsethi(Node *);
 
 /* peep.c */
 extern void peephole(void);
@@ -280,6 +281,7 @@ extern void freesym(Symbol *sym);
 /* cfg.c */
 extern void gencfg(void);
 extern void cleancfg(void);
+extern Node *sethi(Node *);
 
 /* globals */
 extern Symbol *curfun;

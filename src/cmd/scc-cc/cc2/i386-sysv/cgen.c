@@ -8,7 +8,7 @@ genasm(void)
 {
 }
 
-void
-genaddr(void)
+Node *
+tsethi(Node *np)
 {
 }

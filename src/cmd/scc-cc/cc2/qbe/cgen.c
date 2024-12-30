@@ -159,8 +159,8 @@ complex(Node *np)
 	return np;
 }
 
-static Node *
-sethi(Node *np)
+Node *
+tsethi(Node *np)
 {
 	Node *l, *r;
 
@@ -189,8 +189,8 @@ sethi(Node *np)
 		goto binary;
 	default:
 	binary:
-		l = sethi(l);
-		r = sethi(r);
+		l = tsethi(l);
+		r = tsethi(r);
 		break;
 	}
 	np->left = l;
@@ -599,7 +599,7 @@ assign(Node *np)
 		aux.left = ret;
 		aux.right = r;
 		aux.type = np->type;
-		r = rhs(sethi(&aux));
+		r = rhs(tsethi(&aux));
 		break;
 	default:
 		/* assign abbreviation */
@@ -611,7 +611,7 @@ assign(Node *np)
 			aux.right = r;
 			aux.type = int32type;
 			aux.address = np->address;
-			ret = r = sethi(rhs(&aux));
+			ret = r = tsethi(rhs(&aux));
 			break;
 		}
 
@@ -620,7 +620,7 @@ assign(Node *np)
 		aux.right = r;
 		aux.type = np->type;
 		aux.address = np->address;
-		r = sethi(&aux);
+		r = tsethi(&aux);
 	case 0:
 		lhs_rhs(&l, &r);
 		ret = r;
@@ -830,5 +830,5 @@ genasm(void)
 void
 genaddr(void)
 {
-	apply(sethi);
+	apply(tsethi);
 }

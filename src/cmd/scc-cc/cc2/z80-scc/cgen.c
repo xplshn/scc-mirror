@@ -567,16 +567,11 @@ cgen(Node *np)
  *     STATIC => 12        (value)
  *     CONST => 20         $value
  */
-static Node *
-sethi(Node *np)
+Node *
+tsethi(Node *np)
 {
 	Node *l, *r;
 
-	if (!np)
-		return np;
-
-	np->complex = 0;
-	np->address = 0;
 	l = np->left;
 	r = np->right;
 	switch (np->op) {
@@ -593,36 +588,19 @@ sethi(Node *np)
 		np->address = 20;
 		break;
 	default:
-		sethi(l);
-		sethi(r);
+		l = sethi(l);
+		r = sethi(r);
 		break;
 	}
 
-	if (np->address > 10)
-		return np;
-	if (l)
-		np->complex = l->complex;
-	if (r) {
-		int d = np->complex - r->complex;
+	np->left = l;
+	np->right = r;
 
-		if (d == 0)
-			++np->complex;
-		else if (d < 0)
-			np->complex = r->complex;
-	}
-	if (np->complex == 0)
-		++np->complex;
 	return np;
 }
 
 void
 genasm(void)
 {
-	apply(fbody(), cgen);
-}
-
-void
-genaddr(void)
-{
-	apply(sethi);
+	apply(cgen);
 }

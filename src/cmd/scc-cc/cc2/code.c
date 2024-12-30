@@ -141,7 +141,7 @@ label2node(Node *np, Symbol *sym)
 Node *
 tmpnode(Type *tp)
 {
-	char flags;
+	unsigned short flags;
 	Symbol *sym;
 	Node *np;
 
