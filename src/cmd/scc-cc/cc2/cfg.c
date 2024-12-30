@@ -24,7 +24,6 @@
 
 struct cfg {
 	int nr;
-	int dirty;
 	Block *entryb, *exitb;
 	Block *cur;
 	Block *blocks;
@@ -225,10 +224,8 @@ buildcfg(void)
 static Node *
 optlabels(Node *np)
 {
-	if (np->op == ONOP && np->label->refcnt == 0) {
-		cfg.dirty = 1;
+	if (np->op == ONOP && np->label->refcnt == 0)
 		return NULL;
-	}
 	return np;
 }
 
@@ -250,7 +247,6 @@ optjmps(Node *np)
 		/* Avoid jump over a set of NOPs */
 		for (p = np->next; p; p = p->next) {
 			if (p == stmt) {
-				cfg.dirty = 1;
 				label->refcnt--;
 				return NULL;
 			}
@@ -263,7 +259,6 @@ optjmps(Node *np)
 		for (p = stmt; p && p->op == ONOP; p = p->next)
 			;
 		if (p && p != np && p->op == OJMP) {
-			cfg.dirty = 1;
 			label->refcnt--;
 			label = p->u.sym;
 			stmt = label->u.stmt;
@@ -280,31 +275,13 @@ gencfg(void)
 {
 	PRTREE("before_gencfg");
 
-	cfg.dirty = 1;
-	while (cfg.dirty) {
-		DBG("new cfg");
-		cleancfg();
-		buildcfg();
-		trimcfg();
-
-		/*
-		 * Jump optimizations only can happen after trimming the cfg,
-		 * because any change in the jumps make invalid the cfg
-		 * automatically
-		 */
-		apply(optjmps);
-		apply(optlabels);
-	}
+	apply(optjmps);
+	apply(optlabels);
+	DBG("new cfg");
+	buildcfg();
+	trimcfg();
 
 	PRTREE("after_gencfg");
-}
-
-static Node *
-cleanbb(Node *np)
-{
-	np->flags &= ~(BBENTRY | BBEXIT);
-	np->bb = NULL;
-	return np;
 }
 
 void
@@ -312,6 +289,4 @@ cleancfg(void)
 {
 	free(cfg.blocks);
 	memset(&cfg, 0, sizeof(cfg));
-	if (curfun)
-		apply(cleanbb);
 }
