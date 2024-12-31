@@ -187,8 +187,6 @@ f 755 libexec/scc/as-ppc
 f 755 libexec/scc/as-ppc64
 f 755 libexec/scc/as-z80
 f 755 libexec/scc/cc1
-f 755 libexec/scc/cc2-amd64-sysv
-f 755 libexec/scc/cc2-i386-sysv
 f 755 libexec/scc/cc2-qbe_amd64-sysv
 f 755 libexec/scc/cc2-qbe_arm64-sysv
 f 755 libexec/scc/cc2-z80-scc

@@ -25,14 +25,6 @@ OBJS =\
 	cfg.o\
 	$(QBE_OBJS)\
 
-AMD64_SYSV_OBJS =\
-	amd64-sysv/builtin.o\
-	$(OBJS) \
-
-I386_SYSV_OBJS =\
-	i386-sysv/builtin.o\
-	$(OBJS)
-
 QBE_AMD64_SYSV_OBJS=\
 	qbe_amd64-sysv/builtin.o\
 	$(QBE_OBJS)\
@@ -46,8 +38,6 @@ Z80_SCC_OBJS =\
 	$(OBJS) \
 
 TARGET  =\
-	cc2-amd64-sysv\
-	cc2-i386-sysv\
 	cc2-qbe_amd64-sysv\
 	cc2-qbe_arm64-sysv\
 	cc2-z80-scc\
@@ -66,12 +56,6 @@ error.h: cc2.h
 	rm -f $@;\
 	trap 'rm -f $$$$.h' EXIT INT QUIT TERM HUP;\
 	awk -f generror.awk cc2.h > $$$$.h && mv $$$$.h $@
-
-cc2-amd64-sysv: $(LIBSCC) $(AMD64_SYSV_OBJS)
-	$(CC) $(PROJ_LDFLAGS) $(AMD64_SYSV_OBJS) $(PROJ_LDLIBS) -o $@
-
-cc2-i386-sysv: $(LIBSCC) $(I386_SYSV_OBJS)
-	$(CC) $(PROJ_LDFLAGS) $(I386_SYSV_OBJS) $(PROJ_LDLIBS) -o $@
 
 cc2-qbe_amd64-sysv: $(LIBSCC) $(QBE_AMD64_SYSV_OBJS)
 	$(CC) $(PROJ_LDFLAGS) $(QBE_AMD64_SYSV_OBJS) $(PROJ_LDLIBS) -o $@
