@@ -87,27 +87,18 @@ swtch_dir(Node *np, int n, TINT min, TINT max)
 Node *
 swtch(Node *np)
 {
+	Swtch *swt;
 	int n;
-	TINT min, max, range, val;
-	Node *p, *def = NULL;
+	TINT min, max, range;
 
-	min = TINT_MAX;
-	max = n = 0;
-	for (p = np->next; p->op != OESWITCH; p = p->next) {
-		if (p->op != ODEFAULT) {
-			val = p->left->u.i;
-			if (val > max)
-				max = val;
-			if (val < min)
-				min = val;
-			++n;
-		}
-	}
+	swt = np->u.swtch;
+	min = swt->min;
+	max = swt->max;
+	range = max - min + 1;
+	n = swt->nr;
 
 	if (n < 4)
 		return swtch_if(np);
-
-	range = max - min + 1;
 	if (range == n)
 		return swtch_dir(np, range, min, max);
 
