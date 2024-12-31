@@ -139,6 +139,7 @@ emittree(Node *np)
 	case OADDR:
 		emittree(np->left);
 		break;
+	case OLABEL:
 	case OMEM:
 		fputs(symname(np->u.sym), stdout);
 		break;

@@ -302,6 +302,7 @@ swtch_if(Node *idx)
 
 	for (np = idx->next; ; np = next) {
 		next = np->next;
+
 		switch (np->op) {
 		case OESWITCH:
 			if (!deflabel)
@@ -328,28 +329,71 @@ swtch_if(Node *idx)
 }
 
 static Node *
+swtch_dir(Node *np, int n, TINT min, TINT max)
+{
+	Node aux, *p, *defnode;
+	Node **its, **zero, **ip;
+	Symbol *tbl;
+
+	its = xcalloc(n, sizeof(*its));
+	zero = its;
+	if (min < 0)
+		zero -= min;
+
+	for (p = np->next; p->op != OESWITCH; p = p->next) {
+		if (p->op == ODEFAULT)
+			defnode = p;
+		else
+			its[p->left->u.i] = p;
+		p->type = ptrtype;
+		p->op = OLABEL;
+	}
+	np->next = p->next;
+
+	for (ip = its; ip < &its[n]; ++ip) {
+		if (*ip == NULL)
+			*ip = defnode;
+	}
+
+	tbl = getsym(TMPSYM);
+	tbl->kind = SLOCAL;
+	tbl->type = ptrtype;
+	tbl->type.flags |= INITF;
+
+	defglobal(tbl);
+	for (ip = its; ip < &its[n]; ++ip)
+		data(*ip);
+	endinit();
+}
+
+static Node *
 swtch(Node *np)
 {
 	int n;
-	TINT min, max, val;
+	TINT min, max, range, val;
 	Node *p, *def = NULL;
 
 	min = TINT_MAX;
-	min = max = n = 0;
+	max = n = 0;
 	for (p = np->next; p->op != OESWITCH; p = p->next) {
-		if (p->op == ODEFAULT) {
-			def = np;
-		} else {
-			val = np->left->u.i;
+		if (p->op != ODEFAULT) {
+			val = p->left->u.i;
 			if (val > max)
 				max = val;
 			if (val < min)
 				min = val;
+			++n;
 		}
-		++n;
 	}
 
-	return swtch_if(np);
+	if (n < 4)
+		return swtch_if(np);
+
+	range = max - min + 1;
+	if (range == n)
+		return swtch_dir(np, range, min, max);
+
+	abort();
 }
 
 Node *
