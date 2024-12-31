@@ -4,6 +4,20 @@ int
 main()
 {
 	switch(x)
+		return 1;
+	switch(x) {
+		default:
+			return 1;
+		case 0:
+			;
+	}
+	switch(x) {
+		case 1:
+			return 1;
+		case 2:
+			return 2;
+	}
+	switch(x)
 		case 0:
 			;
 	switch(x)
