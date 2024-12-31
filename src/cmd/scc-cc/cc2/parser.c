@@ -385,14 +385,18 @@ bswitch(char *token, union tokenop u)
 static void
 eswitch(char *token, union tokenop u)
 {
+	Node *first;
 	Swtch *cur;
 
 	if (swp == swtbl)
 		error(EWTACKU);
 	jump(token, u);
 	waft(pop());
+
 	cur = --swp;
-	cur->first->u.swtch = newswitch(cur);
+	first = cur->first;
+	cur->cases = first->next;
+	first->u.swtch = newswitch(cur);
 }
 
 static void

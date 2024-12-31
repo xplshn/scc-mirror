@@ -161,6 +161,7 @@ struct swtch {
 	int nr;
 	TINT min, max;
 	Node *defnode;
+	Node *cases;
 	Node *first;
 	Node *last;
 	Swtch *next;
@@ -217,6 +218,7 @@ struct block {
 	int printed, visited;
 	Node *entryp, *exitp;
 	Block *true, *false;
+	Swtch *swtch;
 	Block *next;
 };
 

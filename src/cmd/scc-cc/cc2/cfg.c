@@ -29,6 +29,10 @@ static struct cfg cfg;
 static void
 prbb(Block *bb)
 {
+	Node *np;
+	Swtch *swt;
+	Block *casebb;
+
 	if (!bb || bb->printed)
 		return;
 
@@ -46,6 +50,28 @@ prbb(Block *bb)
 	}
 	prbb(bb->true);
 	prbb(bb->false);
+
+	swt = bb->swtch;
+	if (!swt)
+		return;
+
+	for (np = swt->cases; np->op != OESWITCH; np = np->next) {
+		casebb = np->u.sym->u.stmt->bb;
+
+		if (!np->left) {
+			fprintf(stderr,
+				"\t%d -> %d [label=\"default\"]\n",
+			        bb->id,
+			        casebb->id);
+		} else {
+			fprintf(stderr,
+				"\t%d -> %d [label=\"case %lld\"]\n",
+			        bb->id,
+			        casebb->id,
+			        np->left->u.i);
+		}
+		prbb(casebb);
+	}
 }
 
 static void
@@ -84,6 +110,7 @@ newbb(Node *np)
 	bb = &cfg.blocks[cfg.nr];
 	bb->entryp = np;
 	bb->exitp = NULL;
+	bb->swtch = NULL;
 	bb->true = bb->false = NULL;
 	bb->id = cfg.nr++;
 	bb->visited = 0;
@@ -95,9 +122,6 @@ newbb(Node *np)
 static Node *
 mkcfg(Node *np)
 {
-	if ((np->flags & (BBENTRY|BBEXIT)) == 0)
-		return np;
-
 	if (np->flags & BBENTRY)
 		cfg.cur = np->bb;
 
@@ -115,6 +139,12 @@ mkcfg(Node *np)
 		break;
 	case ORET:
 		cfg.cur->true = laststmt->bb;
+		break;
+	case OBSWITCH:
+		cfg.cur->swtch = np->u.swtch;
+		break;
+	case OESWITCH:
+		cfg.cur->true = NULL;
 		break;
 	case OBRANCH:
 		cfg.cur->false = np->next->bb;
@@ -152,6 +182,9 @@ newentry(Node *np)
 static Node *
 markbb(Node *np)
 {
+	Swtch *swt;
+	Node *p;
+
 	switch (np->op) {
 	case OBFUN:
 		newentry(np);
@@ -159,6 +192,14 @@ markbb(Node *np)
 	case ORET:
 		newentry(laststmt);
 		newentry(np->next);
+		break;
+	case OBSWITCH:
+		swt = np->u.swtch;
+		for (p = swt->cases; p->op != OESWITCH; p = p->next)
+			newentry(p->u.sym->u.stmt);
+		break;
+	case OESWITCH:
+		np->flags |= BBEXIT;
 		break;
 	case OBRANCH:
 	case OJMP:
@@ -172,11 +213,21 @@ markbb(Node *np)
 static void
 visit(Block *bb)
 {
+	Node *np;
+	Swtch *swt;
+
 	if (!bb || bb->visited)
 		return;
 	bb->visited = 1;
 	visit(bb->true);
 	visit(bb->false);
+
+	swt = bb->swtch;
+	if (!swt)
+		return;
+
+	for (np = swt->cases; np->op != OESWITCH; np = np->next)
+		visit(np->u.sym->u.stmt->bb);
 }
 
 static void

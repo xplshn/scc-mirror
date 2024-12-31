@@ -66,7 +66,6 @@ swtch_dir(Node *np, int n, TINT min, TINT max)
 		p->type = ptrtype;
 		p->op = OLABEL;
 	}
-	np->next = p->next;
 
 	for (ip = its; ip < &its[n]; ++ip) {
 		if (*ip == NULL)
