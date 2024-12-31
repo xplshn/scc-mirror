@@ -28,6 +28,7 @@ struct cfg {
 };
 
 static struct cfg cfg;
+static Swtch *switchlist;
 
 #ifndef NDEBUG
 #include <stdio.h>
@@ -285,8 +286,15 @@ gencfg(void)
 void
 cleancfg(void)
 {
+	Swtch *p, *next;
+
 	free(cfg.blocks);
 	memset(&cfg, 0, sizeof(cfg));
+
+	for (p = switchlist; p; p = next) {
+		next = p;
+		free(p);
+	}
 }
 
 static Node *
@@ -394,6 +402,16 @@ swtch(Node *np)
 		return swtch_dir(np, range, min, max);
 
 	abort();
+}
+
+Swtch *
+newswitch(Swtch *swt)
+{
+	Swtch *p = xmalloc(sizeof(*p));
+
+	*p = *swt;
+	p->next = switchlist;
+	return switchlist = p;
 }
 
 Node *

@@ -14,6 +14,8 @@ extern int enadebug;
 #define TUINT       unsigned long long
 #define TUINT_MAX   ULLONG_MAX
 #define TINT_MAX    LLONG_MAX
+#define TUINT_MIN   ULLONG_MIN
+#define TINT_MIN    LLONG_MIN
 #define TFLOAT      double
 #define SIZET       size_t
 

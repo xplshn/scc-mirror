@@ -20,3 +20,9 @@ void
 cleancfg(void)
 {
 }
+
+Swtch *
+newswitch(Swtch *swt)
+{
+	return NULL;
+}

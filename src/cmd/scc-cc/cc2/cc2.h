@@ -155,6 +155,16 @@ typedef struct symbol Symbol;
 typedef struct addr Addr;
 typedef struct inst Inst;
 typedef struct block Block;
+typedef struct swtch Swtch;
+
+struct swtch {
+	int nr;
+	TINT min, max;
+	Node *defnode;
+	Node *first;
+	Node *last;
+	Swtch *next;
+};
 
 struct type {
 	unsigned long size;
@@ -191,6 +201,7 @@ struct node {
 		TFLOAT f;
 		char *s;
 		Symbol *sym;
+		Swtch *swtch;
 		int reg;
 		int subop;
 		long off;
@@ -282,6 +293,7 @@ extern void freesym(Symbol *sym);
 extern void gencfg(void);
 extern void cleancfg(void);
 extern Node *sethi(Node *);
+extern Swtch *newswitch(Swtch *);
 
 /* globals */
 extern Symbol *curfun;

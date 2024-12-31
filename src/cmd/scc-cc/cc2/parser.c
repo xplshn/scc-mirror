@@ -24,14 +24,8 @@ union tokenop {
 	unsigned op;
 };
 
-struct swtch {
-	int nr;
-	Node *first;
-	Node *last;
-};
-
 Node *laststmt;
-static struct swtch swtbl[NR_BLOCK], *swp = swtbl;
+static Swtch swtbl[NR_BLOCK], *swp = swtbl;
 static Symbol *lastfun;
 
 typedef void parsefun(char *, union tokenop);
@@ -347,7 +341,8 @@ oreturn(char *token, union tokenop u)
 static void
 waft(Node *np)
 {
-	struct swtch *cur;
+	TINT val;
+	Swtch *cur;
 
 	if (swp == swtbl)
 		error(EWTACKU);
@@ -356,20 +351,31 @@ waft(Node *np)
 	addstmt(np);
 	waftstmt(cur->last);
 	cur->last = np;
-	cur->nr++;
+	if (np->op == ODEFAULT) {
+		cur->defnode = np;
+	} else if (np->op != OESWITCH) {
+		cur->nr++;
+		val = np->left->u.i;
+		if (val < cur->min)
+			cur->min = val;
+		if (val > cur->max)
+			cur->max = val;
+	}
 }
 
 static void
 bswitch(char *token, union tokenop u)
 {
-	struct swtch *cur;
+	Swtch *cur;
 	Node *np = node(u.op);
 
 	if (swp == &swtbl[NR_BLOCK])
 		error(EWTACKO);
 	cur = swp++;
 	cur->nr = 0;
-
+	cur->min = TINT_MAX;
+	cur->max = TINT_MIN;
+	cur->defnode = NULL;
 	eval(strtok(NULL, "\t\n"));
 	np->left = pop();
 
@@ -379,14 +385,14 @@ bswitch(char *token, union tokenop u)
 static void
 eswitch(char *token, union tokenop u)
 {
-	struct swtch *cur;
+	Swtch *cur;
 
 	if (swp == swtbl)
 		error(EWTACKU);
 	jump(token, u);
 	waft(pop());
 	cur = --swp;
-	cur->first->u.i = cur->nr;
+	cur->first->u.swtch = newswitch(cur);
 }
 
 static void
