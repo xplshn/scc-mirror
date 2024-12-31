@@ -23,6 +23,7 @@ QBE_OBJS =\
 
 OBJS =\
 	cfg.o\
+	swtch.o\
 	$(QBE_OBJS)\
 
 QBE_AMD64_SYSV_OBJS=\

@@ -26,3 +26,8 @@ newswitch(Swtch *swt)
 {
 	return NULL;
 }
+
+void
+cleanswtch(void)
+{
+}

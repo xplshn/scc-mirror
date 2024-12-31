@@ -704,6 +704,7 @@ void
 parse(void)
 {
 	/* clean from previous function */
+	cleanswtch();
 	cleancfg();
 	cleannodes();
 	popctx();

@@ -293,7 +293,11 @@ extern void freesym(Symbol *sym);
 extern void gencfg(void);
 extern void cleancfg(void);
 extern Node *sethi(Node *);
+
+/* swtch.c */
+extern void cleanswtch(void);
 extern Swtch *newswitch(Swtch *);
+extern Node *swtch(Node *);
 
 /* globals */
 extern Symbol *curfun;

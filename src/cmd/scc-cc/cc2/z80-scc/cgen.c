@@ -105,11 +105,6 @@ static Node regs[] = {
 	}
 };
 
-static void
-swtch(Node *idx)
-{
-}
-
 void
 defpar(Symbol *sym)
 {
@@ -549,7 +544,7 @@ cgen(Node *np)
 		ret(np);
 		break;
 	case OBSWITCH:
-		swtch(rhs(np->left));
+		/* TODO */
 		break;
 	default:
 		rhs(np);

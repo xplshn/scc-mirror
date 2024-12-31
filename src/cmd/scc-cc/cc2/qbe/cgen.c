@@ -483,12 +483,13 @@ function(void)
 	return NULL;
 }
 
-static void
-swtch(Node *swt, Node *idx)
+Node *
+swtch(Node *swt)
 {
-	Node aux1, aux2, *np;
+	Node aux1, aux2, *np, *idx;
 	Symbol *deflabel = NULL;
 
+	idx = rhs(swt->left);
 	for (np = swt->next; ; np = np->next) {
 		setlabel(np->label);
 
@@ -501,7 +502,7 @@ swtch(Node *swt, Node *idx)
 			aux1.u.sym = deflabel;
 			cgen(&aux1);
 			delrange(swt->next, np);
-			return;
+			return NULL;
 		case OCASE:
 			aux1 = *np;
 			aux1.op = OBRANCH;
@@ -777,7 +778,7 @@ cgen(Node *np)
 		code(ASRET, NULL, p, NULL);
 		break;
 	case OBSWITCH:
-		swtch(np, rhs(np->left));
+		swtch(np);
 		break;
 	default:
 		rhs(np);
