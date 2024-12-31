@@ -319,7 +319,7 @@ swtch_if(Node *idx)
 			break;
 		case ODEFAULT:
 			deflabel = np->u.sym;
-			deltree(unlinkstmt(np));
+			delstmt(np);
 			break;
 		default:
 			abort();

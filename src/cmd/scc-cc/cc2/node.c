@@ -123,13 +123,13 @@ addstmt(Node *np)
 }
 
 Node *
-delstmt(void)
+delstmt(Node *np)
 {
 	Node *next;
 
-	next = curstmt->next;
+	next = np->next;
 	deltree(unlinkstmt(curstmt));
-	return curstmt = next;
+	return next;
 }
 
 void
@@ -189,13 +189,8 @@ apply(Node *(*fun)(Node *))
 {
 	Node *np;
 
-	curstmt = curfun->u.stmt;
-	while (curstmt) {
+	for (curstmt = curfun->u.stmt; curstmt; curstmt = np) {
 		np = (*fun)(curstmt);
-		if (!np) {
-			delstmt();
-		} else {
-			curstmt = np->next;
-		}
+		np = (np) ? np->next : delstmt(curstmt);
 	}
 }

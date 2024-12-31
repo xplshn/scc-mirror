@@ -265,7 +265,7 @@ extern void deltree(Node *np);
 extern void prtree(Node *np), prforest(char *msg);
 extern Node *node(int op);
 extern Node *addstmt(Node *);
-extern Node *delstmt(void);
+extern Node *delstmt(Node *);
 extern Node *insstmt(Node *, Node *);
 extern void delrange(Node *, Node *);
 extern Node *waftstmt(Node *);
