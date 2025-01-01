@@ -218,7 +218,9 @@ chklvalue(Node *np)
 static Node *
 chkconstaddr(Node *var, Node *addr)
 {
-	if (var->sym && var->sym->flags & (SGLOBAL|SLOCAL|SPRIVATE)
+	unsigned mask = SGLOBAL|SLOCAL|SPRIVATE|SEXTERN;
+
+	if (var->sym && var->sym->flags & mask
 	|| var->op == OFIELD && var->left->op == OSYM
 	|| var->op == OFIELD && (var->left->flags & NCONST)) {
 		addr->flags |= NCONST;
