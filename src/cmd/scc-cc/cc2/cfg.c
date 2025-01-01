@@ -6,14 +6,6 @@
 
 #include "cc2.h"
 
-#ifdef NDEBUG
-#define PRCFG(msg)
-#define PRTREE(msg)
-#else
-#define PRCFG(msg) (enadebug ? prcfg(msg) : NULL)
-#define PRTREE(msg) (enadebug ? prforest(msg) : NULL)
-#endif
-
 struct cfg {
 	int nr;
 	Block *entryb, *exitb;
@@ -26,12 +18,24 @@ static struct cfg cfg;
 #ifndef NDEBUG
 #include <stdio.h>
 
+static Node *
+jtarget(Node *np)
+{
+	return np->u.sym->u.stmt;
+}
+
+static Block *
+jtargetbb(Node *np)
+{
+	return jtarget(np)->bb;
+}
+
 static void
 prbb(Block *bb)
 {
-	Node *np;
 	Swtch *swt;
 	Block *casebb;
+	Node **cases, **bp;
 
 	if (!bb || bb->printed)
 		return;
@@ -54,24 +58,24 @@ prbb(Block *bb)
 	swt = bb->swtch;
 	if (!swt)
 		return;
+	cases = swt->cases;
 
-	for (np = swt->cases; np->op != OESWITCH; np = np->next) {
-		casebb = np->u.sym->u.stmt->bb;
-
-		if (!np->left) {
-			fprintf(stderr,
-				"\t%d -> %d [label=\"default\"]\n",
-			        bb->id,
-			        casebb->id);
-		} else {
-			fprintf(stderr,
-				"\t%d -> %d [label=\"case %lld\"]\n",
-			        bb->id,
-			        casebb->id,
-			        np->left->u.i);
-		}
+	for (bp = cases; bp < &cases[swt->nr]; ++bp) {
+		casebb = jtargetbb(*bp);
+		fprintf(stderr,
+			"\t%d -> %d [label=\"case %lld\"]\n",
+			bb->id,
+			casebb->id,
+			(*bp)->left->u.i);
 		prbb(casebb);
 	}
+
+	casebb = jtargetbb(swtchdefault(swt));
+	fprintf(stderr,
+		"\t%d -> %d [label=\"default\"]\n",
+		bb->id,
+		casebb->id);
+	prbb(casebb);
 }
 
 static void
@@ -122,6 +126,9 @@ newbb(Node *np)
 static Node *
 mkcfg(Node *np)
 {
+	if ((np->flags & (BBENTRY|BBEXIT)) == 0)
+		return np;
+
 	if (np->flags & BBENTRY)
 		cfg.cur = np->bb;
 
@@ -142,14 +149,12 @@ mkcfg(Node *np)
 		break;
 	case OBSWITCH:
 		cfg.cur->swtch = np->u.swtch;
-		break;
-	case OESWITCH:
 		cfg.cur->true = NULL;
 		break;
 	case OBRANCH:
 		cfg.cur->false = np->next->bb;
 	case OJMP:
-		cfg.cur->true = np->u.sym->u.stmt->bb;
+		cfg.cur->true = jtargetbb(np);
 		break;
 	}
 
@@ -183,7 +188,7 @@ static Node *
 markbb(Node *np)
 {
 	Swtch *swt;
-	Node *p;
+	Node **cases, **bp;
 
 	switch (np->op) {
 	case OBFUN:
@@ -194,16 +199,16 @@ markbb(Node *np)
 		newentry(np->next);
 		break;
 	case OBSWITCH:
-		swt = np->u.swtch;
-		for (p = swt->cases; p->op != OESWITCH; p = p->next)
-			newentry(p->u.sym->u.stmt);
-		break;
-	case OESWITCH:
 		np->flags |= BBEXIT;
+		swt = np->u.swtch;
+		cases = swt->cases;
+		for (bp = cases; bp < &cases[swt->nr]; ++bp)
+			newentry(jtarget((*bp)));
+		newentry(jtarget(swtchdefault(swt)));
 		break;
 	case OBRANCH:
 	case OJMP:
-		newentry(np->u.sym->u.stmt);
+		newentry(jtarget(np));
 		newentry(np->next);
 		break;
 	}
@@ -213,8 +218,8 @@ markbb(Node *np)
 static void
 visit(Block *bb)
 {
-	Node *np;
 	Swtch *swt;
+	Node **cases, **bp, *p;
 
 	if (!bb || bb->visited)
 		return;
@@ -225,9 +230,11 @@ visit(Block *bb)
 	swt = bb->swtch;
 	if (!swt)
 		return;
+	cases = swt->cases;
 
-	for (np = swt->cases; np->op != OESWITCH; np = np->next)
-		visit(np->u.sym->u.stmt->bb);
+	for (bp = swt->cases; bp < &cases[swt->nr]; ++bp)
+		visit(jtargetbb(*bp));
+	visit(jtargetbb(swtchdefault(swt)));
 }
 
 static void
@@ -332,50 +339,4 @@ cleancfg(void)
 {
 	free(cfg.blocks);
 	memset(&cfg, 0, sizeof(cfg));
-}
-
-Node *
-sethi(Node *np)
-{
-	Node *l, *r;
-
-	if (!np)
-		return np;
-
-	np->complex = 0;
-	np->address = 0;
-
-	switch (np->op) {
-	case OBSWITCH:
-		np = swtch(np);
-		break;
-	default:
-		np = tsethi(np);
-	}
-
-	l = np->left;
-	r = np->right;
-
-	if (np->address > 10)
-		return np;
-	if (l)
-		np->complex = l->complex;
-	if (r) {
-		int d = np->complex - r->complex;
-
-		if (d == 0)
-			++np->complex;
-		else if (d < 0)
-			np->complex = r->complex;
-	}
-	if (np->complex == 0)
-		++np->complex;
-
-	return np;
-}
-
-void
-genaddr(void)
-{
-	apply(sethi);
 }

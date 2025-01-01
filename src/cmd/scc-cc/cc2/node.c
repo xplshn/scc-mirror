@@ -100,21 +100,6 @@ unlinkstmt(Node *np)
 	return np;
 }
 
-/*
- * Move current node after `at' and keep the current
- * pointer to the end of the list
- */
-Node *
-waftstmt(Node *at)
-{
-	Node *np = curstmt, *prev = np->prev;
-
-	if (prev == at)
-		return np;
-	curstmt = prev;
-	return insstmt(unlinkstmt(np), at);
-}
-
 Node *
 addstmt(Node *np)
 {

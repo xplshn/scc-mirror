@@ -136,39 +136,11 @@ static unsigned char i2f_conv[4][4][2] = {
  * QBE is AMD64 targered we could do a better job there, and try to
  * detect some of the complex addressing modes of these processors.
  */
-static Node *
-complex(Node *np)
-{
-	Node *l = np->left, *r = np->right;
-
-	if (np->address > 10)
-		return np;
-	if (l)
-		np->complex = l->complex;
-	if (r) {
-		int d = np->complex - r->complex;
-
-		if (d == 0)
-			++np->complex;
-		else if (d < 0)
-			np->complex = r->complex;
-	}
-	if (np->complex == 0)
-		++np->complex;
-
-	return np;
-}
-
 Node *
 tsethi(Node *np)
 {
 	Node *l, *r;
 
-	if (!np)
-		return np;
-
-	np->complex = 0;
-	np->address = 0;
 	l = np->left;
 	r = np->right;
 
@@ -189,14 +161,14 @@ tsethi(Node *np)
 		goto binary;
 	default:
 	binary:
-		l = tsethi(l);
-		r = tsethi(r);
+		l = sethi(l);
+		r = sethi(r);
 		break;
 	}
 	np->left = l;
 	np->right = r;
 
-	return complex(np);
+	return np;
 }
 
 static int
@@ -483,48 +455,6 @@ function(void)
 	return NULL;
 }
 
-Node *
-swtch(Node *swt)
-{
-	Node aux1, aux2, *np, *idx;
-	Symbol *deflabel = NULL;
-
-	idx = rhs(swt->left);
-	for (np = swt->next; ; np = np->next) {
-		setlabel(np->label);
-
-		switch (np->op) {
-		case OESWITCH:
-			if (!deflabel)
-				deflabel = np->u.sym;
-			aux1.op = OJMP;
-			aux1.label = NULL;
-			aux1.u.sym = deflabel;
-			cgen(&aux1);
-			delrange(swt->next, np);
-			return NULL;
-		case OCASE:
-			aux1 = *np;
-			aux1.op = OBRANCH;
-			aux1.label = NULL;
-			aux1.left = &aux2;
-
-			aux2.op = OEQ;
-			aux2.type = idx->type;
-			aux2.left = np->left;
-			aux2.right = idx;
-
-			cgen(&aux1);
-			break;
-		case ODEFAULT:
-			deflabel = np->u.sym;
-			break;
-		default:
-			abort();
-		}
-	}
-}
-
 static int
 assignop(Type *tp)
 {
@@ -600,7 +530,7 @@ assign(Node *np)
 		aux.left = ret;
 		aux.right = r;
 		aux.type = np->type;
-		r = rhs(tsethi(&aux));
+		r = rhs(sethi(&aux));
 		break;
 	default:
 		/* assign abbreviation */
@@ -612,7 +542,7 @@ assign(Node *np)
 			aux.right = r;
 			aux.type = int32type;
 			aux.address = np->address;
-			ret = r = tsethi(rhs(&aux));
+			ret = r = sethi(rhs(&aux));
 			break;
 		}
 
@@ -621,8 +551,14 @@ assign(Node *np)
 		aux.right = r;
 		aux.type = np->type;
 		aux.address = np->address;
-		r = tsethi(&aux);
+		r = sethi(&aux);
 	case 0:
+		if (l->op == OTMP) {
+			r = rhs(r);
+			l->u.sym->numid = r->u.sym->numid;
+			return r;
+		}
+
 		lhs_rhs(&l, &r);
 		ret = r;
 		break;
@@ -777,9 +713,6 @@ cgen(Node *np)
 		p = (np->left) ? rhs(np->left) : NULL;
 		code(ASRET, NULL, p, NULL);
 		break;
-	case OBSWITCH:
-		swtch(np);
-		break;
 	default:
 		rhs(np);
 		break;
@@ -825,10 +758,4 @@ genasm(void)
 {
 	apply(norm);
 	apply(cgen);
-}
-
-void
-genaddr(void)
-{
-	apply(tsethi);
 }

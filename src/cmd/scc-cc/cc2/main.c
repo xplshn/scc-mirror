@@ -10,6 +10,7 @@
 #include "error.h"
 
 char *argv0;
+int noswtch;
 
 void
 error(unsigned nerror, ...)
@@ -59,6 +60,9 @@ main(int argc, char *argv[])
 
 	if (argv[0] && !freopen(argv[0], "r", stdin))
 		die("cc2: %s: %s", argv[0], strerror(errno));
+
+	if (strstr(argv0, "qbe"))
+		noswtch = 1;
 
 	while (moreinput()) {
 		parse();

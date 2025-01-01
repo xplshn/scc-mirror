@@ -1,5 +1,13 @@
 #define ASLABEL 0
 
+#ifdef NDEBUG
+#define PRCFG(msg)
+#define PRTREE(msg)
+#else
+#define PRCFG(msg) (enadebug ? prcfg(msg) : NULL)
+#define PRTREE(msg) (enadebug ? prforest(msg) : NULL)
+#endif
+
 enum iflags {
 	BBENTRY =    1,        /* basic block entry */
 	BBEXIT  =    2,        /* basic block exit */
@@ -160,10 +168,11 @@ typedef struct swtch Swtch;
 struct swtch {
 	int nr;
 	TINT min, max;
+	Node *bswtch;
+	Node *eswtch;
+	Node **cases;
 	Node *defnode;
-	Node *cases;
-	Node *first;
-	Node *last;
+
 	Swtch *next;
 };
 
@@ -281,7 +290,6 @@ extern Node *addstmt(Node *);
 extern Node *delstmt(Node *);
 extern Node *insstmt(Node *, Node *);
 extern void delrange(Node *, Node *);
-extern Node *waftstmt(Node *);
 extern Node *unlinkstmt(Node *);
 
 /* symbol.c */
@@ -298,14 +306,16 @@ extern Node *sethi(Node *);
 
 /* swtch.c */
 extern void cleanswtch(void);
-extern Swtch *newswitch(Swtch *);
+extern Swtch *newswtch(Swtch *);
 extern Node *swtch(Node *);
+extern Node *swtchdefault(Swtch *);
 
 /* globals */
 extern Symbol *curfun;
 extern Symbol *locals;
 extern Inst *pc, *prog;
 extern Node *laststmt;
+extern int noswtch;
 
 /* target */
 extern Type int8type, int16type, int32type, int64type,

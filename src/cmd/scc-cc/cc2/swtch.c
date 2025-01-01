@@ -8,79 +8,89 @@
 static Swtch *list;
 
 static Node *
-swtch_if(Node *idx)
+swtch_if(Node *np)
 {
-	Node *tmpvar, *next, *tmp, *np;
-	Symbol *deflabel = NULL;
+	Type *tp;
+	Swtch *swt;
+	Node **cases, **bp, *tmpvar, *p;
 
-	tmpvar = tmpnode(&idx->type);
-	idx->right = idx->left;
-	idx->right = tmpvar;
-	idx->op = OASSIG;
+	swt = np->u.swtch;
+	tp = &np->left->type;
 
-	for (np = idx->next; ; np = next) {
-		next = np->next;
+	tmpvar = tmpnode(tp);
+	np->type = *tp;
+	np->right = np->left;
+	np->left = tmpvar;
+	np->op = OASSIG;
+	np->u.subop = 0;
 
-		switch (np->op) {
-		case OESWITCH:
-			if (!deflabel)
-				deflabel = np->u.sym;
-			np->op = OJMP;
-			np->u.sym = deflabel;
-			return sethi(idx);
-		case OCASE:
-			np->op = OBRANCH;
-			tmp = node(OEQ);
-			tmp->type = idx->type;
-			tmp->left = np->left;
-			tmp->right = tmpvar;
-			np->left = tmp;
-			break;
-		case ODEFAULT:
-			deflabel = np->u.sym;
-			delstmt(np);
-			break;
-		default:
-			abort();
-		}
+	cases = swt->cases;
+	for (bp = cases; bp < &cases[swt->nr]; ++bp) {
+		Node *eq, *tmp = node(OTMP);
+
+		p = *bp;
+		*tmp = *tmpvar;
+		eq = node(OEQ);
+		eq->type = *tp;
+		eq->left = p->left;
+		eq->right = tmp;
+		*bp = NULL;
+
+		p->left = eq;
+		p->op = OBRANCH;
+		addstmt(p);
 	}
+	p = swtchdefault(swt);
+	p->op = OJMP;
+	addstmt(p);
+
+	free(cases);
+	swt->cases = NULL;
+
+	return sethi(np);
 }
 
 static Node *
-swtch_dir(Node *np, int n, TINT min, TINT max)
+swtch_dir(Node *np, TINT min, TINT max)
 {
-	Node aux, *p, *defnode;
-	Node **its, **zero, **ip;
+	int i;
+	TINT cur, nval;
+	Swtch *swt;
 	Symbol *tbl;
-
-	its = xcalloc(n, sizeof(*its));
-	zero = its;
-	if (min < 0)
-		zero -= min;
-
-	for (p = np->next; p->op != OESWITCH; p = p->next) {
-		if (p->op == ODEFAULT)
-			defnode = p;
-		else
-			its[p->left->u.i] = p;
-		p->type = ptrtype;
-		p->op = OLABEL;
-	}
-
-	for (ip = its; ip < &its[n]; ++ip) {
-		if (*ip == NULL)
-			*ip = defnode;
-	}
+	Node *p, *def, **cases;
 
 	tbl = getsym(TMPSYM);
 	tbl->kind = SLOCAL;
 	tbl->type = ptrtype;
 	tbl->type.flags |= INITF;
-
 	defglobal(tbl);
-	for (ip = its; ip < &its[n]; ++ip)
-		data(*ip);
+
+	swt = np->u.swtch;
+	cases = swt->cases;
+
+	def = swtchdefault(swt);
+	def->type = ptrtype;
+	def->op = OLABEL;
+
+	i = 0;
+	p = NULL;
+	for (cur = min; cur <= max; ++cur) {
+		if (!p && i < swt->nr) {
+			p = cases[i++];
+			p->type = ptrtype;
+			p->op = OLABEL;
+			nval = p->left->u.i;
+		}
+		if (p && nval == cur) {
+			data(p);
+			p = NULL;
+		} else {
+			data(def);
+		}
+	}
 	endinit();
+
+	return np;
 }
 
 Node *
@@ -96,16 +106,24 @@ swtch(Node *np)
 	range = max - min + 1;
 	n = swt->nr;
 
-	if (n < 4)
+	if (n < 4 || noswtch)
 		return swtch_if(np);
-	if (range == n)
-		return swtch_dir(np, range, min, max);
+	return swtch_dir(np, min, max);
+}
 
-	abort();
+Node *
+swtchdefault(Swtch *swt)
+{
+	Node *np;
+
+	np = swt->defnode;
+	if (!np)
+		np = swt->eswtch;
+	return np;
 }
 
 Swtch *
-newswitch(Swtch *swt)
+newswtch(Swtch *swt)
 {
 	Swtch *p = xmalloc(sizeof(*p));
 
@@ -118,9 +136,16 @@ void
 cleanswtch(void)
 {
 	Swtch *p, *next;
+	Node **bp, **cases;
 
 	for (p = list; p; p = next) {
-		next = p;
+		next = p->next;
+		cases = p->cases;
+		if (cases) {
+			for (bp = cases; bp < &cases[p->nr]; ++p)
+				deltree(*bp);
+			free(cases);
+		}
 		free(p);
 	}
 }

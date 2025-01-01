@@ -334,27 +334,26 @@ oreturn(char *token, union tokenop u)
 	push(np);
 }
 
-/*
- * Move np (which is a OCASE/ODEFAULT/OESWITCH) to be contigous with
- * the last switch table.
- */
 static void
-waft(Node *np)
+addcase(Node *np)
 {
 	TINT val;
+	Node **bp;
 	Swtch *cur;
 
 	if (swp == swtbl)
 		error(EWTACKU);
 
 	cur = swp - 1;
-	addstmt(np);
-	waftstmt(cur->last);
-	cur->last = np;
 	if (np->op == ODEFAULT) {
 		cur->defnode = np;
-	} else if (np->op != OESWITCH) {
+	} else {
 		cur->nr++;
+		bp = cur->cases;
+		bp = xrealloc(bp, cur->nr * sizeof(Node *));
+		bp[cur->nr-1] = np;
+		cur->cases = bp;
+
 		val = np->left->u.i;
 		if (val < cur->min)
 			cur->min = val;
@@ -376,34 +375,50 @@ bswitch(char *token, union tokenop u)
 	cur->min = TINT_MAX;
 	cur->max = TINT_MIN;
 	cur->defnode = NULL;
+	cur->cases = NULL;
 	eval(strtok(NULL, "\t\n"));
 	np->left = pop();
 
-	push(cur->first = cur->last = np);
+	push(cur->bswtch = np);
+}
+
+static int
+cmpcase(const void *p1, const void *p2)
+{
+	TINT d;
+	Node *np1, *np2;
+
+	np1 = *(Node **) p1;
+	np2 = *(Node **) p2;
+	d = np1->left->u.i - np2->left->u.i;
+	if (d < 0)
+		return -1;
+	if (d > 0)
+		return 1;
+	return 0;
 }
 
 static void
 eswitch(char *token, union tokenop u)
 {
-	Node *first;
+	Node *p;
 	Swtch *cur;
 
 	if (swp == swtbl)
 		error(EWTACKU);
 	jump(token, u);
-	waft(pop());
 
 	cur = --swp;
-	first = cur->first;
-	cur->cases = first->next;
-	first->u.swtch = newswitch(cur);
+	cur->eswtch = pop();
+	cur->bswtch->u.swtch = newswtch(cur);
+	qsort(cur->cases, cur->nr, sizeof(Node *), cmpcase);
 }
 
 static void
 ocase(char *token, union tokenop u)
 {
 	jump(token, u);
-	waft(pop());
+	addcase(pop());
 }
 
 static void
@@ -723,4 +738,6 @@ parse(void)
 
 	if (beginf && !endf)
 		error(EBAFFUN);
+
+	PRTREE("after parsing");
 }

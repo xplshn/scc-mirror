@@ -19,11 +19,12 @@ QBE_OBJS =\
 	main.o\
 	node.o\
 	parser.o\
+	sethi.o\
+	swtch.o\
 	symbol.o\
 
 OBJS =\
 	cfg.o\
-	swtch.o\
 	$(QBE_OBJS)\
 
 QBE_AMD64_SYSV_OBJS=\
