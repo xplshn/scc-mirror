@@ -324,15 +324,19 @@ convert(Node *np, Type *newtp, int iscast)
 				goto good_conv;
 		} else if (op == PTR) {
 			if (eqtype(newtp, oldtp, EQUIV))
-				goto good_conv;
+				goto good_ptr_conv;
 			if (iscast)
-				goto good_conv;
+				goto good_ptr_conv;
 			if (newtp == pvoidtype || oldtp == pvoidtype)
-				goto good_conv;
+				goto good_ptr_conv;
 		}
 	default:
 		return NULL;
 	}
+
+good_ptr_conv:
+	np->type = newtp;
+	return np;
 
 good_conv:
 	return node(OCAST, newtp, np, NULL);
