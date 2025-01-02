@@ -106,7 +106,7 @@ swtch(Node *np)
 	range = max - min + 1;
 	n = swt->nr;
 
-	if (n < 4 || noswtch)
+	if (n < mach.swtchif)
 		return swtch_if(np);
 	return swtch_dir(np, min, max);
 }

@@ -164,6 +164,11 @@ typedef struct addr Addr;
 typedef struct inst Inst;
 typedef struct block Block;
 typedef struct swtch Swtch;
+typedef struct mach Mach;
+
+struct mach {
+	int swtchif;
+};
 
 struct swtch {
 	int nr;
@@ -315,7 +320,7 @@ extern Symbol *curfun;
 extern Symbol *locals;
 extern Inst *pc, *prog;
 extern Node *laststmt;
-extern int noswtch;
+extern Mach mach;
 
 /* target */
 extern Type int8type, int16type, int32type, int64type,
