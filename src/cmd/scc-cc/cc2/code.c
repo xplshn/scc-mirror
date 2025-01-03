@@ -126,6 +126,19 @@ newlabel(void)
 }
 
 Node *
+labelstmt(Node *np, Symbol *sym)
+{
+	if(!sym)
+		sym = newlabel();
+	if (!np)
+		np = node(ONOP);
+	np->label = sym;
+	sym->u.stmt = np;
+
+	return np;
+}
+
+Node *
 label2node(Node *np, Symbol *sym)
 {
 	if(!sym)

@@ -2,10 +2,52 @@
 
 #include "cc2.h"
 
+static Node *
+bool(Node *np, Symbol *true, Symbol *false)
+{
+	Symbol *label;
+	Node *p, *l = np->left, *r = np->right;
+
+	switch (np->op) {
+	case ONEG:
+		l = bool(l, false, true);
+		break;
+	case OAND:
+		label = newlabel();
+		l = bool(l, label, false);
+		addstmt(labelstmt(NULL, label));
+		r = bool(r, true, false);
+		break;
+	case OOR:
+		label = newlabel();
+		l = bool(l, true, label);
+		addstmt(labelstmt(NULL, label));
+		r = bool(r, true, false);
+		break;
+	default:
+		p = node(OBRANCH);
+		p->left = sethi(np);
+		p->u.sym = true;
+		true->refcnt++;
+		addstmt(p);
+
+		p = node(OJMP);
+		p->u.sym = false;
+		false->refcnt++;
+		addstmt(p);
+		return NULL;
+	}
+
+	np->left = l;
+	np->right = r;
+	return np;
+}
+
 Node *
 sethi(Node *np)
 {
-	Node *l, *r;
+	int op;
+	Node *next, *l, *r;
 
 	if (!np)
 		return np;
@@ -17,8 +59,23 @@ sethi(Node *np)
 	case OBSWITCH:
 		np = swtch(np);
 		break;
+	case OBRANCH:
+		next = np->next;
+		if (!next->label)
+			labelstmt(next, NULL);
+
+		op = np->left->op;
+		if (op != ONEG && op != OOR && op != OAND) {
+			sethi(np->left);
+			return np;
+		}
+
+		bool(np->left, np->u.sym, next->label);
+		np->u.sym->refcnt--;
+		return NULL;
 	default:
 		np = tsethi(np);
+		break;
 	}
 
 	l = np->left;

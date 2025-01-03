@@ -282,6 +282,7 @@ extern void delcode(void);
 extern Symbol *newlabel(void);
 extern void pprint(char *s);
 extern void deftype(Type *);
+extern Node *labelstmt(Node *, Symbol *);
 
 /* node.c */
 extern void newfun(Symbol *, Node *);

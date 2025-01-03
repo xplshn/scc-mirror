@@ -139,6 +139,7 @@ static unsigned char i2f_conv[4][4][2] = {
 Node *
 tsethi(Node *np)
 {
+	int op;
 	Node *l, *r;
 
 	l = np->left;
@@ -159,6 +160,21 @@ tsethi(Node *np)
 		np->op = OBXOR;
 		r = constnode(NULL, ~(TUINT) 0, &np->type);
 		goto binary;
+	case OEFUN:
+		/*
+		 * In QBE we need at the end of a basic block
+		 * a jump, so we have to ensure that the last
+		 * statement of the function is a ret, a jmp
+		 * or a branch. In the same way, QBE does
+		 * not accept labels at the end of a function
+		 * (ONOP is used for labels) so we have to add
+		 * a ret there, and in the case of branches
+		 * we need a label for the next statement
+		 */
+		op = np->prev->op;
+		if (op == ONOP || op == OBRANCH || (op != ORET && op != OJMP))
+			addstmt(node(ORET));
+		break;
 	default:
 	binary:
 		l = sethi(l);
@@ -368,7 +384,7 @@ static void
 bool(Node *np, Symbol *true, Symbol *false)
 {
 	Node *l = np->left, *r = np->right;
-	Node ret, ifyes, ifno;
+	Node ifyes, ifno;
 	Symbol *label;
 
 	switch (np->op) {
@@ -688,7 +704,7 @@ rhs(Node *np)
 static Node *
 cgen(Node *np)
 {
-	Node aux, *p, *next;
+	Node true, false, *p, *next;
 
 	setlabel(np->label);
 	switch (np->op) {
@@ -700,14 +716,17 @@ cgen(Node *np)
 	case OEFUN:
 		break;
 	case OJMP:
-		label2node(&aux, np->u.sym);
-		code(ASJMP, NULL, &aux, NULL);
+		label2node(&true, np->u.sym);
+		code(ASJMP, NULL, &true, NULL);
 		break;
 	case OBRANCH:
 		next = np->next;
 		if (!next->label)
-			next->label = newlabel();
-		bool(np->left, np->u.sym, next->label);
+			labelstmt(next, NULL);
+
+		label2node(&true, np->u.sym);
+		label2node(&false, np->next->label);
+		code(ASBRANCH, rhs(np->left), &true, &false);
 		break;
 	case ORET:
 		p = (np->left) ? rhs(np->left) : NULL;
@@ -720,42 +739,8 @@ cgen(Node *np)
 	return NULL;
 }
 
-static Node *
-norm(Node *np)
-{
-	int op = np->op;
-	Node *p, *dst, *next = np->next;
-	Symbol *sym, *osym;
-
-	switch (op) {
-	case OEFUN:
-		/*
-		 * In QBE we need at the end of a basic block
-		 * a jump, so we have to ensure that the last
-		 * statement of the function is a ret, a jmp
-		 * or a branch. In the same way, QBE does
-		 * not accept labels at the end of a function
-		 * (ONOP is used for labels) so we have to add
-		 * a ret there, and in the case of branches
-		 * we need a label for the next statement
-		 */
-		op = (np->prev) ? np->prev->op : 0;
-		if (!op || op == ONOP || op == OBRANCH || (op != ORET && op != OJMP))
-			addstmt(node(ORET));
-		break;
-	case OBRANCH:
-		if (!next->label) {
-			sym = getsym(TMPSYM);
-			sym->kind = SLABEL;
-			next->label = sym;
-		}
-	}
-	return np;
-}
-
 void
 genasm(void)
 {
-	apply(norm);
 	apply(cgen);
 }
