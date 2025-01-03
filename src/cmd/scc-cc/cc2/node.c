@@ -113,7 +113,7 @@ delstmt(Node *np)
 	Node *next;
 
 	next = np->next;
-	deltree(unlinkstmt(curstmt));
+	deltree(unlinkstmt(np));
 	return next;
 }
 
