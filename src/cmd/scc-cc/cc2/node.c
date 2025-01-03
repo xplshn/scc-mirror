@@ -172,10 +172,11 @@ delrange(Node *begin, Node *end)
 void
 apply(Node *(*fun)(Node *))
 {
-	Node *np;
+	Node *np, *ocurstmt;
 
 	for (curstmt = curfun->u.stmt; curstmt; curstmt = np) {
+		ocurstmt = curstmt;
 		np = (*fun)(curstmt);
-		np = (np) ? np->next : delstmt(curstmt);
+		np = (np) ? np->next : delstmt(ocurstmt);
 	}
 }
