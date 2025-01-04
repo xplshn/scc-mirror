@@ -36,7 +36,34 @@ prnode(Node *np)
 	prnode(np->left);
 	prnode(np->right);
 
-	fprintf(stderr, "\t%c%lu", np->op, np->type.size);
+	switch (np->op) {
+	case OBRANCH:
+	case OJMP:
+		fprintf(stderr,
+		        "\t%c -> L%u",
+		        np->op, np->u.sym->numid);
+		break;
+	case OCONST:
+		fprintf(stderr,
+		        "\t%c%lu{%llu}",
+		        np->op, np->type.size, np->u.i);
+		break;
+	case OAUTO:
+	case OREG:
+	case OMEM:
+	case OLABEL:
+	case OTMP:
+		fprintf(stderr,
+		        "\t%c%lu[%u]",
+		        np->op, np->type.size, np->u.sym->numid);
+		break;
+	default:
+		fprintf(stderr,
+		        "\t%c%lu",
+		        np->op, np->type.size);
+		break;
+	}
+	fprintf(stderr,"(%d,%d)", np->complex, np->address);
 }
 
 void
@@ -51,6 +78,9 @@ prtree(Node *np)
 	fprintf(stderr, "(%d)",  bb ? bb->id : 0);
 	if (np->flags & BBEXIT)
 		putc('>', stderr);
+	putc('\t', stderr);
+	if (np->label)
+		fprintf(stderr, "L%u:", np->label->numid);
 
 	prnode(np);
 	putc('\n', stderr);

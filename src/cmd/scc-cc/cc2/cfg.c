@@ -323,8 +323,6 @@ optjmps(Node *np)
 void
 gencfg(void)
 {
-	PRTREE("before_gencfg");
-
 	apply(optjmps);
 	apply(optlabels);
 	DBG("new cfg");
