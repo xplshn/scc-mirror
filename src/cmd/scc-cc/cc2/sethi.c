@@ -15,13 +15,13 @@ bool(Node *np, Symbol *true, Symbol *false)
 	case OAND:
 		label = newlabel();
 		l = bool(l, label, false);
-		addstmt(labelstmt(NULL, label));
+		prestmt(labelstmt(NULL, label));
 		r = bool(r, true, false);
 		break;
 	case OOR:
 		label = newlabel();
 		l = bool(l, true, label);
-		addstmt(labelstmt(NULL, label));
+		prestmt(labelstmt(NULL, label));
 		r = bool(r, true, false);
 		break;
 	default:
@@ -29,18 +29,56 @@ bool(Node *np, Symbol *true, Symbol *false)
 		p->left = sethi(np);
 		p->u.sym = true;
 		true->refcnt++;
-		addstmt(p);
+		prestmt(p);
 
 		p = node(OJMP);
 		p->u.sym = false;
 		false->refcnt++;
-		addstmt(p);
+		prestmt(p);
 		return NULL;
 	}
 
 	np->left = l;
 	np->right = r;
 	return np;
+}
+
+Node *
+logicexpr(Node *np)
+{
+	Node *tmpvar, *p;
+	Type *tp = &np->type;
+	Symbol *true, *false, *phi;
+
+	true = newlabel();
+	false = newlabel();
+	phi = newlabel();
+
+	bool(np, true, false);
+
+	tmpvar = tmpnode(tp, NULL);
+
+	p = node(OASSIG);
+	p->type = *tp;
+	p->left = tmpnode(tp, tmpvar->u.sym);
+	p->right = constnode(NULL, 0, tp);
+	prestmt(labelstmt(sethi(p), false));
+
+	p = node(OJMP);
+	p->u.sym = phi;
+	phi->refcnt++;
+	prestmt(p);
+
+	p = node(OASSIG);
+	p->type = *tp;
+	p->left = tmpnode(tp, tmpvar->u.sym);
+	p->right = constnode(NULL, 1, tp);
+	prestmt(labelstmt(sethi(p), true));
+
+	prestmt(labelstmt(NULL, phi));
+	delstmt(np);
+
+	return sethi(tmpvar);
 }
 
 Node *
@@ -73,6 +111,11 @@ sethi(Node *np)
 		bool(np->left, np->u.sym, next->label);
 		np->u.sym->refcnt--;
 		return NULL;
+	case ONEG:
+	case OAND:
+	case OOR:
+		np = logicexpr(np);
+		break;
 	default:
 		np = tsethi(np);
 		break;

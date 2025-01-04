@@ -295,6 +295,7 @@ extern Node *node(int op);
 extern Node *addstmt(Node *);
 extern Node *delstmt(Node *);
 extern Node *insstmt(Node *, Node *);
+extern Node *prestmt(Node *);
 extern void delrange(Node *, Node *);
 extern Node *unlinkstmt(Node *);
 

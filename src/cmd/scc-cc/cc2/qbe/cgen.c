@@ -165,12 +165,9 @@ tsethi(Node *np)
 		 * In QBE we need at the end of a basic block
 		 * a jump, so we have to ensure that the last
 		 * statement of the function is a ret, a jmp
-		 * or a branch. In the same way, QBE does
-		 * not accept labels at the end of a function
-		 * (ONOP is used for labels) so we have to add
-		 * a ret there, and in the case of branches
-		 * we need a label for the next statement
+		 * or a branch.
 		 */
+
 		op = np->prev->op;
 		if (op == ONOP || op == OBRANCH || (op != ORET && op != OJMP))
 			addstmt(node(ORET));
@@ -380,37 +377,6 @@ lhs(Node *np)
 	}
 }
 
-static void
-bool(Node *np, Symbol *true, Symbol *false)
-{
-	Node *l = np->left, *r = np->right;
-	Node ifyes, ifno;
-	Symbol *label;
-
-	switch (np->op) {
-	case ONEG:
-		bool(l, false, true);
-		break;
-	case OAND:
-		label = newlabel();
-		bool(l, label, false);
-		setlabel(label);
-		bool(r, true, false);
-		break;
-	case OOR:
-		label = newlabel();
-		bool(l, true, label);
-		setlabel(label);
-		bool(r, true, false);
-		break;
-	default:
-		label2node(&ifyes, true);
-		label2node(&ifno, false);
-		code(ASBRANCH, rhs(np), &ifyes, &ifno);
-		break;
-	}
-}
-
 static Node *
 ternary(Node *np)
 {
@@ -603,25 +569,6 @@ rhs(Node *np)
 	case OREG:
 	case OAUTO:
 		return load(tp, np);
-	case ONEG:
-	case OAND:
-	case OOR:
-		true = newlabel();
-		false = newlabel();
-		phi = label2node(&aux1, NULL);
-		tmp = tmpnode(tp, NULL);
-
-		bool(np, true, false);
-
-		setlabel(true);
-		code(ASCOPYW, tmp, constnode(&aux2, 1, tp), NULL);
-		code(ASJMP, NULL, phi, NULL);
-
-		setlabel(false);
-		code(ASCOPYW, tmp, constnode(&aux2, 0, tp), NULL);
-
-		setlabel(phi->u.sym);
-		return tmp;
 	case OMOD:
 	case OSHL:
 	case OBAND:
@@ -720,6 +667,12 @@ cgen(Node *np)
 		code(ASJMP, NULL, &true, NULL);
 		break;
 	case OBRANCH:
+		/*
+		 * QBE does not accept labels at the end of a function
+		 * (ONOP is used for labels) so we have to add a ret
+		 * there, and in the case of branches we need a label
+		 * for the next statement.
+		 */
 		next = np->next;
 		if (!next->label)
 			labelstmt(next, NULL);

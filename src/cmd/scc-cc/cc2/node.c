@@ -131,6 +131,12 @@ unlinkstmt(Node *np)
 }
 
 Node *
+prestmt(Node *np)
+{
+	return insstmt(np, curstmt->prev);
+}
+
+Node *
 addstmt(Node *np)
 {
 	insstmt(np, curstmt);
