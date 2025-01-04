@@ -571,7 +571,7 @@ assign(Node *np)
 	case 0:
 		if (l->op == OTMP) {
 			r = rhs(r);
-			l->u.sym->numid = r->u.sym->numid;
+			copy(&np->type, l, r);
 			return r;
 		}
 
