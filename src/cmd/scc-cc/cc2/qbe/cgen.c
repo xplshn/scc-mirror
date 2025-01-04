@@ -609,16 +609,16 @@ rhs(Node *np)
 		true = newlabel();
 		false = newlabel();
 		phi = label2node(&aux1, NULL);
-		tmp = tmpnode(&int32type, NULL);
+		tmp = tmpnode(tp, NULL);
 
 		bool(np, true, false);
 
 		setlabel(true);
-		code(ASCOPYW, tmp, constnode(&aux2, 1, &int32type), NULL);
+		code(ASCOPYW, tmp, constnode(&aux2, 1, tp), NULL);
 		code(ASJMP, NULL, phi, NULL);
 
 		setlabel(false);
-		code(ASCOPYW, tmp, constnode(&aux2, 0, &int32type), NULL);
+		code(ASCOPYW, tmp, constnode(&aux2, 0, tp), NULL);
 
 		setlabel(phi->u.sym);
 		return tmp;
