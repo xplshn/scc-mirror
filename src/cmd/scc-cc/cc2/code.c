@@ -152,21 +152,25 @@ label2node(Node *np, Symbol *sym)
 }
 
 Node *
-tmpnode(Type *tp)
+tmpnode(Type *tp, Symbol *sym)
 {
 	unsigned short flags;
-	Symbol *sym;
 	Node *np;
 
 	np = node(OTMP);
-	sym = getsym(TMPSYM);
-	sym->type = np->type = *tp;
+	if (!sym) {
+		sym = getsym(TMPSYM);
+		sym->type = np->type = *tp;
+		sym->kind = STMP;
+	}
+
 	flags = tp->flags & ~(PARF|INITF);
 	sym->type.flags = np->type.flags = flags;
-	sym->kind = STMP;
+	np->type = *tp;
 	np->left = np->right = NULL;
 	np->u.sym = sym;
 	np->op = OTMP;
+
 	return np;
 }
 

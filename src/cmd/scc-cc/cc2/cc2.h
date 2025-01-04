@@ -276,7 +276,7 @@ extern void defvar(Symbol *), defpar(Symbol *), defglobal(Symbol *);
 extern void setlabel(Symbol *);
 extern Node *label2node(Node *np, Symbol *sym);
 extern Node *constnode(Node *np, TUINT n, Type *tp);
-extern Node *tmpnode(Type *);
+extern Node *tmpnode(Type *, Symbol *);
 extern Node *idxnode(Node *, long);
 extern void delcode(void);
 extern Symbol *newlabel(void);

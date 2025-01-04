@@ -235,7 +235,7 @@ load(Type *tp, Node *np)
 	if ((flags & (INTF|SIGNF)) == INTF && tp->size < 8)
 		++op;
 
-	new = tmpnode(tp);
+	new = tmpnode(tp, NULL);
 	code(op, new, np, NULL);
 
 	return new;
@@ -289,7 +289,7 @@ cast(Type *td, Node *np)
 	}
 
 	assert(op != 0);
-	tmp = tmpnode(td);
+	tmp = tmpnode(td, NULL);
 	code(op, tmp, np, NULL);
 
 	return tmp;
@@ -306,12 +306,12 @@ call(Node *np, Node *fun)
 		pars[n++] = rhs(p->left);
 
 	tp = &np->type;
-	tmp = tmpnode(tp);
+	tmp = tmpnode(tp, NULL);
 	code(ASCALL, tmp, fun, NULL);
 
 	for (q = pars; q < &pars[n]; ++q) {
 		op = (q == &pars[n-1]) ? ASPARE : ASPAR;
-		code(op, NULL, *q, tmpnode(&(*q)->type));
+		code(op, NULL, *q, tmpnode(&(*q)->type, NULL));
 	}
 	code((np->op == OCALL) ? ASCALLE : ASCALLEX, NULL, NULL, NULL);
 
@@ -416,7 +416,7 @@ ternary(Node *np)
 {
 	Node ifyes, ifno, phi, *colon, *tmp;
 
-	tmp = tmpnode(&np->type);
+	tmp = tmpnode(&np->type, NULL);
 	label2node(&ifyes, NULL);
 	label2node(&ifno, NULL);
 	label2node(&phi, NULL);
@@ -609,7 +609,7 @@ rhs(Node *np)
 		true = newlabel();
 		false = newlabel();
 		phi = label2node(&aux1, NULL);
-		tmp = tmpnode(&int32type);
+		tmp = tmpnode(&int32type, NULL);
 
 		bool(np, true, false);
 
@@ -646,7 +646,7 @@ rhs(Node *np)
 		isfloat = (tp->flags & FLOATF) != 0;
 		op = opbin[isfloat][size][np->op][sign];
 		rhs_rhs(&l, &r);
-		tmp = tmpnode(tp);
+		tmp = tmpnode(tp, NULL);
 		code(op, tmp, l, r);
 		return tmp;
 	case OCALL:
@@ -668,7 +668,7 @@ rhs(Node *np)
 		size = tp->size == 8;
 		isfloat = (tp->flags & FLOATF) != 0;
 		op = opbin[isfloat][size][np->op][sign];
-		tmp = tmpnode(tp);
+		tmp = tmpnode(tp, NULL);
 		code(op, tmp, rhs(l), NULL);
 		return tmp;
 	case OPTR:
@@ -689,7 +689,7 @@ rhs(Node *np)
 			return NULL;
 		case BVA_ARG:
 			l = rhs(l);
-			tmp = tmpnode(tp);
+			tmp = tmpnode(tp, NULL);
 			code(ASVARG, tmp, l, NULL);
 			return tmp;
 		default:

@@ -17,7 +17,7 @@ swtch_if(Node *np)
 	swt = np->u.swtch;
 	tp = &np->left->type;
 
-	tmpvar = tmpnode(tp);
+	tmpvar = tmpnode(tp, NULL);
 	np->type = *tp;
 	np->right = np->left;
 	np->left = tmpvar;
@@ -26,10 +26,9 @@ swtch_if(Node *np)
 
 	cases = swt->cases;
 	for (bp = cases; bp < &cases[swt->nr]; ++bp) {
-		Node *eq, *tmp = node(OTMP);
+		Node *eq, *tmp = tmpnode(tp, tmpvar->u.sym);
 
 		p = *bp;
-		*tmp = *tmpvar;
 		eq = node(OEQ);
 		eq->type = *tp;
 		eq->left = p->left;
