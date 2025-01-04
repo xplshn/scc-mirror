@@ -15,9 +15,6 @@ struct cfg {
 
 static struct cfg cfg;
 
-#ifndef NDEBUG
-#include <stdio.h>
-
 static Node *
 jtarget(Node *np)
 {
@@ -29,6 +26,9 @@ jtargetbb(Node *np)
 {
 	return jtarget(np)->bb;
 }
+
+#ifndef NDEBUG
+#include <stdio.h>
 
 static void
 prbb(Block *bb)
