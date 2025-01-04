@@ -279,22 +279,50 @@ optlabels(Node *np)
 	return np;
 }
 
+static int
+negop(int op)
+{
+	switch (op) {
+	case OEQ:  return ONE;
+	case ONE:  return OEQ;
+	case OLT:  return OGE;
+	case OGE:  return OLT;
+	case OLE:  return OGT;
+	case OGT:  return OLE;
+	default:   abort();
+	}
+	return op;
+}
+
 static Node *
 optjmps(Node *np)
 {
 	Symbol *label;
-	Node *p, *stmt, *last;
+	Node *p, *stmt, *next;
 
 	switch (np->op) {
 	case OBRANCH:
+	branch:
 		label = np->u.sym;
 		stmt = label->u.stmt;
+		next = np->next;
+
+		/* avoid branch over jump */
+		if (next->op == OJMP && next->next->label == label &&
+		    (!next->label || next->label->refcnt == 0)) {
+			Node *left = np->left;
+			np->u.sym = next->u.sym;
+			label->refcnt--;
+			left->op = negop(left->op);
+			delstmt(next);
+			goto branch;
+		}
 		goto chain_jumps;
 	case OJMP:
 		label = np->u.sym;
 		stmt = label->u.stmt;
 
-		/* Avoid jump over a set of NOPs */
+		/* avoid jump over a set of NOPs */
 		for (p = np->next; p; p = p->next) {
 			if (p == stmt) {
 				label->refcnt--;
