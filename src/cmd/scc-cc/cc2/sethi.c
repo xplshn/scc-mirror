@@ -3,12 +3,27 @@
 #include "cc2.h"
 
 static Node *
-bool(Node *np, Symbol *true, Symbol *false)
+branchnode(Node *cond, Symbol *sym)
+{
+	Node *np;
+	int op = cond ? OBRANCH : OJMP;
+
+	np = node(op);
+	np->op = op;
+	np->left = sethi(cond);
+	np->u.sym = sym;
+	sym->refcnt++;
+
+	return np;
+}
+
+static Node *
+bool(Node *cond, Symbol *true, Symbol *false)
 {
 	Symbol *label;
-	Node *p, *l = np->left, *r = np->right;
+	Node *p, *l = cond->left, *r = cond->right;
 
-	switch (np->op) {
+	switch (cond->op) {
 	case ONEG:
 		l = bool(l, false, true);
 		break;
@@ -25,22 +40,14 @@ bool(Node *np, Symbol *true, Symbol *false)
 		r = bool(r, true, false);
 		break;
 	default:
-		p = node(OBRANCH);
-		p->left = sethi(np);
-		p->u.sym = true;
-		true->refcnt++;
-		prestmt(p);
-
-		p = node(OJMP);
-		p->u.sym = false;
-		false->refcnt++;
-		prestmt(p);
+		prestmt(branchnode(cond, true));
+		prestmt(branchnode(NULL, false));
 		return NULL;
 	}
 
-	np->left = l;
-	np->right = r;
-	return np;
+	cond->left = l;
+	cond->right = r;
+	return cond;
 }
 
 Node *
@@ -64,10 +71,7 @@ logicexpr(Node *np)
 	p->right = constnode(NULL, 0, tp);
 	prestmt(labelstmt(sethi(p), false));
 
-	p = node(OJMP);
-	p->u.sym = phi;
-	phi->refcnt++;
-	prestmt(p);
+	prestmt(branchnode(NULL, phi));
 
 	p = node(OASSIG);
 	p->type = *tp;
