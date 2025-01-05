@@ -3,6 +3,18 @@
 #include "cc2.h"
 
 static Node *
+assignnode(Type *tp, Node *lhs, Node *rhs)
+{
+	Node *np;
+
+	np = node(OASSIG);
+	np->type = *tp;
+	np->left = lhs;
+	np->right = rhs;
+	return sethi(np);
+}
+
+static Node *
 branchnode(Node *cond, Symbol *sym)
 {
 	Node *np;
@@ -53,9 +65,9 @@ bool(Node *cond, Symbol *true, Symbol *false)
 Node *
 logicexpr(Node *np)
 {
-	Node *tmpvar, *p;
+	Node *tmpvar, *p, *zero, *one;
 	Type *tp = &np->type;
-	Symbol *true, *false, *phi;
+	Symbol *true, *false, *phi, *tmpsym;
 
 	true = newlabel();
 	false = newlabel();
@@ -64,20 +76,17 @@ logicexpr(Node *np)
 	bool(np, true, false);
 
 	tmpvar = tmpnode(tp, NULL);
+	tmpsym = tmpvar->u.sym;
+	zero = constnode(NULL, 0, tp);
+	one = constnode(NULL, 1, tp);
 
-	p = node(OASSIG);
-	p->type = *tp;
-	p->left = tmpnode(tp, tmpvar->u.sym);
-	p->right = constnode(NULL, 0, tp);
-	prestmt(labelstmt(sethi(p), false));
+	p = assignnode(tp, tmpnode(tp, tmpsym), zero);
+	prestmt(labelstmt(p, false));
 
 	prestmt(branchnode(NULL, phi));
 
-	p = node(OASSIG);
-	p->type = *tp;
-	p->left = tmpnode(tp, tmpvar->u.sym);
-	p->right = constnode(NULL, 1, tp);
-	prestmt(labelstmt(sethi(p), true));
+	p = assignnode(tp, tmpnode(tp, tmpsym), one);
+	prestmt(labelstmt(p, true));
 
 	prestmt(labelstmt(NULL, phi));
 	delstmt(np);
