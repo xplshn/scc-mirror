@@ -607,9 +607,6 @@ rhs(Node *np)
 		return assign(np);
 	case OASK:
 		return ternary(np);
-	case OCOMMA:
-		rhs(l);
-		return rhs(r);
 	case OSNEG:
 		sign = (tp->flags & SIGNF) == 0;
 		size = tp->size == 8;

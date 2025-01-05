@@ -94,11 +94,23 @@ logicexpr(Node *np)
 	return sethi(tmpvar);
 }
 
+static void
+comma(Node *np)
+{
+	if (np->op != OCOMMA) {
+		prestmt(sethi(np));
+	} else {
+		comma(np->left);
+		prestmt(sethi(np->right));
+		delnode(np);
+	}
+}
+
 Node *
 sethi(Node *np)
 {
 	int op;
-	Node *next, *l, *r;
+	Node *prev, *next, *l, *r;
 
 	if (!np)
 		return np;
@@ -124,6 +136,14 @@ sethi(Node *np)
 		bool(np->left, np->u.sym, next->label);
 		np->u.sym->refcnt--;
 		return NULL;
+	case OCOMMA:
+		r = np->right;
+		comma(np->left);
+		next = np->next, prev = np->prev;
+		*np = *r;
+		delnode(r);
+		np->next = next, np->prev = prev;
+		return sethi(np);
 	case ONEG:
 	case OAND:
 	case OOR:
