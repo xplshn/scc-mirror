@@ -89,7 +89,6 @@ logicexpr(Node *np)
 	prestmt(labelstmt(p, false));
 
 	prestmt(labelstmt(NULL, phi));
-	delstmt(np);
 
 	return sethi(tmpvar);
 }
@@ -106,11 +105,24 @@ comma(Node *np)
 	}
 }
 
+static Node *
+replace(Node *what, Node *with)
+{
+	Node *prev, *next;
+
+	next = what->next, prev = what->prev;
+	*what = *with;
+	delnode(with);
+	what->next = next, what->prev = prev;
+
+	return sethi(what);
+}
+
 Node *
 sethi(Node *np)
 {
 	int op;
-	Node *prev, *next, *l, *r;
+	Node *next, *p, *l, *r;
 
 	if (!np)
 		return np;
@@ -139,16 +151,12 @@ sethi(Node *np)
 	case OCOMMA:
 		r = np->right;
 		comma(np->left);
-		next = np->next, prev = np->prev;
-		*np = *r;
-		delnode(r);
-		np->next = next, np->prev = prev;
-		return sethi(np);
+		return replace(np, r);
 	case ONEG:
 	case OAND:
 	case OOR:
-		np = logicexpr(np);
-		break;
+		p = logicexpr(np);
+		return replace(np, p);
 	default:
 		np = tsethi(np);
 		break;
