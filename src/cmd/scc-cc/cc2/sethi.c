@@ -80,13 +80,13 @@ logicexpr(Node *np)
 	zero = constnode(NULL, 0, tp);
 	one = constnode(NULL, 1, tp);
 
-	p = assignnode(tp, tmpnode(tp, tmpsym), zero);
-	prestmt(labelstmt(p, false));
+	p = assignnode(tp, tmpnode(tp, tmpsym), one);
+	prestmt(labelstmt(p, true));
 
 	prestmt(branchnode(NULL, phi));
 
-	p = assignnode(tp, tmpnode(tp, tmpsym), one);
-	prestmt(labelstmt(p, true));
+	p = assignnode(tp, tmpnode(tp, tmpsym), zero);
+	prestmt(labelstmt(p, false));
 
 	prestmt(labelstmt(NULL, phi));
 	delstmt(np);
