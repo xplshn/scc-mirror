@@ -475,7 +475,6 @@ assign(Node *np)
 	int op;
 
 	switch (np->u.subop) {
-		break;
 	case OINC:
 		op = OADD;
 		goto post_oper;
