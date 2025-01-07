@@ -813,8 +813,7 @@ structdcl(void)
 		error("too many levels of nested structure or union definitions");
 
 	++nested;
-	while (yytoken != '}')
-		fieldlist(tp);
+	do fieldlist(tp); while (yytoken != '}');
 	--nested;
 
 	deftype(tp);
