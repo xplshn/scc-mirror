@@ -106,6 +106,37 @@ comma(Node *np)
 }
 
 static Node *
+ternary(Node *np)
+{
+	Type *tp;
+	Node *tmpvar, *colon, *p;
+	Symbol *tmpsym, *true, *false, *phi;
+
+	true = newlabel();
+	false = newlabel();
+	phi = newlabel();
+	bool(np->left, true, false);
+
+	tp = &np->type;
+	colon = np->right;
+	tmpvar = tmpnode(tp, NULL);
+	tmpsym = tmpvar->u.sym;
+
+	prestmt(labelstmt(NULL, true));
+	p = assignnode(tp, tmpnode(tp, tmpsym), sethi(colon->left));
+	prestmt(p);
+	prestmt(branchnode(NULL, phi));
+
+	prestmt(labelstmt(NULL, false));
+	p = assignnode(tp, tmpnode(tp, tmpsym), sethi(colon->right));
+	prestmt(p);
+
+	prestmt(labelstmt(NULL, phi));
+
+	return sethi(tmpvar);
+}
+
+static Node *
 replace(Node *what, Node *with)
 {
 	Node *prev, *next;
@@ -122,7 +153,7 @@ Node *
 sethi(Node *np)
 {
 	int op;
-	Node *next, *p, *l, *r;
+	Node *next, *l, *r;
 
 	if (!np)
 		return np;
@@ -152,11 +183,12 @@ sethi(Node *np)
 		r = np->right;
 		comma(np->left);
 		return replace(np, r);
+	case OASK:
+		return replace(np, ternary(np));
 	case ONEG:
 	case OAND:
 	case OOR:
-		p = logicexpr(np);
-		return replace(np, p);
+		return replace(np, logicexpr(np));
 	default:
 		np = tsethi(np);
 		break;

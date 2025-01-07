@@ -378,30 +378,6 @@ lhs(Node *np)
 }
 
 static Node *
-ternary(Node *np)
-{
-	Node ifyes, ifno, phi, *colon, *tmp;
-
-	tmp = tmpnode(&np->type, NULL);
-	label2node(&ifyes, NULL);
-	label2node(&ifno, NULL);
-	label2node(&phi, NULL);
-
-	colon = np->right;
-	code(ASBRANCH, rhs(np->left), &ifyes, &ifno);
-
-	setlabel(ifyes.u.sym);
-	copy(&tmp->type, tmp, rhs(colon->left));
-	code(ASJMP, NULL, &phi, NULL);
-
-	setlabel(ifno.u.sym);
-	copy(&tmp->type, tmp, rhs(colon->right));
-	setlabel(phi.u.sym);
-
-	return tmp;
-}
-
-static Node *
 function(void)
 {
 	Node aux;
@@ -605,8 +581,6 @@ rhs(Node *np)
 		return cast(tp, rhs(l));
 	case OASSIG:
 		return assign(np);
-	case OASK:
-		return ternary(np);
 	case OSNEG:
 		sign = (tp->flags & SIGNF) == 0;
 		size = tp->size == 8;
