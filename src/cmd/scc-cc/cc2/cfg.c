@@ -14,6 +14,7 @@ struct cfg {
 };
 
 static struct cfg cfg;
+static int modjmp;
 
 static Node *
 jtarget(Node *np)
@@ -271,14 +272,6 @@ buildcfg(void)
 	PRCFG("cfg");
 }
 
-static Node *
-optlabels(Node *np)
-{
-	if (np->op == ONOP && np->label->refcnt == 0)
-		return NULL;
-	return np;
-}
-
 static int
 negop(int op)
 {
@@ -295,12 +288,26 @@ negop(int op)
 }
 
 static Node *
-optjmps(Node *np)
+skipnop(Node *np, Node *target)
+{
+	for ( ; np->op == ONOP && np != target; np = np->next)
+		;
+	return np;
+}
+
+static Node *
+optjmps_helper(Node *np)
 {
 	Symbol *label;
 	Node *p, *stmt, *next;
 
 	switch (np->op) {
+	case ONOP:
+		if (np->label->refcnt == 0) {
+			modjmp = 1;
+			return NULL;
+		}
+		break;
 	case OBRANCH:
 	branch:
 		label = np->u.sym;
@@ -315,6 +322,7 @@ optjmps(Node *np)
 			label->refcnt--;
 			left->op = negop(left->op);
 			delstmt(next);
+			modjmp = 1;
 			goto branch;
 		}
 		goto chain_jumps;
@@ -323,24 +331,22 @@ optjmps(Node *np)
 		stmt = label->u.stmt;
 
 		/* avoid jump over a set of NOPs */
-		for (p = np->next; p; p = p->next) {
-			if (p == stmt) {
-				label->refcnt--;
-				return NULL;
-			}
-			if (p->op != ONOP)
-				break;
+		p = skipnop(np->next, stmt);
+		if (p == stmt) {
+			label->refcnt--;
+			modjmp = 1;
+			return NULL;
 		}
 
 	chain_jumps:
 		/* avoid chain of jumps to jumps */
-		for (p = stmt; p && p->op == ONOP; p = p->next)
-			;
-		if (p && p != np && p->op == OJMP) {
+		p = skipnop(stmt, NULL);
+		if (p != np && p->op == OJMP) {
 			label->refcnt--;
 			label = p->u.sym;
 			stmt = label->u.stmt;
 			np->u.sym = label;
+			modjmp = 1;
 			goto chain_jumps;
 		}
 	}
@@ -348,11 +354,20 @@ optjmps(Node *np)
 	return np;
 }
 
+static void
+optjmps(void)
+{
+	do {
+		modjmp = 0;
+		apply(optjmps_helper);
+		PRTREE("after_modjmp");
+	} while (modjmp == 1);
+}
+
 void
 gencfg(void)
 {
-	apply(optjmps);
-	apply(optlabels);
+	optjmps();
 	DBG("new cfg");
 	buildcfg();
 	trimcfg();
