@@ -92,6 +92,7 @@
 0097-extern.c
 0098-tentative.c
 0099-tentative.c
+0102-decl.c [TODO]
 0103-voidparm.c
 0104-qbebug.c
 0105-shl.c
