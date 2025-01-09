@@ -16,3 +16,5 @@ MACRO = $$(echo hello)
 all:
 	@echo MACRO=$(MACRO)
 EOF
+
+diff $tmp1 $tmp2
