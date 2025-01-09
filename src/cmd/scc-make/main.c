@@ -355,6 +355,7 @@ main(int argc, char *argv[])
 	if (pflag) {
 		dumpmacros();
 		dumprules();
+		exit(EXIT_SUCCESS);
 	}
 
 	if (!*targets) {

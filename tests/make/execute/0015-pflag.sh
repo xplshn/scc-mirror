@@ -65,6 +65,7 @@ FFLAGS = -O 1
 .SUFFIXES: .o .c .y .l .a .sh .f
 
 all:
+	@echo hello
 
 .sh:
 	cp $< $@
@@ -72,8 +73,9 @@ all:
 
 EOF
 
-(scc make -pf - | grep -v MAKE > $tmp1 2>&1) <<'EOF'
+(scc make -pf - all | grep -v MAKE > $tmp1 2>&1) <<'EOF'
 all:
+	@echo hello
 EOF
 
 diff -u $tmp1 $tmp2
