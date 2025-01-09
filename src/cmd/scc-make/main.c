@@ -87,7 +87,7 @@ estrdup(char *s)
 	return memcpy(emalloc(len), s, len);
 }
 
-static void
+void
 sighandler(int signo)
 {
 	stop = signo;

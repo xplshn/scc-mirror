@@ -1,3 +1,6 @@
+#define _POSIX_C_SOURCE
+
+#include <signal.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -38,7 +41,23 @@ launch(char *cmd, int ignore)
 	pid_t pid;
 	char *name, *shell;
 	char *args[] = {NULL, "-ec" , cmd, NULL};
+	static int initsignals;
 	extern char **environ;
+	extern void sighandler(int);
+
+
+	if (!initsignals) {
+		struct sigaction act = {
+			.sa_handler = sighandler
+		};
+
+		/* avoid BSD weirdness signal restart handling */
+		sigaction(SIGINT, &act, NULL);
+		sigaction(SIGHUP, &act, NULL);
+		sigaction(SIGTERM, &act, NULL);
+		sigaction(SIGQUIT, &act, NULL);
+		initsignals = 1;
+	}
 
 	switch (pid = fork()) {
 	case -1:
@@ -56,8 +75,8 @@ launch(char *cmd, int ignore)
 		execve(shell, args, environ);
 		_exit(127);
 	default:
-		while (waitpid(pid, &st, 0) < 0 && errno == EINTR)
-                        ;
-                return st;
+		if (waitpid(pid, &st, 0) < 0)
+			kill(pid, SIGTERM);
+		return st;
 	}
 }
