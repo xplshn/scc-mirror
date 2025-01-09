@@ -1,4 +1,6 @@
+#!/bin/sh
 
+trap "rm -f f1.?" EXIT INT TERM HUP
 
 scc-make -df- <<'EOF'
 all: f1.o
