@@ -1,29 +1,36 @@
 #!/bin/sh
 
-trap 'rm -f file.txt; kill -KILL $pid 2>/dev/null' EXIT INT TERM HUP
+cleanup()
+{
+	rm -f test.txt
+	kill -KILL $pid 2>/dev/null
+	if test $1 -ne 0
+	then
+		kill -KILL $$
+	fi
+}
+
+trap 'cleanup 0' EXIT
+trap 'cleanup 1' INT TERM HUP
 
 scc-make -f - <<'EOF' 2>&1 &
 file.txt:
 	@touch $@
-	@test -f $@
 	@while : ; do sleep 1 ; done
 EOF
 
 pid=$!
 
-for i in 1 2 3
+sleep 10 && kill $$ 2>/dev/null &
+
+while :
 do
 	if test -f file.txt
 	then
-		kill $pid
-		for i in 1 2 3
-		do
-			test -f file.txt || exit 0
-			sleep 1
-		done
-		exit 1
+		kill $pid 2>/dev/null
+		wait $pid
+		break
 	fi
-	sleep 1			
 done
 
-exit 1
+! test -f file.txt
