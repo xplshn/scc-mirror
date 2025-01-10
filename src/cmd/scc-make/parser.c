@@ -102,7 +102,7 @@ macroinfo(char *name, int *pwhere, Macro **mpp)
 	s = mp->value;
 	where = mp->where;
 
-	if (!s && !hide) {
+	if (where == UNDEF && !hide) {
 		where = ENVIRON;
 		s = getenv(name);
 	}
