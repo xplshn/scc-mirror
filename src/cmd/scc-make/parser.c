@@ -102,12 +102,7 @@ macroinfo(char *name, int *pwhere, Macro **mpp)
 	s = mp->value;
 	where = mp->where;
 
-	if (where == UNDEF && !hide) {
-		where = ENVIRON;
-		s = getenv(name);
-	}
-
-	if (eflag && !hide) {
+	if (!hide && (where == UNDEF || where == INTERNAL || eflag)) {
 		t = getenv(name);
 		if (t) {
 			where = ENVIRON;
@@ -142,14 +137,14 @@ setmacro(char *name, char *val, int where, int export)
 
 	/*
 	 *  Default values are defined before anything else, and marked
-	 *  as MAKEFILES because they are injected as parseable text, and
-	 *  MAKEFILE variables are always overriden. ENVIRON macros are
-	 *  generated in macroinfo() and this is why this function should
-	 *  not receive a where == ENVIRON ever.
+	 *  as INTERNAL because they are injected as parseable text, and
+	 *  MAKEFILE and INTERNAL variables are always overriden. ENVIRON
+	 *  macros are generated in macroinfo() and this is why this function
+	 *  should not receive a where == ENVIRON ever.
 	 */
-
 	switch (owhere) {
 	case UNDEF:
+	case INTERNAL:
 	case MAKEFILE:
 		set = 1;
 		break;
@@ -960,7 +955,7 @@ rule(char *targets[], int ntargets)
 }
 
 static void
-assign(char *macros[], int n)
+assign(char *macros[], int where, int n)
 {
 	char *defs;
 
@@ -969,12 +964,12 @@ assign(char *macros[], int n)
 
 	skipspaces();
 	defs = readmacrodef();
-	setmacro(*macros, defs, MAKEFILE, NOEXPORT);
+	setmacro(*macros, defs, where, NOEXPORT);
 	free(defs);
 }
 
 void
-parseinput(void)
+parseinput(int where)
 {
 	int i, n;
 	char **targets;
@@ -999,7 +994,7 @@ parseinput(void)
 			rule(targets, n);
 			break;
 		case '=':
-			assign(targets, n);
+			assign(targets, where, n);
 			break;
 		default:
 			error("unexpected token '%s'(%d)", token, tok);
@@ -1025,7 +1020,7 @@ parse(char *fname)
 
 	debug("parsing %s", fname);
 	push(FTFILE, fp, fname, 0);
-	parseinput();
+	parseinput(MAKEFILE);
 
 	return 1;
 }
@@ -1035,5 +1030,5 @@ inject(char *s)
 {
 	push(FTFILE, NULL, "<internal>", 0);
 	push(FTEXPAN, s);
-	parseinput();
+	parseinput(INTERNAL);
 }
