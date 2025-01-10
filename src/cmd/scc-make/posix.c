@@ -11,6 +11,18 @@
 
 #include "make.h"
 
+int
+is_dir(char *fname)
+{
+	struct stat st;
+
+	if (stat(fname, &st) < 0) {
+		perror("make: cheking if target is a dir");
+		return 0;
+	}
+	return (st.st_mode & S_IFMT) == S_IFDIR;
+}
+
 void
 exportvar(char *var, char *value)
 {

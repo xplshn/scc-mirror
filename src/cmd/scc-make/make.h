@@ -70,6 +70,7 @@ extern time_t stamp(char *);
 extern int launch(char *, int);
 extern int putenv(char *);
 extern void exportvar(char *, char *);
+extern int is_dir(char *);
 
 /* main.c */
 extern int kflag, dflag, nflag, iflag, sflag;

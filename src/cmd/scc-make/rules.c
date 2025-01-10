@@ -454,7 +454,7 @@ cleanup(Target *tp)
 		}
 	}
 
-	if (!precious && !nflag && !qflag) {
+	if (!precious && !nflag && !qflag && !is_dir(tp->name)) {
 		printf("make: trying to remove target %s\n", tp->name);
 		remove(tp->name);
 	}
