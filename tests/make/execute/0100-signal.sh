@@ -21,17 +21,17 @@ test.txt:
 	@touch $@
 	@while : ; do sleep 1 ; done
 EOF
-
 pid=$!
 
 sleep 10 && echo timeout >&2 && kill $$ 2>/dev/null &
+timer=$!
 
 while :
 do
 	if test -f test.txt
 	then
-		kill $pid 2>/dev/null
-		wait $pid
+		kill $pid $timer 2>/dev/null
+		wait $pid $timer
 		break
 	fi
 done
