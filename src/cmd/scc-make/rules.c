@@ -91,25 +91,33 @@ addtarget(char *target, int ndeps)
 	Target *tp = lookup(target);
 
 	tp->defined = 1;
-	if (!deftarget && target[0] != '.')
+	if (!deftarget && target[0] != '.') {
 		deftarget = tp;
+		return;
+	}
 
 	if (strcmp(target, ".SUFFIXES") == 0 && ndeps == 0) {
 		free(tp->deps);
 		tp->deps = NULL;
 		tp->ndeps = 0;
+		return;
 	}
 
 	if (strcmp(target, ".DEFAULT") == 0) {
 		if (ndeps > 0)
 			error("DEFAULT rule with prerequisites");
+		return;
 	}
 
-	if (strcmp(target, ".SILENT") == 0 && ndeps == 0)
+	if (strcmp(target, ".SILENT") == 0 && ndeps == 0) {
 		sflag = 1;
+		return;
+	}
 
-	if (strcmp(target, ".IGNORE") == 0 && ndeps == 0)
+	if (strcmp(target, ".IGNORE") == 0 && ndeps == 0) {
 		iflag = 1;
+		return;
+	}
 }
 
 void
