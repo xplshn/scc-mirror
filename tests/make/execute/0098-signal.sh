@@ -22,7 +22,7 @@ EOF
 
 pid=$!
 
-sleep 10 && kill $$ 2>/dev/null &
+sleep 10 && echo timeout >&2 && kill $$ 2>/dev/null &
 
 while :
 do
