@@ -16,10 +16,8 @@ is_dir(char *fname)
 {
 	struct stat st;
 
-	if (stat(fname, &st) < 0) {
-		perror("make: cheking if target is a dir");
+	if (stat(fname, &st) < 0)
 		return 0;
-	}
 	return (st.st_mode & S_IFMT) == S_IFDIR;
 }
 
