@@ -9,7 +9,7 @@ DIRS =\
 	strip/execute\
 	libc/execute\
 	cc/execute cc/error\
-	make/execute\
+	make/execute make/error\
 
 PROJECTDIR = ..
 include $(PROJECTDIR)/scripts/rules.mk
