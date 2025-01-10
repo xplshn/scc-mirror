@@ -454,7 +454,7 @@ cleanup(Target *tp)
 		}
 	}
 
-	if (!precious) {
+	if (!precious && !nflag) {
 		printf("make: trying to remove target %s\n", tp->name);
 		remove(tp->name);
 	}
