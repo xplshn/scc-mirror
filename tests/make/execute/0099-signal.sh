@@ -10,6 +10,7 @@ cleanup()
 	fi
 }
 
+rm -f file.txt
 trap 'cleanup 0' EXIT
 trap 'cleanup 1' INT TERM HUP
 
