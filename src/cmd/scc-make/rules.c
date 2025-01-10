@@ -311,6 +311,7 @@ run(Target *tp)
 
 	for (i = 0; i < tp->nactions; i++) {
 		struct action *p = &tp->actions[i];
+		debug("executing action '%s'", p->line);
 		s = expandstring(p->line, tp, &p->loc);
 		r = execline(tp, s, ignore, silent);
 		free(s);

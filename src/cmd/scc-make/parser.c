@@ -465,7 +465,12 @@ validchar(int c)
 static char *
 expandmacro(char *name)
 {
-	return expandstring(getmacro(name), NULL, getloc());
+	char *s;
+
+	s = expandstring(getmacro(name), NULL, getloc());
+	debug("macro %s expanded to '%s'", name, s);
+
+	return s;
 }
 
 static void
