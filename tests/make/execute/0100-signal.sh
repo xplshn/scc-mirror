@@ -14,7 +14,7 @@ rm -f file.txt
 trap 'cleanup 0' EXIT
 trap 'cleanup 1' INT TERM HUP
 
-scc-make -f - test.txt <<'EOF' &
+scc make -f - test.txt <<'EOF' &
 .PRECIOUS: test.txt
 
 test.txt:

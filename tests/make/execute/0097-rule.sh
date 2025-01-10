@@ -10,7 +10,7 @@ touch f1.c
 touch f1.o
 EOF
 
-scc-make -f- <<'EOF' > $tmp2 2>&1
+scc make -f- <<'EOF' > $tmp2 2>&1
 all: f1.o
 
 f1.o: f1.c

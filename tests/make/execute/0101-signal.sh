@@ -14,7 +14,7 @@ rm -f file.txt
 trap 'cleanup 0' EXIT
 trap 'cleanup 1' INT TERM HUP
 
-scc-make -qf - test.txt <<'EOF' &
+scc make -qf - test.txt <<'EOF' &
 test.txt:
 	@+touch $@
 	+@while : ; do sleep 1 ; done

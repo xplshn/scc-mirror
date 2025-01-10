@@ -11,7 +11,7 @@ cat > $tmp1 <<EOF
 Hello World
 EOF
 
-scc-make -f - <<'EOF' > $tmp2 2>&1
+scc make -f - <<'EOF' > $tmp2 2>&1
 FLAGS=Hello $(EFLAGS)
 all:
 	@echo $(FLAGS)
