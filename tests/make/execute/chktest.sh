@@ -3,6 +3,9 @@
 ulimit -c 0
 rm -f test.log
 
+unset CFLAGS
+unset CC
+
 for i in *-*.sh
 do
 	printf "Test: %s\n\n" $i >> test.log
