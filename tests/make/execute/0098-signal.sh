@@ -28,8 +28,9 @@ while :
 do
 	if test -f file.txt
 	then
-		kill $pid $timer 2>/dev/null
-		wait $pid $timer
+		kill $pid
+		wait $pid
+		kill $timer
 		break
 	fi
 done
