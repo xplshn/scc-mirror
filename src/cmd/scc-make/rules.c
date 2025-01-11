@@ -58,6 +58,32 @@ lookup(char *name)
 }
 
 static int
+cleanup(Target *tp)
+{
+	int precious;
+	Target *p, **q;
+
+	printf("make: signal %d arrived\n", stop);
+
+	precious = 0;
+	p = lookup(".PRECIOUS");
+	for (q = p->deps; q && *q; q++) {
+		if (strcmp((*q)->name, tp->name) == 0) {
+			precious = 1;
+			break;
+		}
+	}
+
+	if (!precious && !nflag && !qflag && !is_dir(tp->name)) {
+		printf("make: trying to remove target %s\n", tp->name);
+		remove(tp->name);
+	}
+
+	signal(stop, SIG_DFL);
+	raise(stop);
+}
+
+static int
 depends(char *target, char *dep)
 {
 	int i;
@@ -318,7 +344,12 @@ run(Target *tp)
 	}
 
 	for (i = 0; i < tp->nactions; i++) {
-		struct action *p = &tp->actions[i];
+		struct action *p;
+
+		if (stop)
+			cleanup(tp);
+
+		p = &tp->actions[i];
 		debug("executing action '%s'", p->line);
 		s = expandstring(p->line, tp, &p->loc);
 		r = execline(tp, s, ignore, silent);
@@ -444,32 +475,6 @@ update(Target *tp)
 		error("don't know how to make %s", tp->name);
 
 	return 0;
-}
-
-static int
-cleanup(Target *tp)
-{
-	int precious;
-	Target *p, **q;
-
-	printf("make: signal %d arrived\n", stop);
-
-	precious = 0;
-	p = lookup(".PRECIOUS");
-	for (q = p->deps; q && *q; q++) {
-		if (strcmp((*q)->name, tp->name) == 0) {
-			precious = 1;
-			break;
-		}
-	}
-
-	if (!precious && !nflag && !qflag && !is_dir(tp->name)) {
-		printf("make: trying to remove target %s\n", tp->name);
-		remove(tp->name);
-	}
-
-	signal(stop, SIG_DFL);
-	raise(stop);
 }
 
 static int 
