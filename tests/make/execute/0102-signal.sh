@@ -14,7 +14,7 @@ rm -rf adir
 trap 'cleanup 0' EXIT
 trap 'cleanup 1' INT TERM HUP
 
-scc make -f - <<'EOF' 2>&1 &
+scc make -f - <<'EOF' &
 adir:
 	@mkdir $@
 	@while : ; do sleep 1 ; done
