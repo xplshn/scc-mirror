@@ -11,7 +11,7 @@ strcmp:
 	repne
 	scasb
 
-	leaq	-1(%rdi),%rcx
+	leaq	0(%rdi),%rcx
 	subq	%r8,%rcx
 	movq	%r8,%rdi
 
