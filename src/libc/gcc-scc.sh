@@ -5,6 +5,9 @@ set -e
 for i
 do
 	case "$i" in
+	-g)
+		shift
+		;;
 	-r)
 		root=$2
 		shift 2
