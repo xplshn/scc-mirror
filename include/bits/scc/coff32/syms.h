@@ -1,6 +1,24 @@
-/* This file is inspired in the book "Understanding and using COFF" */
+/*
+ * This file is inspired in:
+ *	- the book "Understanding and using COFF"
+ *	- the book "UNIX System V 386 R3.2 Programmers guide, Vol 2"
+ */
 
 #define SYMNMLEN   8
+
+#define SYMENT  struct syment
+#define SYMESZ  18
+
+#define AUXENT  union auxent
+#define AUXESZ  18
+
+#define n_name       _n._n_name
+#define n_zeroes     _n._n_n._n_zeroes
+#define n_offset     _n._n_n._n_offset
+#define n_nptr       _n._n_nptr[1]
+
+#define FILNMLEN  14
+#define EFILNMLEN 20
 
 struct syment {
 	union {
@@ -9,20 +27,70 @@ struct syment {
 			long _n_zeroes;  /* if _n_name[0-3] == 0 */
 			long _n_offset;  /* offset into string table */
 		} _n_n;
+		char *_n_nptr[2];        /* allows overlaying */
 	} _n;
-	long n_value;                    /* value of symbol */
+	unsigned long n_value;           /* value of symbol */
 	short n_scnum;                   /* section number */
 	unsigned short n_type;           /* type and derived type */
 	char n_sclass;                   /* storage class */
 	char n_numaux;                   /* number of aux. entries */
 };
 
-#define SYMENT  struct syment
-#define SYMESZ  18
+struct x_file {
+	union {
+		char _x_fname[EFILNMLEN]; /* file name */
+		struct {
+			long x_zeroes; /* if _x_fname[0-3] == 0 */
+			long x_offset; /* offset into string table */
+		} _x_n;
+	} _x_file;
+};
 
-#define n_name       _n._n_name
-#define n_zeroes     _n._n_n._n_zeroes
-#define n_offset     _n._n_n._n_offset
+struct x_tag {
+	char zeroes0[6];
+	unsigned short x_size;  /* size of struct, union or enum */
+	char zeroes1[4];
+	long x_endndx;          /* index of next entry for the tag */
+};
+
+struct x_etag {
+	long xtagndx;           /* tag index */
+	char zeroes[2];
+	unsigned short x_size;  /* size of struct, union or enum */
+};
+
+struct x_scn {
+	long x_scnlen;              /* section length */
+	unsigned short x_nreloc;    /* num reloc entries */
+	unsigned short x_nlinno;    /* num line numbers */
+	unsigned long x_checksum;   /* section COMDAT checksum for PE */
+	unsigned short x_associated; /* COMDAT associated section index for PE */
+	unsigned char x_comdat;      /* COMDAT selection number for PE */
+};
+
+struct x_fun {
+	long x_tagndx;         /* tag index */
+	long x_fsize;          /* size in bytes */
+	long x_lnnoptr;        /* file pointer to line info */
+	long x_endndx;         /* index to next entry */
+	unsigned short x_tvndx; /* index of function in vector table */
+};
+
+struct x_ary {
+	long x_tagndx;               /* tag index */
+	unsigned short x_lnno;       /* line number of declaration */
+	unsigned short x_size;       /* size of array */
+	unsigned short x_dimen[4];   /* until 4 dimensions */
+};
+
+union auxent {
+	struct x_fun x_fun;
+	struct x_ary x_ary;
+	struct x_scn x_scn;
+	struct x_tag x_tag;
+	struct x_etag x_etag;
+	struct x_file x_file;
+};
 
 /* Special n_scnum values */
 #define N_DEBUG      -2
