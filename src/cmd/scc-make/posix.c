@@ -85,8 +85,11 @@ launch(char *cmd, int ignore)
 		execve(shell, args, environ);
 		_exit(127);
 	default:
-		if (waitpid(pid, &st, 0) < 0)
+		if (wait(&st) < 0) {
 			kill(pid, SIGTERM);
+			wait(&st);
+		}
+
 		return st;
 	}
 }
