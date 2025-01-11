@@ -98,10 +98,7 @@ COMMON_OBJS =\
 	stdlib/wcstombs.$O\
 	stdlib/wctomb.$O\
 	string/strcat.$O\
-	string/strchr.$O\
-	string/strcmp.$O\
 	string/strcoll.$O\
-	string/strcpy.$O\
 	string/strcspn.$O\
 	string/strerror.$O\
 	string/strncat.$O\
