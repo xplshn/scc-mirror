@@ -12,7 +12,7 @@ strchr:
 	repne
 	scasb
 
-	leaq	-1(%rdi),%rcx
+	leaq	0(%rdi),%rcx
 	subq	%r8,%rcx
 
 	cmp     %rdi,%rsi       /* set ZF to 0 */
