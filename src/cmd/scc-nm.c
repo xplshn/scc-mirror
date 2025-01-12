@@ -60,10 +60,9 @@ cmp(const void *p1, const void *p2)
 			return -1;
 		if (sym2->type == 'U')
 			return 1;
-		return 0;
-	} else {
-		return strcmp(sym1->name, sym2->name);
 	}
+
+	return strcmp(sym1->name, sym2->name);
 }
 
 static void
