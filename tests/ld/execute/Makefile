@@ -5,8 +5,13 @@ BINDIR = ../../../bin/
 OBJS   = f1.o f2.o
 OBJLIB = f3.o
 
+.SUFFIXES: .s
+
 all:
 	PATH=$(BINDIR):$$PATH $(MAKE) a.out
+
+.s.o:
+	$(AS) -o $@ $<
 
 tests:
 	@if command -v $(AS) >/dev/null;\
