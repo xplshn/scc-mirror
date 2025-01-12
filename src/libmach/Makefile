@@ -47,5 +47,4 @@ $(TARGET): $(OBJS)
 	cp $@ $(LIBDIR)/scc
 
 clean:
-	rm -f $(TBLS) objlst.mk
 	rm -f */*.o
