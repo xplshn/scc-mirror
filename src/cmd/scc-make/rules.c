@@ -548,7 +548,7 @@ rebuild(Target *tp, int *buildp)
 int
 build(char *name)
 {
-	int build, r;;
+	int build, r;
 
 	if (!name) {
 		if (!deftarget) {
@@ -561,5 +561,5 @@ build(char *name)
 	debug("checking target %s", name);
 
 	build = 0;
-	return  rebuild(lookup(name), &build);
+	return rebuild(lookup(name), &build);
 }
