@@ -256,7 +256,9 @@ secflags(char *attr)
 		case 'a':
 			flags |= SABS;
 			break;
-		/* TODO: What happens with SRELOC ? */
+		case 'm':
+			flags |= SRELOC;
+			break;
 		default:
 			abort();
 		}
@@ -385,9 +387,9 @@ ibinfmt(void)
 		exit(EXIT_FAILURE);
 	}
 
-	stext = defsec(".text", "rxcl");
-	sdata = defsec(".data", "rwcl");
-	sbss = defsec(".bss", "rwc");
+	stext = defsec(".text", "mrxcl");
+	sdata = defsec(".data", "mrwcl");
+	sbss = defsec(".bss", "mrwc");
 }
 
 void
