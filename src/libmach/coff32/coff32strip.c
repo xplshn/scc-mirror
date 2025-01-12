@@ -20,18 +20,16 @@ coff32strip(Obj *obj)
 		scn->s_relptr = 0;
 		scn->s_nlnno = 0;
 		scn->s_lnnoptr = 0;
-	}
 
-	hdr->f_nsyms = 0;
-	hdr->f_symptr = 0;
-	hdr->f_flags |= F_RELFLG | F_LMNO | F_LSYMS;
-
-	for (i = 0; i < coff->hdr.f_nscns; i++) {
 		if (coff->rels)
 			free(coff->rels[i]);
 		if (coff->lines)
 			free(coff->lines[i]);
 	}
+
+	hdr->f_nsyms = 0;
+	hdr->f_symptr = 0;
+	hdr->f_flags |= F_RELFLG | F_LMNO | F_LSYMS;
 
 	free(coff->ents);
 	free(coff->rels);
