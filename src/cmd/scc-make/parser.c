@@ -359,7 +359,7 @@ repeat:
 	if (!strcmp(input->buf, ""))
 		goto repeat;
 
-	if (strncmp(input->buf, "include", 7) == 0) {
+	if (!strncmp(input->buf, "include", 7) && isblank(input->buf[7])) {
 		input->pos = input->siz;
 		include(input->buf+7);
 		goto repeat;
