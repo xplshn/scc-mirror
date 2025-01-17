@@ -55,17 +55,21 @@ pack_ent(int order, unsigned char *buf, SYMENT *ent)
 	int n;
 	char *s;
 
-	/* TODO: What happens with the union? */
+	if (ent->n_zeroes == 0)
+		pack(order, buf, "ll", ent->n_zeroes, ent->n_offset);
+	else
+		memcpy(buf, ent->n_name, 8);
 
 	n = pack(order,
 	         buf,
-	         "'8lsscc",
-	         ent->n_name,
-	         ent->n_value,
-	         ent->n_scnum,
-	         ent->n_type,
-	         ent->n_sclass,
-	         ent->n_numaux);
+	         "lsscc",
+		     ent->n_value,
+		     ent->n_scnum,
+		     ent->n_type,
+		     ent->n_sclass,
+		     ent->n_numaux);
+	n += 8;
+
 	assert(n == SYMESZ);
 }
 
