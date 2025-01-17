@@ -38,10 +38,14 @@ pack_scn(int order, unsigned char *buf, SCNHDR *scn)
 {
 	int n;
 
+	if (scn->s_zeroes == 0)
+		pack(order, buf, "ll", scn->s_zeroes, scn->s_offset);
+	else
+		memcpy(buf, scn->s_name, 8);
+
 	n = pack(order,
-	         buf,
-	         "'8llllllssl",
-	         scn->s_name,
+	         buf + 8,
+	         "llllllssl",
 	         scn->s_paddr,
 	         scn->s_vaddr,
 	         scn->s_size,
@@ -51,6 +55,7 @@ pack_scn(int order, unsigned char *buf, SCNHDR *scn)
 	         scn->s_nrelloc,
 	         scn->s_nlnno,
 	         scn->s_flags);
+	n += 8;
 	assert(n == SCNHSZ);
 }
 
@@ -58,7 +63,6 @@ static void
 pack_ent(int order, unsigned char *buf, SYMENT *ent)
 {
 	int n;
-	char *s;
 
 	if (ent->n_zeroes == 0)
 		pack(order, buf, "ll", ent->n_zeroes, ent->n_offset);
@@ -66,7 +70,7 @@ pack_ent(int order, unsigned char *buf, SYMENT *ent)
 		memcpy(buf, ent->n_name, 8);
 
 	n = pack(order,
-	         buf,
+	         buf + 8,
 	         "lsscc",
 		     ent->n_value,
 		     ent->n_scnum,
@@ -224,28 +228,6 @@ writehdr(Obj *obj, FILE *fp)
 }
 
 static int
-writescns(Obj *obj, FILE *fp)
-{
-	int i;
-	SCNHDR *scn;
-	FILHDR *hdr;
-	struct coff32 *coff;
-	unsigned char buf[SCNHSZ];
-
-	coff  = obj->data;
-	hdr = &coff->hdr;
-
-	for (i = 0; i < hdr->f_nscns; i++) {
-		scn = &coff->scns[i];
-		pack_scn(ORDER(obj->type), buf, scn);
-		if (fwrite(buf, SCNHSZ, 1, fp) != 1)
-			return 0;
-	}
-
-	return 1;
-}
-
-static int
 allocstring(struct coff32 *coff, long off, struct strtbl *tbl)
 {
 	char *s, *name;
@@ -264,6 +246,32 @@ allocstring(struct coff32 *coff, long off, struct strtbl *tbl)
 
 	tbl->s = s;
 	tbl->siz += len;
+
+	return 1;
+}
+
+static int
+writescns(Obj *obj, FILE *fp, struct strtbl *tbl)
+{
+	int i;
+	SCNHDR *scn;
+	FILHDR *hdr;
+	struct coff32 *coff;
+	unsigned char buf[SCNHSZ];
+
+	coff  = obj->data;
+	hdr = &coff->hdr;
+
+	for (i = 0; i < hdr->f_nscns; i++) {
+		scn = &coff->scns[i];
+		if (scn->s_zeroes == 0) {
+			if (!allocstring(coff, scn->s_offset, tbl))
+				return 0;
+		}
+		pack_scn(ORDER(obj->type), buf, scn);
+		if (fwrite(buf, SCNHSZ, 1, fp) != 1)
+			return 0;
+	}
 
 	return 1;
 }
@@ -510,7 +518,7 @@ coff32write(Obj *obj, Map *map, FILE *fp)
 		goto err;
 	if (!writeaout(obj, fp))
 		goto err;
-	if (!writescns(obj, fp))
+	if (!writescns(obj, fp, &tbl))
 		goto err;
 	if (!writedata(obj, map, fp))
 		goto err;

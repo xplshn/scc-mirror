@@ -8,6 +8,29 @@
 #include "../libmach.h"
 #include "coff32.h"
 
+static char *
+secname(Coff32 *coff, SCNHDR *scn, Section *sec)
+{
+	char *p;
+	unsigned long siz = strlen(sec->name);
+
+	if (siz < SCNNMLEN)
+		return strncpy(scn->s_name, sec->name, SCNNMLEN);
+
+	if (coff->strsiz > ULONG_MAX - siz - 1)
+		return NULL;
+
+	siz += coff->strsiz + 1;
+	if ((p = realloc(coff->strtbl, siz)) == NULL)
+		return NULL;
+	coff->strtbl = p;
+
+	scn->s_zeroes = 0;
+	scn->s_offset = coff->strsiz;
+	coff->strsiz += siz;
+	return strcpy(&coff->strtbl[scn->s_offset], sec->name);
+}
+
 Section *
 coff32setsec(Obj *obj, int *idx, Section *sec)
 {
@@ -65,9 +88,11 @@ coff32setsec(Obj *obj, int *idx, Section *sec)
 		coff->scns = scn;
 		hdr->f_nscns = n + 1;
 	}
-	scn = &coff->scns[n];
 
-	strncpy(scn->s_name, sec->name, SCNNMLEN);
+	scn = &coff->scns[n];
+	if (!secname(coff, scn, sec))
+		return NULL;
+
 	scn->s_paddr = 0;
 	scn->s_vaddr = sec->base;
 	scn->s_size = sec->size;

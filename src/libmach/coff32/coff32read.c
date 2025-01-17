@@ -46,6 +46,7 @@ static void
 unpack_scn(int order, unsigned char *buf, SCNHDR *scn)
 {
 	int n;
+	char *s;
 
 	n = unpack(order,
 	          buf,
@@ -61,6 +62,10 @@ unpack_scn(int order, unsigned char *buf, SCNHDR *scn)
 	          &scn->s_nlnno,
 	          &scn->s_flags);
 	assert(n == SCNHSZ);
+
+	s = scn->s_name;
+	if (!s[0] && !s[1] && !s[2] && !s[3])
+		unpack(order, buf, "ll", &scn->s_zeroes, &scn->s_offset);
 }
 
 static void

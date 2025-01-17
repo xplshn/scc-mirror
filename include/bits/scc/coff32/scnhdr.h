@@ -2,8 +2,18 @@
 
 #define SCNNMLEN 8
 
+#define s_name       _s._s_name
+#define s_zeroes     _s._s_s._s_zeroes
+#define s_offset     _s._s_s._s_offset
+
 struct scnhdr {
-	char s_name[SCNNMLEN];    /* section name */
+	union {
+		char _s_name[SCNNMLEN];    /* section name */
+		struct {
+			long _s_zeroes;        /* if _s_name[0-3] == 0 */
+			long _s_offset;        /* offset into string table */
+		} _s_s;
+	} _s;
 	long s_paddr;             /* physical address */
 	long s_vaddr;             /* virtual address */
 	long s_size;              /* section size */
