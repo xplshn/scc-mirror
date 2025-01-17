@@ -17,5 +17,3 @@ all: $(TARGET)
 scc-make: $(OBJS)
 	$(CC) $(PROJ_LDFLAGS) $(OBJS) $(PROJ_LDLIBS) -o $@
 	cp $@ $(BINDIR)
-
-$(OBJS): make.h
