@@ -10,6 +10,11 @@
 #include "../libmach.h"
 #include "coff32.h"
 
+struct strtbl {
+	char *s;
+	long siz;
+};
+
 static void
 pack_hdr(int order, unsigned char *buf, FILHDR *hdr)
 {
@@ -241,33 +246,32 @@ writescns(Obj *obj, FILE *fp)
 }
 
 static int
-allocstring(struct coff32 *coff, long off, char **tbl, long *psiz)
+allocstring(struct coff32 *coff, long off, struct strtbl *tbl)
 {
 	char *s, *name;
 	long len, siz;
 
-	siz = *psiz;
+	siz = tbl->siz;
 	name = &coff->strtbl[off];
 	len = strlen(name) + 1;
 	if (len > siz - LONG_MAX)
 		return 0;
 
-	s = realloc(*tbl, siz + len);
+	s = realloc(tbl->s, siz + len);
 	if (!s)
 		return 0;
 	memcpy(s + siz, name, len);
 
-	*tbl = s;
-	*psiz += len;
+	tbl->s = s;
+	tbl->siz += len;
 
 	return 1;
 }
 
 static int
-writeents(Obj *obj, FILE *fp)
+writeents(Obj *obj, FILE *fp, struct strtbl *tbl)
 {
-	long i, len, strsiz;
-	char *strtbl, *s, *name;
+	long i;
 	FILHDR *hdr;
 	struct coff32 *coff;
 	unsigned char buf[SYMESZ];
@@ -277,9 +281,6 @@ writeents(Obj *obj, FILE *fp)
 
 	if (!coff->ents)
 		return 1;
-
-	strtbl = NULL;
-	strsiz = 0;
 
 	for (i = 0; i < hdr->f_nsyms; i++) {
 		SYMENT *ent;
@@ -291,8 +292,8 @@ writeents(Obj *obj, FILE *fp)
 		case SYM_ENT:
 			ent = &ep->u.sym;
 			if (ent->n_zeroes == 0) {
-				if (!allocstring(coff, ent->n_offset, &strtbl, &strsiz))
-					goto err;
+				if (!allocstring(coff, ent->n_offset, tbl))
+					return 0;
 			}
 			pack_ent(ORDER(obj->type), buf, ent);
 			break;
@@ -304,8 +305,8 @@ writeents(Obj *obj, FILE *fp)
 			break;
 		case SYM_AUX_FILE:
 			if (aux->x_zeroes == 0) {
-				if (!allocstring(coff, aux->x_offset, &strtbl, &strsiz))
-					goto err;
+				if (!allocstring(coff, aux->x_offset, tbl))
+					return 0;
 			}
 			pack_aux_file(ORDER(obj->type), buf, aux);
 			break;
@@ -324,24 +325,23 @@ writeents(Obj *obj, FILE *fp)
 			return 0;
 	}
 
-	free(coff->strtbl);
-	coff->strtbl = strtbl;
-	coff->strsiz = strsiz;
-
 	return 1;
-
-err:
-	free(strtbl);
-	return 0;
 }
 
 static int
-writestr(Obj *obj, FILE *fp)
+writestr(Obj *obj, FILE *fp, struct strtbl *tbl)
 {
 	struct coff32 *coff;
 	unsigned char buf[4];
 
 	coff = obj->data;
+
+	free(coff->strtbl);
+	coff->strtbl = tbl->s;
+	coff->strsiz = tbl->siz;
+	tbl->s = NULL;
+	tbl->siz = 0;
+
 	if ((coff->strsiz & 0xffff) != coff->strsiz)
 		return 0;
 
@@ -468,11 +468,14 @@ coff32write(Obj *obj, Map *map, FILE *fp)
 	long ptr, n;
 	SCNHDR *scn;
 	Mapsec *sec;
+	struct strtbl tbl;
 	struct coff32 *coff = obj->data;
 	FILHDR *hdr = &coff->hdr;
 
 	ptr = ftell(fp);
 	obj->pos = ptr;
+	tbl.s = NULL;
+	tbl.siz = 0;
 
 	n = hdr->f_nscns;
 	ptr += FILHSZ + hdr->f_opthdr + n*SCNHSZ;
@@ -504,23 +507,26 @@ coff32write(Obj *obj, Map *map, FILE *fp)
 	/* and now update symbols */
 
 	if (!writehdr(obj, fp))
-		return -1;
+		goto err;
 	if (!writeaout(obj, fp))
-		return -1;
+		goto err;
 	if (!writescns(obj, fp))
-		return -1;
+		goto err;
 	if (!writedata(obj, map, fp))
-		return -1;
+		goto err;
 	if (!writereloc(obj, fp))
-		return -1;
+		goto err;
 	if (!writelines(obj, fp))
-		return -1;
-	if (!writeents(obj, fp))
-		return -1;
-	if (!writestr(obj, fp))
-		return -1;
+		goto err;
+	if (!writeents(obj, fp, &tbl))
+		goto err;
+	if (!writestr(obj, fp, &tbl))
+		goto err;
 	if (ferror(fp))
-		return -1;
-
+		goto err;
 	return 0;
+
+err:
+	free(tbl.s);
+	return -1;
 }
