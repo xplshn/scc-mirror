@@ -78,7 +78,8 @@ Symbol *
 coff32setsym(Obj *obj, int *idx, Symbol *sym)
 {
 	int n = *idx;
-	SYMENT *ent, *p;
+	Entry *ep;
+	SYMENT *ent;
 	Coff32 *coff = obj->data;
 	FILHDR *hdr = &coff->hdr;
 
@@ -86,12 +87,13 @@ coff32setsym(Obj *obj, int *idx, Symbol *sym)
 	if (n >= coff->hdr.f_nsyms) {
 		if (n > LONG_MAX-1)
 			return NULL;
-		if ((p = realloc(coff->ents, (n+1) * sizeof(*p))) == NULL)
+		if ((ep = realloc(coff->ents, (n+1) * sizeof(*ep))) == NULL)
 			return NULL;
-		coff->ents = p;
+		coff->ents = ep;
 		coff->hdr.f_nsyms = n+1;
 	}
-	ent = &coff->ents[n];
+	ep = &coff->ents[n];
+	ent = &ep->u.sym;
 	if (!symname(coff, ent, sym))
 		return NULL;
 

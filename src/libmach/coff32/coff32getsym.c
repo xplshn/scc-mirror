@@ -67,6 +67,7 @@ Symbol *
 coff32getsym(Obj *obj, int *idx, Symbol *sym)
 {
 	int n = *idx;
+	Entry *ep;
 	SYMENT *ent;
 	Coff32 *coff = obj->data;
 	FILHDR *hdr = &coff->hdr;
@@ -74,7 +75,11 @@ coff32getsym(Obj *obj, int *idx, Symbol *sym)
 	if ((hdr->f_flags & F_LSYMS) != 0 || n >= coff->hdr.f_nsyms)
 		return NULL;
 
-	ent = &coff->ents[n];
+	ep = &coff->ents[n];
+	if (ep->type != SYM_ENT)
+		return NULL;
+	ent = &ep->u.sym;
+
 	sym->name = symname(coff, ent);
 	sym->type = typeof(coff, ent);
 	sym->stype = SYMOBJECT;

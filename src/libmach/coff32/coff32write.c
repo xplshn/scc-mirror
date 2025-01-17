@@ -74,6 +74,87 @@ pack_ent(int order, unsigned char *buf, SYMENT *ent)
 }
 
 static void
+pack_aux_file(int order, unsigned char *buf, AUXENT *aux)
+{
+
+	if (aux->x_zeroes == 0) {
+		memset(buf, 0, sizeof(AUXESZ));
+		pack(order, buf, "ll", aux->x_zeroes, aux->x_offset);
+	} else {
+		memcpy(buf, aux->x_fname, E_FILNMLEN);
+	}
+}
+
+static void
+pack_aux_scn(int order, unsigned char *buf, AUXENT *aux)
+{
+	int n;
+
+	n = pack(order,
+	         buf,
+	         "lsslsc",
+	         aux->x_scnlen,
+	         aux->x_nreloc,
+	         aux->x_nlinno,
+	         aux->x_checksum,
+	         aux->x_associated,
+	         aux->x_comdat);
+	assert(n == AUXESZ);
+}
+
+static void
+pack_aux_fun(int order, unsigned char *buf, AUXENT *aux)
+{
+	int n;
+
+	n = pack(order,
+	         buf,
+	         "lllls",
+	         aux->x_tagndx,
+	         aux->x_fsize,
+	         aux->x_lnnoptr,
+	         aux->x_endndx,
+	         aux->x_tvndx);
+	assert(n == AUXESZ);
+}
+
+static void
+pack_aux_ary(int order, unsigned char *buf, AUXENT *aux)
+{
+	int n;
+
+	n = pack(order,
+	         buf,
+	         "lssssss",
+	         aux->x_tagndx,
+	         aux->x_lnno,
+	         aux->x_size,
+	         aux->x_dimen[0],
+	         aux->x_dimen[1],
+	         aux->x_dimen[2],
+	         aux->x_dimen[3],
+	         aux->x_tvndx);
+	assert(n == AUXESZ);
+}
+
+static void
+pack_aux_sym(int order, unsigned char *buf, AUXENT *aux)
+{
+	int n;
+
+	n = pack(order,
+	         buf,
+	         "lsslls",
+	         aux->x_tagndx,
+	         aux->x_lnno,
+	         aux->x_size,
+	         aux->x_lnnoptr,
+	         aux->x_endndx,
+	         aux->x_tvndx);
+	assert(n == AUXESZ);
+}
+
+static void
 pack_aout(int order, unsigned char *buf, AOUTHDR *aout)
 {
 	int n;
@@ -160,6 +241,29 @@ writescns(Obj *obj, FILE *fp)
 }
 
 static int
+allocstring(struct coff32 *coff, long off, char **tbl, long *psiz)
+{
+	char *s, *name;
+	long len, siz;
+
+	siz = *psiz;
+	name = &coff->strtbl[off];
+	len = strlen(name) + 1;
+	if (len > siz - LONG_MAX)
+		return 0;
+
+	s = realloc(*tbl, siz + len);
+	if (!s)
+		return 0;
+	memcpy(s + siz, name, len);
+
+	*tbl = s;
+	*psiz += len;
+
+	return 1;
+}
+
+static int
 writeents(Obj *obj, FILE *fp)
 {
 	long i, len, strsiz;
@@ -178,22 +282,44 @@ writeents(Obj *obj, FILE *fp)
 	strsiz = 0;
 
 	for (i = 0; i < hdr->f_nsyms; i++) {
-		SYMENT *ent = &coff->ents[i];
+		SYMENT *ent;
+		AUXENT *aux;
+		Entry *ep = &coff->ents[i];
 
-		if (ent->n_zeroes == 0) {
-			name = &coff->strtbl[ent->n_offset];
-			len = strlen(name) + 1;
-			if (len > strsiz - LONG_MAX)
-				goto err;
-			s = realloc(strtbl, strsiz + len);
-			if (!s)
-				goto err;
-			memcpy(s + strsiz, name, len);
-			strtbl = s;
-			strsiz += len;
+		aux = &ep->u.aux;
+		switch (ep->type) {
+		case SYM_ENT:
+			ent = &ep->u.sym;
+			if (ent->n_zeroes == 0) {
+				if (!allocstring(coff, ent->n_offset, &strtbl, &strsiz))
+					goto err;
+			}
+			pack_ent(ORDER(obj->type), buf, ent);
+			break;
+		case SYM_AUX_UNK:
+			memcpy(buf, ep->u.buf, AUXESZ);
+			break;
+		case SYM_AUX_SYM:
+			pack_aux_file(ORDER(obj->type), buf, aux);
+			break;
+		case SYM_AUX_FILE:
+			if (aux->x_zeroes == 0) {
+				if (!allocstring(coff, aux->x_offset, &strtbl, &strsiz))
+					goto err;
+			}
+			pack_aux_file(ORDER(obj->type), buf, aux);
+			break;
+		case SYM_AUX_SCN:
+			pack_aux_scn(ORDER(obj->type), buf, aux);
+			break;
+		case SYM_AUX_FUN:
+			pack_aux_fun(ORDER(obj->type), buf, aux);
+			break;
+		case SYM_AUX_ARY:
+			pack_aux_ary(ORDER(obj->type), buf, aux);
+			break;
 		}
 
-		pack_ent(ORDER(obj->type), buf, ent);
 		if (fwrite(buf, SYMESZ, 1, fp) != 1)
 			return 0;
 	}
