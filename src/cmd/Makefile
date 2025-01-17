@@ -15,7 +15,7 @@ TARGET =\
 	scc-strip\
 	scc-size\
 	scc-ranlib\
-	scc-objdump\
+	scc-dump\
 	scc-objcopy\
 	scc-addr2line\
 

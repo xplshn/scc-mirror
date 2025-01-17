@@ -13,7 +13,7 @@ then
 fi
 
 case $1  in
-cc|cpp|as|ar|addr2line|ld|make|nm|objcopy|objdump|size|strip)
+cc|cpp|as|ar|addr2line|ld|make|nm|objcopy|dump|size|strip)
 	tool=$1
 	shift
 	exec $SCCPREFIX/bin/scc-$tool $@

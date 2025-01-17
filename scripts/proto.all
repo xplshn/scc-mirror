@@ -10,7 +10,7 @@ f 755 bin/scc-ld
 f 755 bin/scc-make
 f 755 bin/scc-nm
 f 755 bin/scc-objcopy
-f 755 bin/scc-objdump
+f 755 bin/scc-dump
 f 755 bin/scc-ranlib
 f 755 bin/scc-size
 f 755 bin/scc-strip
