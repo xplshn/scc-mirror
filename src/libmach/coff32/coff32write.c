@@ -502,13 +502,13 @@ coff32write(Obj *obj, Map *map, FILE *fp)
 
 	n = hdr->f_nscns;
 	for (scn = coff->scns; n--; scn++) {
-		scn->s_relptr = ptr;
+		scn->s_relptr = (scn->s_nrelloc > 0) ? ptr : 0;
 		ptr += scn->s_nrelloc * RELSZ;
 	}
 
 	n = hdr->f_nscns;
 	for (scn = coff->scns; n--; scn++) {
-		scn->s_lnnoptr = ptr;
+		scn->s_lnnoptr = (scn->s_nlnno > 0) ? ptr : 0;
 		ptr += scn->s_nlnno * RELSZ;
 	}
 
