@@ -4,6 +4,7 @@
 #include <scc/coff32/syms.h>
 #include <scc/coff32/reloc.h>
 #include <scc/coff32/linenum.h>
+#include <scc/coff32/storclass.h>
 
 typedef struct coff32 Coff32;
 

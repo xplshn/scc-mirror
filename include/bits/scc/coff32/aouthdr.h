@@ -12,7 +12,7 @@ struct aouthdr {
 };
 
 #define AOUTHDR struct aouthdr 
-#define AOUTSZ sizeof(AOUTHDR)
+#define AOUTSZ 28
 
 #define QMAGIC      0314
 #define STMAGIC     0401

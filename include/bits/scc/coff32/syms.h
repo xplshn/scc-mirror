@@ -4,95 +4,8 @@
  *	- the book "UNIX System V 386 R3.2 Programmers guide, Vol 2"
  */
 
-#define SYMNMLEN   8
-
-#define SYMENT  struct syment
-#define SYMESZ  18
-
-#define AUXENT  union auxent
-#define AUXESZ  18
-
-#define n_name       _n._n_name
-#define n_zeroes     _n._n_n._n_zeroes
-#define n_offset     _n._n_n._n_offset
-#define n_nptr       _n._n_nptr[1]
-
-#define FILNMLEN  14
-#define EFILNMLEN 20
-
-struct syment {
-	union {
-		char _n_name[SYMNMLEN];  /* symbol name */
-		struct {
-			long _n_zeroes;  /* if _n_name[0-3] == 0 */
-			long _n_offset;  /* offset into string table */
-		} _n_n;
-		char *_n_nptr[2];        /* allows overlaying */
-	} _n;
-	unsigned long n_value;           /* value of symbol */
-	short n_scnum;                   /* section number */
-	unsigned short n_type;           /* type and derived type */
-	char n_sclass;                   /* storage class */
-	char n_numaux;                   /* number of aux. entries */
-};
-
-struct x_file {
-	union {
-		char _x_fname[EFILNMLEN]; /* file name */
-		struct {
-			long x_zeroes; /* if _x_fname[0-3] == 0 */
-			long x_offset; /* offset into string table */
-		} _x_n;
-	} _x_file;
-};
-
-struct x_tag {
-	char zeroes0[6];
-	unsigned short x_size;  /* size of struct, union or enum */
-	char zeroes1[4];
-	long x_endndx;          /* index of next entry for the tag */
-};
-
-struct x_etag {
-	long xtagndx;           /* tag index */
-	char zeroes[2];
-	unsigned short x_size;  /* size of struct, union or enum */
-};
-
-struct x_scn {
-	long x_scnlen;              /* section length */
-	unsigned short x_nreloc;    /* num reloc entries */
-	unsigned short x_nlinno;    /* num line numbers */
-	unsigned long x_checksum;   /* section COMDAT checksum for PE */
-	unsigned short x_associated; /* COMDAT associated section index for PE */
-	unsigned char x_comdat;      /* COMDAT selection number for PE */
-};
-
-struct x_fun {
-	long x_tagndx;         /* tag index */
-	long x_fsize;          /* size in bytes */
-	long x_lnnoptr;        /* file pointer to line info */
-	long x_endndx;         /* index to next entry */
-	unsigned short x_tvndx; /* index of function in vector table */
-};
-
-struct x_ary {
-	long x_tagndx;               /* tag index */
-	unsigned short x_lnno;       /* line number of declaration */
-	unsigned short x_size;       /* size of array */
-	unsigned short x_dimen[4];   /* until 4 dimensions */
-};
-
-union auxent {
-	struct x_fun x_fun;
-	struct x_ary x_ary;
-	struct x_scn x_scn;
-	struct x_tag x_tag;
-	struct x_etag x_etag;
-	struct x_file x_file;
-};
-
 /* Special n_scnum values */
+#define N_TV         -3
 #define N_DEBUG      -2
 #define N_ABS        -1
 #define N_UNDEF       0
@@ -123,34 +36,104 @@ union auxent {
 #define DT_FCN       2
 #define DT_ARY       3
 
-/* storage class */
-#define C_NULL       0
-#define C_AUTO       1
-#define C_EXT        2
-#define C_STAT       3
-#define C_REG        4
-#define C_EXTDEF     5
-#define C_LABEL      6
-#define C_ULABEL     7
-#define C_MOS        8
-#define C_ARG        9
-#define C_STRTAG     10
-#define C_MOU        11
-#define C_UNTAG      12
-#define C_TPDEF      13
-#define C_USTATIC    14
-#define C_ENTAG      15
-#define C_MOE        16
-#define C_REGPARM    17
-#define C_FIELD      18
-#define C_AUTOARG    19
-#define C_LASTENT    20
-#define C_BLOCK      100
-#define C_FCN        101
-#define C_EOS        102
-#define C_FILE       103
-#define C_LINE       104
-#define C_ALIAS      105
-#define C_HIDDEN     106
-#define C_WEAKEXT    127
-#define C_EFCN       255
+#define SYMNMLEN   8
+#define FILNMLEN  14
+
+#define SYMENT  struct syment
+#define SYMESZ  18
+
+#define AUXENT  union auxent
+#define AUXESZ  18
+
+#define n_name       _n._n_name
+#define n_zeroes     _n._n_n._n_zeroes
+#define n_offset     _n._n_n._n_offset
+#define n_nptr       _n._n_nptr[1]
+
+#define E_FILNMLEN 18
+#define DIMNUM     4
+
+struct syment {
+	union {
+		char _n_name[SYMNMLEN];  /* symbol name */
+		struct {
+			long _n_zeroes;  /* if _n_name[0-3] == 0 */
+			long _n_offset;  /* offset into string table */
+		} _n_n;
+		char *_n_nptr[2];        /* allows overlaying */
+	} _n;
+	unsigned long n_value;           /* value of symbol */
+	short n_scnum;                   /* section number */
+	unsigned short n_type;           /* type and derived type */
+	char n_sclass;                   /* storage class */
+	char n_numaux;                   /* number of aux. entries */
+};
+
+#define x_fname    _x_file._x_fname
+#define x_zeroes   _x_file._x_n._x_zeroes
+#define x_offset   _x_file._x_n._x_offset
+#define x_tagndx   _x_sym._x_tagndx
+#define x_lnno     _x_sym._x_misc._x_lnsz._x_lnno
+#define x_size     _x_sym._x_misc._x_lnsz._x_size
+#define x_fsize    _x_sym._x_misc._x_fsize
+#define x_lnnoptr  _x_sym._x_fcnary._x_fcn._x_lnnoptr
+#define x_endndx   _x_sym._x_fcnary._x_fcn._x_endndx
+#define x_dimen    _x_sym._x_fcnary._x_ary._x_dimen
+#define x_tvndx    _x_sym._x_tvndx
+#define x_scnlen   _x_scn._x_scnlen
+#define x_nreloc   _x_scn._x_nreloc
+#define x_nlinno   _x_scn._x_nlinno
+#define x_checksum _x_scn._x_checksum
+#define x_associated _x_scn._x_associated
+#define x_comdat   _x_scn._x_comdat
+#define x_tvfill   _x_tv._x_tvfill
+#define x_tvlen    _x_tv._x_tvlen
+#define x_tvran    _x_tv._x_tvran
+
+union auxent {
+	union {
+		char _x_fname[E_FILNMLEN]; /* file name */
+		struct {
+			long _x_zeroes; /* if _x_fname[0-3] == 0 */
+			long _x_offset; /* offset into string table */
+		} _x_n;
+	} _x_file;
+
+	struct {
+		long _x_tagndx;	/* str, un, or enum tag indx */
+		union {
+			struct {
+				unsigned short _x_lnno;	/* declaration line number */
+				unsigned short _x_size;	/* str, union, array size */
+			} _x_lnsz;
+			long _x_fsize; /* size of function */
+		} _x_misc;
+
+		union {
+			struct {             /* if ISFCN, tag, or .bb */
+				long _x_lnnoptr;  /* ptr to fcn line # */
+				long _x_endndx;   /* entry ndx past block end */
+			} _x_fcn;
+			struct {             /* if ISARY, up to 4 dimen. */
+				unsigned short _x_dimen[DIMNUM];
+			} _x_ary;
+		} _x_fcnary;
+
+		unsigned short _x_tvndx;		/* tv index */
+	} _x_sym;
+
+	struct {
+		long _x_scnlen;                /* section length */
+		unsigned short _x_nreloc;      /* number of relocation entries */
+		unsigned short _x_nlinno;      /* number of line numbers */
+		unsigned long _x_checksum;     /* section COMDAT checksum         */
+		unsigned short _x_associated;  /* COMDAT associated section index */
+		unsigned char _x_comdat;       /* COMDAT selection number         */
+	} _x_scn;
+
+	struct {	   /* info about .tv section (in auxent of symbol .tv)) */
+		long _x_tvfill;	             /* tv fill value */
+		unsigned short _x_tvlen;     /* length of .tv */
+		unsigned short _x_tvran[2];  /* tv range */
+	} _x_tv;
+};
