@@ -389,7 +389,7 @@ ibinfmt(void)
 
 	stext = defsec(".text", "mrxcl");
 	sdata = defsec(".data", "mrwcl");
-	sbss = defsec(".bss", "mrwc");
+	sbss = defsec(".bss", "rwc");
 }
 
 void
