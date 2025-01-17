@@ -132,6 +132,7 @@ size(char *fname)
 	int t;
 	FILE *fp;
 
+	membname = NULL;
 	filename = fname;
 	if ((fp = fopen(fname, "rb")) == NULL) {
 		error(strerror(errno));
