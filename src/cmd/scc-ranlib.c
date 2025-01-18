@@ -192,7 +192,7 @@ readsyms(FILE *fp)
 	}
 
 	cur = ftell(fp);
-	if ((off = armember(fp, memb)) < 0)
+	if ((off = armember(fp, memb, NULL)) < 0)
 		goto corrupted;
 
 	if (strcmp(memb, "/") == 0 || strcmp(memb, "__.SYMDEF") == 0)
@@ -201,7 +201,7 @@ readsyms(FILE *fp)
 	fseek(fp, cur, SEEK_SET);
 	for (;;) {
 		cur = ftell(fp);
-		off = armember(fp, memb);
+		off = armember(fp, memb, NULL);
 		switch (off) {
 		case -1:
 			goto corrupted;

@@ -24,7 +24,7 @@ getfname(struct ar_hdr *hdr, char *dst)
 }
 
 long
-armember(FILE *fp, char *member)
+armember(FILE *fp, char *member, struct ar_hdr *phdr)
 {
 	struct ar_hdr hdr;
 	long siz;
@@ -46,6 +46,9 @@ armember(FILE *fp, char *member)
 	}
 
 	getfname(&hdr, member);
+
+	if (phdr)
+		*phdr = hdr;
 
 	return sizeof(hdr) + siz;
 }

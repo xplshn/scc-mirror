@@ -106,7 +106,7 @@ sizelib(FILE *fp)
 
 	for (;;) {
 		cur = ftell(fp);
-		off = armember(fp, memb);
+		off = armember(fp, memb, NULL);
 		switch (off) {
 		case -1:
 			error("library corrupted");

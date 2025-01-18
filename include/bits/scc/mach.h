@@ -68,6 +68,8 @@ enum symtype {
 	SYMCOMMON,
 };
 
+struct ar_hdr;
+
 struct obj {
 	char *index;
 	Objops *ops;
@@ -120,7 +122,7 @@ struct symbol {
 
 #ifdef stdin
 extern int archive(FILE *);
-extern long armember(FILE *, char *);
+extern long armember(FILE *, char *, struct ar_hdr *);
 
 extern int objprobe(FILE *, char **);
 
