@@ -4,9 +4,9 @@
 #include <string.h>
 
 #include <scc/mach.h>
+#include <scc/elf64.h>
 
 #include "../libmach.h"
-#include "elf64.h"
 
 static int
 typeof(Elf64 *elf, Elf_Sym *ent, char *name)

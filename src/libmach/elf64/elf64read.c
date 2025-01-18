@@ -3,9 +3,9 @@
 #include <stdlib.h>
 
 #include <scc/mach.h>
+#include <scc/elf64.h>
 
 #include "../libmach.h"
-#include "elf64.h"
 
 static int
 unpack_hdr(int order, unsigned char *buf, Elf_Ehdr *hdr)

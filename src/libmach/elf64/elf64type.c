@@ -2,9 +2,9 @@
 #include <string.h>
 
 #include <scc/mach.h>
+#include <scc/elf64.h>
 
 #include "../libmach.h"
-#include "elf64.h"
 
 int
 elf64type(char *name)

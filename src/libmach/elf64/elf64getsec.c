@@ -1,9 +1,9 @@
 #include <stdio.h>
 
 #include <scc/mach.h>
+#include <scc/elf64.h>
 
 #include "../libmach.h"
-#include "elf64.h"
 
 Section *
 elf64getsec(Obj *obj, int *idx, Section *sec)
