@@ -14,7 +14,7 @@ union name {
 };
 
 char *
-coff32name(Coff32 *coff, void *hdr)
+coff32str(Coff32 *coff, void *hdr)
 {
 	union name *p = hdr;
 

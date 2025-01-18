@@ -79,7 +79,7 @@ coff32getsec(Obj *obj, int *idx, Section *sec)
 		break;
 	}
 
-	sec->name = coff32name(coff, scn);
+	sec->name = coff32str(coff, scn);
 	sec->index = n;
 	sec->size = scn->s_size;
 	sec->base = scn->s_vaddr;

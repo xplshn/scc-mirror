@@ -71,7 +71,7 @@ coff32getsym(Obj *obj, int *idx, Symbol *sym)
 		return NULL;
 	ent = &ep->u.sym;
 
-	sym->name = coff32name(coff, ent);
+	sym->name = coff32str(coff, ent);
 	sym->type = typeof(coff, ent);
 	sym->stype = SYMOBJECT;
 	sym->value = ent->n_value;

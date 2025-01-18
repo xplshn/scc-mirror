@@ -66,7 +66,7 @@ extern Section *coff32getsec(Obj *, int *, Section *);
 extern Section *coff32setsec(Obj *, int *, Section *);
 extern Map *coff32loadmap(Obj *, FILE *);
 
-extern char *coff32name(Coff32 *, void *);
+extern char *coff32str(Coff32 *, void *);
 
 
 /* globals */

@@ -11,7 +11,6 @@ OBJS =\
 	coff32getsec.o\
 	coff32getsym.o\
 	coff32loadmap.o\
-	coff32name.o\
 	coff32new.o\
 	coff32pc2line.o\
 	coff32probe.o\
@@ -19,6 +18,7 @@ OBJS =\
 	coff32setidx.o\
 	coff32setsec.o\
 	coff32setsym.o\
+	coff32str.o\
 	coff32strip.o\
 	coff32type.o\
 	coff32write.o\
