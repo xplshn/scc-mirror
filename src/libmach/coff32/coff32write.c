@@ -204,8 +204,7 @@ pack_line(int order, unsigned char *buf, LINENO *lp)
 	n = pack(order,
 	         buf,
 	         "lls",
-	         lp->l_symndx,
-	         lp->l_paddr,
+	         lp->l_addr.l_symndx,
 	         lp->l_lnno);
 	assert(n == LINESZ);
 }

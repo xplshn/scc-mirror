@@ -35,9 +35,8 @@ unpack_line(int order, unsigned char *buf, LINENO *lp)
 
 	n = unpack(order,
 	           buf,
-	           "lls",
-	           &lp->l_symndx,
-	           &lp->l_paddr,
+	           "ls",
+	           &lp->l_addr.l_symndx,
 	           &lp->l_lnno);
 	assert(n == LINESZ);
 }
@@ -448,7 +447,7 @@ static int
 readlines(Obj *obj, FILE *fp)
 {
 	int i,j;
-	LINENO **lines, *lp;
+	LINENO **lines, *lp, *p;
 	FILHDR *hdr;
 	SCNHDR *scn;
 	struct coff32 *coff;
@@ -475,14 +474,18 @@ readlines(Obj *obj, FILE *fp)
 			return 0;
 		lines[i] = lp;
 
+		if (!objpos(obj, fp, scn->s_lnnoptr))
+			return 0;
+
 		for (j = 0; j < scn->s_nlnno; j++) {
-			if (!objpos(obj, fp, scn->s_lnnoptr))
+			if (fread(buf, LINESZ, 1, fp) != 1)
 				return 0;
-			if (fread(buf, LINESZ, 1, fp) == 1)
+			unpack_line(ORDER(obj->type), buf, lp);
+			if (lp->l_lnno != 0			
+			&&  lp->l_addr.l_symndx >= hdr->f_nsyms) {
 				return 0;
-			unpack_line(ORDER(obj->type), buf, &lp[j]);
-			if (lp[i].l_symndx >= hdr->f_nsyms)
-				return 0;
+			}
+			++lp;
 		}
 	}
 
