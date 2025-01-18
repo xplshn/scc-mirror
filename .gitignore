@@ -9,7 +9,7 @@ dirs
 /deps
 /src/cmd/scc-addr2line
 /src/cmd/scc-objcopy
-/src/cmd/scc-objdump
+/src/cmd/scc-objdump/scc-objdump
 /src/cmd/scc-size
 /src/cmd/scc-strip
 /src/cmd/scc-ar

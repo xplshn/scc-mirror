@@ -5,6 +5,7 @@ DIRS   =\
 	scc-as\
 	scc-cc\
 	scc-make\
+	scc-objdump\
 
 PROJECTDIR = ../..
 include $(PROJECTDIR)/scripts/rules.mk
