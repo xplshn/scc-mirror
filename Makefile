@@ -1,5 +1,11 @@
 .POSIX:
 
+all: deps
+
+deps:
+	$(MAKE) dep;\
+	touch $@;\
+
 all dep tests install uninstall: check_config FORCE
 	+@$(MAKE) -f main.mk $@
 
@@ -33,6 +39,6 @@ clean: FORCE
 distclean: FORCE
 	touch config.mk
 	$(MAKE) -f main.mk distclean
-	rm -f config.mk
+	rm -f config.mk deps
 
 FORCE:

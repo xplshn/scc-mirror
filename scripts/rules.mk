@@ -200,20 +200,32 @@ clean-dirs:
 clean-files:
 	rm -f *.i *.d *.o *.a *.elf $(TARGET)
 
-dep: inc-dep
-	@set -e; \
+dep: add-makefile recursive-dep
+
+add-makefile: FORCE
+	test -n "$(NODEP)" || $(MKDEP)
+
+recursive-dep: FORCE
+	+@set -e; \
 	for i in $(DIRS); \
 	do \
 		test $$i = tests && continue;\
 		cd $$i; \
-		$(MAKE) $@; \
+		$(MAKE) dep; \
 		cd -; \
 	done
 
-inc-dep: FORCE
-	test -n "$(NODEP)" || $(MKDEP)
+distclean: clean recursive-distclean
 
-distclean: clean del-inc-dep
+del-makefile: FORCE
+	rm -f makefile
 
-del-inc-dep: FORCE
-	find . -name makefile | xargs rm -f
+recursive-distclean: del-makefile FORCE
+	+@set -e;\
+	for i in $(DIRS); \
+	do\
+		test $$i = tests && continue;\
+		cd $$i;\
+		$(MAKE) distclean;\
+		cd -;\
+	done

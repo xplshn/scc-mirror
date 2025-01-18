@@ -6,6 +6,7 @@ libexec/
 dirs
 *.gcno
 *.gcda
+/deps
 /src/cmd/scc-addr2line
 /src/cmd/scc-objcopy
 /src/cmd/scc-objdump
