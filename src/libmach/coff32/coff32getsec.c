@@ -5,15 +5,6 @@
 
 #include "../libmach.h"
 
-static char *
-secname(Coff32 *coff, SCNHDR *scn)
-{
-	if (scn->s_zeroes != 0)
-		return scn->s_name;
-
-	return &coff->strtbl[scn->s_offset];
-}
-
 Section *
 coff32getsec(Obj *obj, int *idx, Section *sec)
 {
@@ -88,7 +79,7 @@ coff32getsec(Obj *obj, int *idx, Section *sec)
 		break;
 	}
 
-	sec->name = secname(coff, scn);
+	sec->name = coff32name(coff, scn);
 	sec->index = n;
 	sec->size = scn->s_size;
 	sec->base = scn->s_vaddr;

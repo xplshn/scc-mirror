@@ -54,15 +54,6 @@ typeof(Coff32 *coff, SYMENT *ent)
 	return c;
 }
 
-static char *
-symname(Coff32 *coff, SYMENT *ent)
-{
-	if (ent->n_zeroes != 0)
-		return ent->n_name;
-
-	return &coff->strtbl[ent->n_offset];
-}
-
 Symbol *
 coff32getsym(Obj *obj, int *idx, Symbol *sym)
 {
@@ -80,7 +71,7 @@ coff32getsym(Obj *obj, int *idx, Symbol *sym)
 		return NULL;
 	ent = &ep->u.sym;
 
-	sym->name = symname(coff, ent);
+	sym->name = coff32name(coff, ent);
 	sym->type = typeof(coff, ent);
 	sym->stype = SYMOBJECT;
 	sym->value = ent->n_value;
