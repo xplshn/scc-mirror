@@ -215,7 +215,7 @@ recursive-dep: FORCE
 		cd -; \
 	done
 
-distclean: clean recursive-distclean
+distclean: recursive-distclean
 
 del-makefile: FORCE
 	rm -f makefile
