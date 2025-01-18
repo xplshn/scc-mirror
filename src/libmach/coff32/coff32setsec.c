@@ -93,7 +93,15 @@ coff32setsec(Obj *obj, int *idx, Section *sec)
 	if (!secname(coff, scn, sec))
 		return NULL;
 
-	scn->s_paddr = 0;
+	/*
+	 * sec->offset is ignored because it is very unlikely
+	 * that the vaule is meaningful here. The field offset
+	 * was added only to allow getsec to retrive the information
+	 * in a generic way, but it was never expected to be a 2 way
+	 * relation. That pointer is updated when the object file
+	 * is written using a mapping.
+	 */
+	scn->s_paddr = sec->load;
 	scn->s_vaddr = sec->base;
 	scn->s_size = sec->size;
 	scn->s_scnptr = 0;
