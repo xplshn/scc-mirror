@@ -4,9 +4,9 @@
 #include <string.h>
 
 #include <scc/mach.h>
+#include <scc/coff32.h>
 
 #include "../libmach.h"
-#include "coff32.h"
 
 static int
 defent(Coff32 *coff, SYMENT *ent, Symbol *sym)

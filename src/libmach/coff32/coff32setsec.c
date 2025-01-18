@@ -4,9 +4,9 @@
 #include <string.h>
 
 #include <scc/mach.h>
+#include <scc/coff32.h>
 
 #include "../libmach.h"
-#include "coff32.h"
 
 static char *
 secname(Coff32 *coff, SCNHDR *scn, Section *sec)

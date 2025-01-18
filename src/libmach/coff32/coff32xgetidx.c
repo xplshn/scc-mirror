@@ -4,9 +4,9 @@
 
 #include <scc/mach.h>
 #include <scc/cstd.h>
+#include <scc/coff32.h>
 
 #include "../libmach.h"
-#include "coff32.h"
 
 int
 coff32xgetidx(int order, long *nsyms, char ***namep, long **offsp, FILE *fp)

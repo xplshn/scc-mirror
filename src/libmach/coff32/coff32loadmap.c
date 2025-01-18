@@ -1,9 +1,9 @@
 #include <stdio.h>
 
 #include <scc/mach.h>
+#include <scc/coff32.h>
 
 #include "../libmach.h"
-#include "coff32.h"
 
 Map *
 coff32loadmap(Obj *obj, FILE *fp)

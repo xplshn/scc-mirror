@@ -6,9 +6,9 @@
 #include <string.h>
 
 #include <scc/mach.h>
+#include <scc/coff32.h>
 
 #include "../libmach.h"
-#include "coff32.h"
 
 struct strtbl {
 	char *s;

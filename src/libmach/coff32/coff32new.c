@@ -2,10 +2,9 @@
 #include <stdlib.h>
 
 #include <scc/mach.h>
-#include <scc/scc.h>
+#include <scc/coff32.h>
 
 #include "../libmach.h"
-#include "coff32.h"
 
 int
 coff32new(Obj *obj, int type)
