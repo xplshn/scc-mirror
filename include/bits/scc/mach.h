@@ -1,3 +1,16 @@
+/*
+ * some systems define macros with this name even when
+ * they should be c99 compliant.
+ */
+#undef LITTLE_ENDIAN
+#undef BIG_ENDIAN
+
+#define NBYTES 32
+#define OBJ(format,arch,order) ((order) << 10 | (arch) << 5 | (format))
+#define FORMAT(t) ((t) & 0x1f)
+#define ARCH(t) (((t) >> 5) & 0x1f)
+#define ORDER(t) (((t) >> 10) & 0x1f)
+
 typedef struct segment Segment;
 typedef struct section Section;
 typedef struct symbol Symbol;
@@ -5,6 +18,26 @@ typedef struct objops Objops;
 typedef struct obj Obj;
 typedef struct map Map;
 typedef struct mapsec Mapsec;
+
+enum objformat {
+	COFF32,
+	ELF64,
+	NFORMATS,
+};
+
+enum objarch {
+	ARCH286,
+	ARCH386,
+	ARCHAMD64,
+	ARCHZ80,
+	ARCHARM32,
+	ARCHARM64,
+};
+
+enum order {
+	LITTLE_ENDIAN,
+	BIG_ENDIAN,
+};
 
 /**
  * enum sectype - Section property flags

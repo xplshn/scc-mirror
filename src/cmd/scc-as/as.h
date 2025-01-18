@@ -13,18 +13,6 @@ enum symflags {
 	FABS    = 1 << 7,
 };
 
-/*
- * some systems polute the namespace defining BIG_ENDIAN and
- * LITTLE_ENDIAN
- */
-#undef BIG_ENDIAN
-#undef LITTLE_ENDIAN
-
-enum endianess {
-	BIG_ENDIAN    = -1,
-	LITTLE_ENDIAN = 1
-};
-
 enum common_args {
 	AIMM = 1,
 	ASTR,
