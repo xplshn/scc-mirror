@@ -344,6 +344,12 @@ main(int argc, char *argv[])
 		usage();
 	} ARGEND
 
+	if (!aflag && !fflag && !hflag && !tflag) {
+		fputs("objdump: At lest one of [afht] flags must be used\n",
+		      stderr);
+		usage();
+	}
+
 	if (argc == 0) {
 		objdump("a.out");
 	} else {
