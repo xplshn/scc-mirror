@@ -371,7 +371,7 @@ ibinfmt(void)
 {
 	int t;
 
-	if ((t = objtype("coff32-z80")) < 0) {
+	if ((t = objtype("coff-z80")) < 0) {
 		fprintf(stderr,
 		        "as: invalid binary format %s\n", "coff32-z80");
 		exit(EXIT_FAILURE);
