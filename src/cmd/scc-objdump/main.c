@@ -1,4 +1,6 @@
+#include <ctype.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +14,7 @@
 
 #include "objdump.h"
 
-int tflag, fflag, hflag, pflag, aflag, rflag;
+int tflag, fflag, hflag, pflag, aflag, rflag, sflag;
 char *argv0;
 
 static int status, nsecs;
@@ -197,6 +199,61 @@ dumpscns(Obj *obj)
 }
 
 static void
+dumpdata(Obj *obj, FILE *fp)
+{
+	int i, j, c;
+	char buf[19];
+	Section sec;
+	unsigned long long n;
+
+	buf[0] = '|';
+	buf[17] = '|';
+	buf[18] = '\0';
+
+	for (i = 0; getsec(obj, &i, &sec); i++) {
+		if (!selected(sec.name))
+			continue;
+		if ((sec.flags & SALLOC) == 0 || sec.size == 0)
+			continue;
+
+		printf("Contents of section %s\n", sec.name);
+
+		if (!objpos(obj, fp, sec.offset))
+			goto errno_error;
+
+		for (n = 0; n < sec.size; ) {
+			memset(buf+1, '.', 16);
+			printf(" %04llx ", sec.base + n);
+			for (j = 0; j < 16 && n < sec.size; j++, n++) {
+				if ((c = getc(fp)) == EOF) {
+					if (ferror(fp))
+						goto errno_error;
+					error("section %s: end of file found before end of section",
+					      sec.name);
+					goto next_section;
+				}
+
+				if (c < CHAR_MAX && c > 0 && isprint(c))
+					buf[j] = c;
+
+				printf("%02x ", (unsigned) c & 0xFF);
+			}
+
+			for ( ; j < 16; j++)
+				fputs("   ", stdout);
+			puts(buf);
+		}
+
+next_section:
+		continue;
+
+errno_error:
+		error("section %s: %s", sec.name, strerror(errno));
+	}
+}
+
+
+static void
 dumpsyms(Obj *obj)
 {
 	puts("SYMBOL TABLE:");
@@ -233,6 +290,8 @@ dumpobj(FILE *fp, int type, char *fmt)
 		dumpfhdr(obj, fmt);
 	if (hflag)
 		dumpscns(obj);
+	if (sflag)
+		dumpdata(obj, fp);
 	if (tflag)
 		dumpsyms(obj);
 
@@ -336,7 +395,7 @@ objdump(char *fname)
 static void
 usage(void)
 {
-	fputs("usage: objdump [-afhpt][-j section] file...\n", stderr);
+	fputs("usage: objdump [-afhpts][-j section] file...\n", stderr);
 	exit(EXIT_FAILURE);
 }
 
@@ -358,6 +417,9 @@ main(int argc, char *argv[])
 	case 'p':
 		pflag = 1;
 		break;
+	case 's':
+		sflag = 1;
+		break;
 	case 't':
 		tflag = 1;
 		break;
@@ -370,8 +432,9 @@ main(int argc, char *argv[])
 		usage();
 	} ARGEND
 
-	if (!aflag && !fflag && !hflag && !tflag) {
-		fputs("objdump: At lest one of [afht] flags must be used\n",
+	if (!aflag && !fflag && !hflag
+	&& !tflag && !sflag) {
+		fputs("objdump: At lest one of [afhts] flags must be used\n",
 		      stderr);
 		usage();
 	}
