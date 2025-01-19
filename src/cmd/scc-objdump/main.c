@@ -182,7 +182,7 @@ dumpscns(Obj *obj)
 		setflag(&f, flags & SEXEC, SEC_CODE);
 		setflag(&f, (flags & (SEXEC|SLOAD)) == SLOAD, SEC_DATA);
 		setflag(&f, debug, SEC_DEBUGGING);
-		setflag(&f, sec.size > 0, SEC_HAS_CONTENTS);
+		setflag(&f, (flags & SALLOC) && sec.size > 0, SEC_HAS_CONTENTS);
 		printsecflags(f);
 	}
 
