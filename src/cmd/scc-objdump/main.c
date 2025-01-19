@@ -129,6 +129,9 @@ logb2(unsigned val)
 {
 	int n;
 
+	if (val == 0)
+		return 0;
+
 	for (n = 0; (val & 1) == 0; n++)
 		val >>= 1;
 	return n;
