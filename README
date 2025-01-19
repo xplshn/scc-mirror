@@ -66,8 +66,9 @@ After a successful install the following programs are installed:
 	- scc-objcopy: A work in progress of a GNU objcopy alike
 	  program.
 
-	- scc-objdump: A work in progress of a GNU objdump alike
-	  program.
+	- scc-objdump: A reduced version of the GUN objdump tool.
+	  It supports many of the options supported by the original
+	  tool, but in some cases it behaves slightly different.
 
 	- scc-ranlib: An implementation of a classical UNIX ranlib.
 	  While ranlib is not specified in current POSIX standards
