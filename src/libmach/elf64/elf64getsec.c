@@ -39,9 +39,9 @@ elf64getsec(Obj *obj, int *idx, Section *sec)
 	if (flags  & SHF_EXECINSTR)
 		sflags |= SEXEC;
 	if (flags & SHF_ALLOC)
-		sflags |= SALLOC|SREAD;
+		sflags |= SLOAD|SREAD;
 	if (type != SHT_NOBITS)
-		sflags |= SLOAD;
+		sflags |= SALLOC;
 	if (stype == 'T' || stype == 'D')
 		sflags |= SRELOC;
 
