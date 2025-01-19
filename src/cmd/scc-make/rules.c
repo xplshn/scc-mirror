@@ -6,6 +6,8 @@
 #include "make.h"
 
 #define TABSIZ 128
+#define FORCE   1
+#define NOFORCE 0
 
 static Target *htab[TABSIZ], *deftarget;
 
@@ -382,7 +384,7 @@ enabled(char *suffix)
 }
 
 static Target *
-inference(Target *tp)
+inference(Target *tp, int force)
 {
 	time_t t;
 	int tolen, r;
@@ -430,8 +432,17 @@ inference(Target *tp)
 		debug("\tsearching prerequisite %s", fname);
 
 		t = stamp(fname);
-		if (t == -1 || t <= tp->stamp)
+		if (t == -1) {
+			debug("\tprerequisite %s not found", fname);
 			continue;
+		}
+
+		if (!force && t <= tp->stamp) {
+			debug("\tdiscarded because is newer");
+			debug("\t%s: %s", tp->name, ctime(&tp->stamp));
+			debug("\t%s: %s", fname, ctime(&t));
+			continue;
+		}
 
 		free(q->req);
 		q->req = estrdup(fname);
@@ -458,7 +469,7 @@ update(Target *tp)
 		return run(tp);
 	}
 
-	if ((p = inference(tp)) != NULL) {
+	if ((p = inference(tp, FORCE)) != NULL) {
 		debug("using inference rule %s", p->name);
 		return run(p);
 	}
@@ -517,7 +528,7 @@ rebuild(Target *tp, int *buildp)
 
 	if (tp->stamp == -1)
 		need = 1;
-	else if (!def && inference(tp))
+	else if (!def && inference(tp, NOFORCE))
 		need = 1;
 
 	if (err) {
