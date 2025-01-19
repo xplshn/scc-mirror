@@ -15,8 +15,8 @@
 int tflag, fflag, hflag, pflag, aflag, rflag;
 char *argv0;
 
-static int status;
-static char *filename, *membname;
+static int status, nsecs;
+static char *filename, *membname, **secs;
 
 void
 error(char *fmt, ...)
@@ -132,6 +132,22 @@ logb2(unsigned val)
 	return n;
 }
 
+int
+selected(char *secname)
+{
+	int i;
+
+	if (nsecs == 0)
+		return 1;
+
+	for (i = 0; i < nsecs; i++) {
+		if (strcmp(secname, secs[i]) == 0)
+			return 1;
+	}
+
+	return 0;
+}
+
 static void
 dumpscns(Obj *obj)
 {
@@ -142,6 +158,9 @@ dumpscns(Obj *obj)
 	puts("Sections:");
 	puts("Idx Name          Size      VMA       LMA       File off  Algn");
 	for (i = 0; getsec(obj, &i, &sec); i++) {
+		if (!selected(sec.name))
+			continue;
+
 		printf("%3d %-13s %08llx  %08llx  %08llx  %08llx  2**%d\n",
 		       sec.index,
 		       sec.name,
@@ -317,13 +336,15 @@ objdump(char *fname)
 static void
 usage(void)
 {
-	fputs("usage: objdump [-afhpt] file...\n", stderr);
+	fputs("usage: objdump [-afhpt][-j section] file...\n", stderr);
 	exit(EXIT_FAILURE);
 }
 
 int
 main(int argc, char *argv[])
 {
+	char *s;
+
 	ARGBEGIN {
 	case 'a':
 		aflag = 1;
@@ -340,6 +361,11 @@ main(int argc, char *argv[])
 	case 't':
 		tflag = 1;
 		break;
+	case 'j':
+		s = EARGF(usage());
+		secs = xrealloc(secs, (nsecs + 1) * sizeof(char *));
+		secs[nsecs++] = s;
+		break;		
 	default:
 		usage();
 	} ARGEND

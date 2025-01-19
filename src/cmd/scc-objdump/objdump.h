@@ -29,6 +29,7 @@ extern unsigned coff32fhdr(Obj *, unsigned long long *);
 /* main.c */
 extern void error(char *, ...);
 extern void setflag(unsigned *, int, int);
+extern int selected(char *);
 
 /* globals */
 extern int pflag;

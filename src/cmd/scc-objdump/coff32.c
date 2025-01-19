@@ -74,12 +74,16 @@ void
 coff32scns(Obj *obj)
 {
 	int i;
+	char *name;
 	SCNHDR *scn;
 	struct coff32 *coff = obj->data;
 	FILHDR *hdr = &coff->hdr;
 
 	for (i = 0; i < hdr->f_nscns; i++) {
 		scn = &coff->scns[i];
+		name = coff32str(coff, scn);
+		if (!selected(name))
+			continue;
 		printf("\nscnhdr: %d\n"
 		       "\tname: %s\n"
 		       "\ts_paddr: 0x%04lx\n"
@@ -92,7 +96,7 @@ coff32scns(Obj *obj)
 		       "\ts_nlnno: %u\n"
 		       "\ts_flags: %#lx\n",
 		       i,
-		       coff32str(coff, scn),
+		       name,
 		       scn->s_paddr,
 		       scn->s_vaddr,
 		       scn->s_size,
