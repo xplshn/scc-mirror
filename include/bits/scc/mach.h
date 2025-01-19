@@ -128,6 +128,7 @@ extern int archive(FILE *);
 extern long armember(FILE *, char *, struct ar_hdr *);
 
 extern int objprobe(FILE *, char **);
+extern int objpos(Obj *, FILE *, long);
 
 extern int readobj(Obj *, FILE *);
 extern int writeobj(Obj *, Map *, FILE *);
