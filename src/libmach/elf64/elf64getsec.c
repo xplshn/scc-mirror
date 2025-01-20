@@ -55,7 +55,11 @@ elf64getsec(Obj *obj, int *idx, Section *sec)
 	 * with the sh_link pointing to this section. Maybe,
 	 * we should just remove the nrelloc field.
 	 */
-	sec->name = elf64str(obj, SEC_STRTBL, shdr->sh_name);
+	if (n == SHN_UNDEF)
+		sec->name = "*UND*";
+	else
+		sec->name = elf64str(obj, SEC_STRTBL, shdr->sh_name);
+
 	sec->index = n;
 	sec->size = shdr->sh_size;
 	sec->base = shdr->sh_addr;
