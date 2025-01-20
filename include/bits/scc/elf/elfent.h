@@ -51,14 +51,14 @@ struct elf32_sym {
 	Elf32_Addr      st_value;       /* symbol value */
 	Elf32_Word      st_size;        /* symbol size */
 	unsigned char   st_info;        /* type and binding */
-	unsigned char   st_other;       /* 0 - no defined meaning */
+	unsigned char   st_other;       /* visibility */
 	Elf32_Half      st_shndx;       /* section header index */
 };
 
 struct elf64_sym {
 	Elf64_Word      st_name;        /* Symbol name index in str table */
 	unsigned char   st_info;        /* type / binding attrs */
-	unsigned char   st_other;       /* unused */
+	unsigned char   st_other;       /* visibility */
 	Elf64_Half      st_shndx;       /* section index of symbol */
 	Elf64_Addr      st_value;       /* value of symbol */
 	Elf64_Xword     st_size;        /* size of symbol */
