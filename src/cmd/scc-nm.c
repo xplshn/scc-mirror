@@ -128,7 +128,7 @@ newsym(Symbol *sym, struct symtbl *tbl)
 
 	if (type == '?' && !fflag
 	|| type == 'N' && !fflag
-	|| stype != SYMFUNC && stype != SYMOBJECT && !fflag
+	|| (stype == SYMSECTION || stype == SYMFILE) && !fflag
 	|| uflag && type != 'U'
 	|| gflag && !isupper(type)) {
 		return 0;
