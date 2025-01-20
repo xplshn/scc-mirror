@@ -109,33 +109,42 @@ coff32scns(Obj *obj)
 	}	
 }
 
-unsigned
-coff32fhdr(Obj *obj, unsigned long long *start)
+void
+coff32fhdr(Obj *obj, unsigned long long *start, Flags *f)
 {
-	unsigned flags, r;
+	unsigned flags;
 	struct coff32 *coff = obj->data;
 	FILHDR *hdr = &coff->hdr;
 	AOUTHDR *aout = &coff->aout;
 
-	if (pflag) {	
-		printf("FILEHDR:\n"
-		       "\tf_magic: %#x\n"
-		       "\tf_nscns: %u\n"
-		       "\tf_timdat: %ld\n"
-		       "\tf_symptr: %ld\n"
-		       "\tf_nsyms: %ld\n"
-		       "\tf_opthdr: %u\n"
-		       "\tf_flags: 0x%04x\n\n",
-		       hdr->f_magic,
-		       hdr->f_nscns,
-		       hdr->f_timdat,
-		       hdr->f_symptr,
-		       hdr->f_nsyms,
-		       hdr->f_opthdr,
-		       hdr->f_flags);
-	}
+	flags = hdr->f_flags;
+	setflag(f, (flags & F_RELFLG) == 0, HAS_RELOC);
+	setflag(f, (flags & F_LMNO) == 0, HAS_LINENO);
+	setflag(f, (flags & F_LSYMS) == 0, HAS_LOCALS);
+	setflag(f, hdr->f_nsyms > 0, HAS_SYMS);
+	setflag(f, flags & F_EXEC, EXEC_P);
+	setflag(f, flags & F_EXEC, D_PAGED);
 
-	if (pflag && hdr->f_opthdr > 0) {
+	if (!pflag)
+		return;
+
+	printf("FILEHDR:\n"
+	       "\tf_magic: %#x\n"
+	       "\tf_nscns: %u\n"
+	       "\tf_timdat: %ld\n"
+	       "\tf_symptr: %ld\n"
+	       "\tf_nsyms: %ld\n"
+	       "\tf_opthdr: %u\n"
+	       "\tf_flags: 0x%04x\n\n",
+	       hdr->f_magic,
+	       hdr->f_nscns,
+	       hdr->f_timdat,
+	       hdr->f_symptr,
+	       hdr->f_nsyms,
+	       hdr->f_opthdr,
+	       hdr->f_flags);
+
+	if (hdr->f_opthdr > 0) {
 		printf("AOUTHDR:\n"
 		       "\tmagic: %x\n"
 		       "\tvstamp: %x\n"
@@ -155,15 +164,4 @@ coff32fhdr(Obj *obj, unsigned long long *start)
 		       aout->data_start);
 		*start = aout->entry;
 	}
-
-	r = 0;
-	flags = hdr->f_flags;
-	setflag(&r, (flags & F_RELFLG) == 0, HAS_RELOC);
-	setflag(&r, (flags & F_LMNO) == 0, HAS_LINENO);
-	setflag(&r, (flags & F_LSYMS) == 0, HAS_LOCALS);
-	setflag(&r, hdr->f_nsyms > 0, HAS_SYMS);
-	setflag(&r, flags & F_EXEC, EXEC_P);
-	setflag(&r, flags & F_EXEC, D_PAGED);
-
-	return r;
 }

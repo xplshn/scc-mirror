@@ -37,33 +37,25 @@ error(char *fmt, ...)
 }
 
 void
-setflag(unsigned *r, int cond, int flag)
+setflag(Flags *f, int cond, int flag)
 {
 	if (cond)
-		*r |= 1 << flag;
+		f->flags |= 1 << flag;
 }
 
-static void
-printfileflags(unsigned flags)
+void
+printflags(Flags *f)
 {
-	int first, i;
-	static const char *text[] = {
-		[HAS_RELOC] = "HAS_RELOC",
-		[EXEC_P] = "EXEC_P",
-		[HAS_LINENO] = "HAS_LINENO",
-		[HAS_DEBUG] = "HAS_DEBUG",
-		[HAS_SYMS] = "HAS_SYMS",
-		[HAS_LOCALS] = "HAS_LOCALS",
-		[D_PAGED] = "D_PAGED",
-	};
+	int i, first;
+	unsigned long flags = f->flags;
 
 	first = 1;
-	for (i = 0; i < NR_FILE_FLAGS; i++) {
+	for (i = 0; i < f->nr; i++) {
 		if (flags & 1) {
 			if (!first)
 				fputs(", ", stdout);
 			first = 0;
-			fputs(text[i], stdout);
+			fputs(f->text[i], stdout);
 		}
 		flags >>= 1;
 	}
@@ -74,54 +66,37 @@ printfileflags(unsigned flags)
 static void
 dumpfhdr(Obj *obj, char *fmt)
 {
-	unsigned f;
 	unsigned long long start = 0;
+	static Flags f = {
+		.nr = NR_FILE_FLAGS,
+		.text = {
+			[HAS_RELOC] = "HAS_RELOC",
+			[EXEC_P] = "EXEC_P",
+			[HAS_LINENO] = "HAS_LINENO",
+			[HAS_DEBUG] = "HAS_DEBUG",
+			[HAS_SYMS] = "HAS_SYMS",
+			[HAS_LOCALS] = "HAS_LOCALS",
+			[D_PAGED] = "D_PAGED",
+		}
+	};
 
 	printf("architecture: %s, flags: 0x%08x\n",
 	       strchr(fmt, '-') + 1,
 	       obj->type);
 
+	f.flags = 0;
+
 	switch (FORMAT(obj->type)) {
 	case COFF32:
-		f = coff32fhdr(obj, &start);
+		coff32fhdr(obj, &start, &f);
 		break;
 	default:
 		error("unknown fhdr binary format");
 		return;
 	}
 
-	printfileflags(f);
+	printflags(&f);
 	printf("start address 0x%08llx\n", start);
-}
-
-static void
-printsecflags(unsigned flags)
-{
-	int first, i;
-	static const char *text[] = {
-		[SEC_HAS_CONTENTS] = "CONTENTS",
-		[SEC_ALLOC] = "ALLOC",
-		[SEC_LOAD] = "LOAD",
-		[SEC_RELOC] = "RELOC",
-		[SEC_READONLY] = "READONLY",
-		[SEC_CODE] = "CODE",
-		[SEC_DATA] = "DATA",
-		[SEC_DEBUGGING] = "DEBUGGING",
-	};
-
-	first = 1;
-	fputs("                  ", stdout);
-	for (i = 0; i < NR_SEC_FLAGS; i++) {
-		if (flags & 1) {
-			if (!first)
-				fputs(", ", stdout);
-			first = 0;
-			fputs(text[i], stdout);
-		}
-		flags >>= 1;
-	}
-
-	putchar('\n');
 }
 
 static int
@@ -157,8 +132,21 @@ static void
 dumpscns(Obj *obj)
 {
 	int i, debug;
-	unsigned f, flags;
+	unsigned flags;
 	Section sec;
+	static Flags f = {
+		.nr = NR_SEC_FLAGS,
+		.text = {
+			[SEC_HAS_CONTENTS] = "CONTENTS",
+			[SEC_ALLOC] = "ALLOC",
+			[SEC_LOAD] = "LOAD",
+			[SEC_RELOC] = "RELOC",
+			[SEC_READONLY] = "READONLY",
+			[SEC_CODE] = "CODE",
+			[SEC_DATA] = "DATA",
+			[SEC_DEBUGGING] = "DEBUGGING",
+		}
+	};
 
 	puts("Sections:");
 	puts("Idx Name          Size      VMA       LMA       File off  Algn");
@@ -175,7 +163,7 @@ dumpscns(Obj *obj)
 		       sec.offset,
 		       logb2(sec.align));
 
-		f = 0;
+		f.flags = 0;
 		flags = sec.flags;
 		debug = sec.type == 'N';
 		setflag(&f, flags & SALLOC, SEC_ALLOC);
@@ -186,7 +174,8 @@ dumpscns(Obj *obj)
 		setflag(&f, (flags & (SEXEC|SLOAD)) == SLOAD, SEC_DATA);
 		setflag(&f, debug, SEC_DEBUGGING);
 		setflag(&f, (flags & SALLOC) && sec.size > 0, SEC_HAS_CONTENTS);
-		printsecflags(f);
+		fputs("                  ", stdout);
+		printflags(&f);
 	}
 
 	if (!pflag)

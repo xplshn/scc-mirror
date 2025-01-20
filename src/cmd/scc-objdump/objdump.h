@@ -1,3 +1,5 @@
+typedef struct flags Flags;
+
 enum file_flags {
 	HAS_RELOC,
 	EXEC_P,
@@ -21,14 +23,21 @@ enum sec_flags {
 	NR_SEC_FLAGS,
 };
 
+struct flags {
+	int nr;
+	unsigned long flags;
+	char *text[];
+};
+
 /* coff32.c */
 extern void coff32syms(Obj *);
 extern void coff32scns(Obj *);
-extern unsigned coff32fhdr(Obj *, unsigned long long *);
+extern void coff32fhdr(Obj *, unsigned long long *, Flags *);
 
 /* main.c */
 extern void error(char *, ...);
-extern void setflag(unsigned *, int, int);
+extern void setflag(Flags *, int, int);
+extern void printflags(Flags *);
 extern int selected(char *);
 
 /* globals */
