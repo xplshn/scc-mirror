@@ -9,11 +9,9 @@ include $(PROJECTDIR)/scripts/rules.mk
 
 TARGET = libmach.a
 
-all: $(TARGET)
-
 OBJS =\
 
-all: $(TARGET)
+all:
 	+@$(MAKE) $(DIRS)
 	+@$(MAKE) $(TARGET)
 
