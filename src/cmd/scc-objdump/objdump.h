@@ -7,7 +7,7 @@ enum file_flags {
 	HAS_DEBUG,
 	HAS_SYMS,
 	HAS_LOCALS,
-	D_PAGED,
+	DYNAMIC,
 	NR_FILE_FLAGS,
 };
 

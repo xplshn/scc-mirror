@@ -76,7 +76,7 @@ dumpfhdr(Obj *obj, char *fmt)
 			[HAS_DEBUG] = "HAS_DEBUG",
 			[HAS_SYMS] = "HAS_SYMS",
 			[HAS_LOCALS] = "HAS_LOCALS",
-			[D_PAGED] = "D_PAGED",
+			[DYNAMIC] = "DYNAMIC",
 		}
 	};
 

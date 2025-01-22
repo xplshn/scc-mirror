@@ -123,7 +123,6 @@ coff32fhdr(Obj *obj, unsigned long long *start, Flags *f)
 	setflag(f, (flags & F_LSYMS) == 0, HAS_LOCALS);
 	setflag(f, hdr->f_nsyms > 0, HAS_SYMS);
 	setflag(f, flags & F_EXEC, EXEC_P);
-	setflag(f, flags & F_EXEC, D_PAGED);
 
 	if (pflag) {
 		printf("FILEHDR:\n"
