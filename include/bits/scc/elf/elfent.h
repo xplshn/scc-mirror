@@ -1,3 +1,5 @@
+/* See http://www.sco.com/developers/gabi/latest/contents.html */
+
 /* Symbol table index */
 #define STN_UNDEF       0               /* undefined */
 

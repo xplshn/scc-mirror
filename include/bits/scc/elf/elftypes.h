@@ -1,3 +1,5 @@
+/* See http://www.sco.com/developers/gabi/latest/contents.html */
+
 #include <stdint.h>
 
 typedef uint32_t Elf32_Addr;	/* Unsigned program address */

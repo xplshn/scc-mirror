@@ -14,9 +14,11 @@
 #define PT_LOPROC       0x70000000      /* reserved range for processor */
 #define PT_HIPROC       0x7fffffff      /*  specific segment types */
 
-#define PF_X            1               /* Execute */
-#define PF_W            2               /* Write */
-#define PF_R            4               /* Read */
+#define PF_X            1               /* Executable */
+#define PF_W            2               /* Writable */
+#define PF_R            4               /* Readable */
+#define PF_MASKOS       0x0ff00000      /* Operating system specific values */
+#define PF_MASKPROC     0xf0000000      /* Processor-specific values */
 
 #define ELFP32SZ        32
 #define ELFP64SZ        56

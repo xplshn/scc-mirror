@@ -1,3 +1,5 @@
+/* See http://www.sco.com/developers/gabi/latest/contents.html */
+
 /* Special Section Indexes */
 #define SHN_UNDEF	0		/* undefined */
 #define SHN_LORESERVE	0xff00		/* lower bounds of reserved indexes */
