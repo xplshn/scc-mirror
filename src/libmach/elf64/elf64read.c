@@ -166,6 +166,8 @@ readshdr(Obj *obj, FILE *fp)
 
 	elf = obj->data;
 	hdr = &elf->hdr;
+	elf->nsec = 0;
+	elf->shdr = NULL;
 
 	if (hdr->e_shoff == 0)
 		return 1;
@@ -192,6 +194,8 @@ readshdr(Obj *obj, FILE *fp)
 
 	if (nsec > SIZE_MAX)
 		return 0;
+	if (nsec == 0)
+		return 1;
 
 	shdr = calloc(nsec, sizeof(*shdr));
 	if (!shdr)
