@@ -34,9 +34,9 @@
 #define SHT_GNU_LIBLIST	0x6ffffff7	/* libraries to be prelinked */
 #define SHT_SUNW_move	0x6ffffffa	/* inf for partially init'ed symbols */
 #define SHT_SUNW_syminfo	0x6ffffffc	/* ad symbol information */
-#define SHT_SUNW_verdef		0x6ffffffd	/* symbol versioning inf */
-#define SHT_SUNW_verneed	0x6ffffffe	/* symbol versioning req */
-#define SHT_SUNW_versym		0x6fffffff	/* symbol versioning table */
+#define SHT_GNU_VERDEF	0x6ffffffd      /* symbol versioning inf */
+#define SHT_GNU_VERNEED	0x6ffffffe      /* symbol versioning req */
+#define SHT_GNU_VERSYM	0x6fffffff      /* symbol versioning table */
 #define SHT_HIOS	0x6fffffff	/*  section header types */
 #define SHT_LOPROC	0x70000000	/* reserved range for processor */
 #define SHT_HIPROC	0x7fffffff	/*  specific section header types */
