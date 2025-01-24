@@ -6,6 +6,7 @@ include $(PROJECTDIR)/scripts/rules.mk
 OBJS =\
 	main.o\
 	coff32.o\
+	elf64.o\
 
 TARGET = scc-objdump
 MORE_LDLIBS = -lmach -lscc

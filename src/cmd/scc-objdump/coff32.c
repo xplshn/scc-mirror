@@ -6,12 +6,26 @@
 
 #include "objdump.h"
 
+int
+coff32hasrelloc(Obj *obj, Section *sec)
+{
+	struct coff32 *coff = obj->data;
+	SCNHDR *scn = &coff->scns[sec->index];
+
+	return scn->s_nrelloc != 0;
+}
+
 void
 coff32syms(Obj *obj)
 {
 	long i;
 	struct coff32 *coff = obj->data;
 	FILHDR *hdr = &coff->hdr;
+
+	if (hdr->f_nsyms == 0) {
+		puts("no symbols");
+		return;
+	}
 
 	for (i = 0; i < hdr->f_nsyms; i++) {
 		SYMENT *ent;

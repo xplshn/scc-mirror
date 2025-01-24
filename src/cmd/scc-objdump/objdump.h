@@ -33,6 +33,13 @@ struct flags {
 extern void coff32syms(Obj *);
 extern void coff32scns(Obj *);
 extern void coff32fhdr(Obj *, unsigned long long *, Flags *);
+extern int coff32hasrelloc(Obj *, Section *);
+
+/* elf64.c */
+extern void elf64syms(Obj *);
+extern void elf64scns(Obj *);
+extern void elf64fhdr(Obj *, unsigned long long *, Flags *);
+extern int elf64hasrelloc(Obj *, Section *);
 
 /* main.c */
 extern void error(char *, ...);

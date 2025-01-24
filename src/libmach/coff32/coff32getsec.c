@@ -85,7 +85,6 @@ coff32getsec(Obj *obj, int *idx, Section *sec)
 	sec->base = scn->s_vaddr;
 	sec->load = scn->s_paddr;
 	sec->offset = scn->s_scnptr;
-	sec->nreloc = scn->s_nrelloc;
 	sec->type = type;
 	sec->flags = sflags;
 	sec->align = 4;

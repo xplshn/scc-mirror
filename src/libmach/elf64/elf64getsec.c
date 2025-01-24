@@ -15,8 +15,15 @@ elf64getsec(Obj *obj, int *idx, Section *sec)
 	Elf_Ehdr *hdr = &elf->hdr;
 	Elf_Shdr *shdr;
 
-	if (n >= elf->nsec)
+	if (n >= elf->nsec) {
+		if (n == SHN_ABS)
+			sec->name = "*ABS";
+		else if (n == SHN_COMMON)
+			sec->name = "*COM*";
+		else
+			sec->name = "*UNK*";
 		return NULL;
+	}
 
 	shdr = &elf->shdr[n];
 	flags = shdr->sh_flags;
@@ -49,11 +56,6 @@ elf64getsec(Obj *obj, int *idx, Section *sec)
 	 * We cannot differentiate between load and base address
 	 * in a section, while we can use the physical address
 	 * for that when dealing with segments.
-	 * Also, we don't have an easy way to know the number of
-	 * relocations affecting one section. To know that, we
-	 * have to run over the relocation sections and find one
-	 * with the sh_link pointing to this section. Maybe,
-	 * we should just remove the nrelloc field.
 	 */
 	if (n == SHN_UNDEF)
 		sec->name = "*UND*";
@@ -65,7 +67,6 @@ elf64getsec(Obj *obj, int *idx, Section *sec)
 	sec->base = shdr->sh_addr;
 	sec->load = shdr->sh_addr;
 	sec->offset = shdr->sh_offset;
-	sec->nreloc = 0;
 	sec->type = stype;
 	sec->flags = sflags;
 	sec->align = shdr->sh_addralign;

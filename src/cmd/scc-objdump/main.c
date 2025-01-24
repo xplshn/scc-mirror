@@ -90,6 +90,9 @@ dumpfhdr(Obj *obj, char *fmt)
 	case COFF32:
 		coff32fhdr(obj, &start, &f);
 		break;
+	case ELF64:
+		elf64fhdr(obj, &start, &f);
+		break;
 	default:
 		error("unknown fhdr binary format");
 		return;
@@ -126,6 +129,21 @@ selected(char *secname)
 	}
 
 	return 0;
+}
+
+static int
+hasrelloc(Obj *obj, Section *sec)
+{
+	switch (FORMAT(obj->type)) {
+	case COFF32:
+		coff32hasrelloc(obj, sec);
+		break;
+	case ELF64:
+		elf64hasrelloc(obj, sec);
+		break;
+	default:
+		return 0;
+	}
 }
 
 static void
@@ -168,7 +186,7 @@ dumpscns(Obj *obj)
 		debug = sec.type == 'N';
 		setflag(&f, flags & SALLOC, SEC_ALLOC);
 		setflag(&f, flags & SLOAD, SEC_LOAD);
-		setflag(&f, (flags & SRELOC) && sec.nreloc > 0, SEC_RELOC);
+		setflag(&f, hasrelloc(obj, &sec), SEC_RELOC);
 		setflag(&f, (flags & SWRITE) == 0 && !debug, SEC_READONLY);
 		setflag(&f, flags & SEXEC, SEC_CODE);
 		setflag(&f, (flags & (SEXEC|SLOAD)) == SLOAD, SEC_DATA);
@@ -184,6 +202,9 @@ dumpscns(Obj *obj)
 	switch (FORMAT(obj->type)) {
 	case COFF32:
 		coff32scns(obj);
+		break;
+	case ELF64:
+		elf64scns(obj);
 		break;
 	default:
 		error("unknown fhdr binary format");
@@ -252,6 +273,9 @@ dumpsyms(Obj *obj)
 	switch (FORMAT(obj->type)) {
 	case COFF32:
 		coff32syms(obj);
+		break;
+	case ELF64:
+		elf64syms(obj);
 		break;
 	default:
 		error("unknown symbol binary format");

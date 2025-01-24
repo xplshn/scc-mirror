@@ -98,7 +98,6 @@ struct section {
 	unsigned long long size;
 	unsigned long long offset;
 
-	unsigned long nreloc;
 	unsigned flags;
 	int index;
 	int align;
