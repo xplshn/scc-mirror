@@ -7,6 +7,7 @@
 #include <scc/elf64.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 static int
 typeof(Elf64 *elf, Elf_Sym *ent, char *name)

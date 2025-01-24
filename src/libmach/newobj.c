@@ -7,6 +7,14 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static int (*ops[NFORMATS])(Obj *, int) = {
+	[COFF32] = coff32new,
+	[ELF64] = elf64new,
+};
+
 Obj *
 newobj(int type)
 {
@@ -23,9 +31,8 @@ newobj(int type)
 		return NULL;
 
 	obj->type = type;
-	obj->ops = objops[fmt];
 	obj->next = NULL;
-	if ((*obj->ops->new)(obj, type) < 0) {
+	if ((*ops[fmt])(obj, type) < 0) {
 		free(obj);
 		return NULL;
 	}

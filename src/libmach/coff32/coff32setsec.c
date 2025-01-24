@@ -7,6 +7,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 static char *
 secname(Coff32 *coff, SCNHDR *scn, Section *sec)

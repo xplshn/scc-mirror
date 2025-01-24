@@ -9,6 +9,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 static void
 unpack_hdr(int order, unsigned char *buf, FILHDR *hdr)

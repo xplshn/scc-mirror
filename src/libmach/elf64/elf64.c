@@ -4,22 +4,7 @@
 #include <scc/elf64.h>
 
 #include "../libmach.h"
-
-struct objops elf64 = {
-	.type = elf64type,
-	.probe = elf64probe,
-	.new = elf64new,
-	.read = elf64read,
-	.getidx = NULL,
-	.setidx = NULL,
-	.pc2line = NULL,
-	.strip = NULL,
-	.del = elf64del,
-	.write = NULL,
-	.getsym = elf64getsym,
-	.getsec = elf64getsec,
-	.loadmap = NULL,
-};
+#include "fun.h"
 
 char *
 elf64str(Obj *obj, int n, long stroff)

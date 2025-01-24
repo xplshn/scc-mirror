@@ -5,6 +5,13 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static int (*ops[NFORMATS])(long *, char ***, long **, FILE *) = {
+	[COFF32] = coff32getidx,
+};
+
 int
 getindex(int type, long *nsyms, char ***names, long **offs, FILE *fp)
 {
@@ -16,6 +23,6 @@ getindex(int type, long *nsyms, char ***names, long **offs, FILE *fp)
 		return -1;
 	}
 
-	return (*objops[fmt]->getidx)(nsyms, names, offs, fp);
+	return (*ops[fmt])(nsyms, names, offs, fp);
 }
 

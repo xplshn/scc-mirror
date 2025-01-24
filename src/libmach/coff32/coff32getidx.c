@@ -4,6 +4,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 int
 coff32getidx(long *nsyms, char ***namep, long **offsp, FILE *fp)

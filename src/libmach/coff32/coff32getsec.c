@@ -4,6 +4,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 Section *
 coff32getsec(Obj *obj, int *idx, Section *sec)

@@ -4,6 +4,14 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static int (*ops[NFORMATS])(Obj *, FILE *) = {
+	[COFF32] = coff32read,
+	[ELF64] = elf64read,
+};
+
 int
 readobj(Obj *obj, FILE *fp)
 {
@@ -13,5 +21,5 @@ readobj(Obj *obj, FILE *fp)
 		return -1;
 	obj->pos = off;
 
-	return (*obj->ops->read)(obj, fp);
+	return (*ops[objfmt(obj)])(obj, fp);
 }

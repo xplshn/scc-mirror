@@ -4,6 +4,7 @@
 #include <scc/elf64.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 Section *
 elf64getsec(Obj *obj, int *idx, Section *sec)

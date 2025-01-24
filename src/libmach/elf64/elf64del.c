@@ -5,6 +5,7 @@
 #include <scc/elf64.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 void
 elf64del(Obj *obj)

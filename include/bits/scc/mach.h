@@ -10,11 +10,11 @@
 #define FORMAT(t) ((t) & 0x1f)
 #define ARCH(t) (((t) >> 5) & 0x1f)
 #define ORDER(t) (((t) >> 10) & 0x1f)
+#define objfmt(o) FORMAT((o)->type)
 
 typedef struct segment Segment;
 typedef struct section Section;
 typedef struct symbol Symbol;
-typedef struct objops Objops;
 typedef struct obj Obj;
 typedef struct map Map;
 typedef struct mapsec Mapsec;
@@ -72,7 +72,6 @@ struct ar_hdr;
 
 struct obj {
 	char *index;
-	Objops *ops;
 	int type;
 	long pos;
 	void *data;

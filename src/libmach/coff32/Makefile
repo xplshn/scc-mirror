@@ -4,7 +4,6 @@ PROJECTDIR =../../..
 include $(PROJECTDIR)/scripts/rules.mk
 
 OBJS =\
-	coff32.o\
 	coff32archs.o\
 	coff32del.o\
 	coff32getidx.o\

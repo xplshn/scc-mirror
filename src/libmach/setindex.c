@@ -5,6 +5,13 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static int (*ops[NFORMATS])(long, char **, long *, FILE *) = {
+	[COFF32] = coff32setidx,
+};
+
 int
 setindex(int type, long nsyms, char **names, long *offs, FILE *fp)
 {
@@ -16,6 +23,6 @@ setindex(int type, long nsyms, char **names, long *offs, FILE *fp)
 		return -1;
 	}
 
-	return (*objops[fmt]->setidx)(nsyms, names, offs, fp);
+	return (*ops[fmt])(nsyms, names, offs, fp);
 }
 

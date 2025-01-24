@@ -4,6 +4,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 Map *
 coff32loadmap(Obj *obj, FILE *fp)

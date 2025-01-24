@@ -272,7 +272,7 @@ dumpobj(FILE *fp, int type, char *fmt)
 		goto err;
 	}
 
-	switch (FORMAT(obj->type)) {
+	switch (objfmt(obj)) {
 	case COFF32:
 		op = &ops[COFF32];
 		break;

@@ -5,6 +5,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 int
 coff32strip(Obj *obj)

@@ -5,6 +5,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 void
 coff32del(Obj *obj)

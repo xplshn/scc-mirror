@@ -4,12 +4,20 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static int (*ops[NFORMATS])(unsigned char *, char **) = {
+	[COFF32] = coff32probe,
+	[ELF64] = elf64probe,
+};
+
 int
 objprobe(FILE *fp, char **name)
 {
 	int n, t;
 	fpos_t pos;
-	Objops **opsp, *ops;
+	int (**bp)(unsigned char *, char **);
 	unsigned char buf[NBYTES];
 
 	fgetpos(fp, &pos);
@@ -19,11 +27,9 @@ objprobe(FILE *fp, char **name)
 	if (n != 1 || ferror(fp))
 		return -1;
 
-	for (opsp = objops; ops = *opsp; ++opsp) {
-		t = (*ops->probe)(buf, name);
-		if (t < 0)
-			continue;
-		return t;
+	for (bp = ops; bp < &ops[NFORMATS]; ++bp) {
+		if ((t = (**bp)(buf, name)) >= 0)
+			return t;
 	}
 
 	return -1;

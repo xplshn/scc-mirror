@@ -4,8 +4,15 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static int (*ops[NFORMATS])(Obj *) = {
+	[COFF32] = coff32strip,
+};
+
 int
 strip(Obj *obj)
 {
-	return (*obj->ops->strip)(obj);
+	return (*ops[objfmt(obj)])(obj);
 }

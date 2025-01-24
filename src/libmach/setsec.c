@@ -4,8 +4,15 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static Section *(*ops[NFORMATS])(Obj *, int *, Section *) = {
+	[COFF32] = coff32setsec,
+};
+
 Section *
 setsec(Obj *obj, int *idx, Section *sec)
 {
-	return (*obj->ops->setsec)(obj, idx, sec);
+	return (*ops[objfmt(obj)])(obj, idx, sec);
 }

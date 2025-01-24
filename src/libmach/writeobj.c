@@ -4,8 +4,15 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static int (*ops[NFORMATS])(Obj *, Map *, FILE *) = {
+	[COFF32] = coff32write,
+};
+
 int
 writeobj(Obj *obj, Map *map, FILE *fp)
 {
-	return (obj->ops->write)(obj, map, fp);
+	return (*ops[objfmt(obj)])(obj, map, fp);
 }

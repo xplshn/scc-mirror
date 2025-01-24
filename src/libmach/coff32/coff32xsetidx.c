@@ -4,6 +4,7 @@
 #include <scc/mach.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 int
 coff32xsetidx(int order, long nsyms, char *names[], long offs[], FILE *fp)

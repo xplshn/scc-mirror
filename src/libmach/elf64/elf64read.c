@@ -6,6 +6,7 @@
 #include <scc/elf64.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 static int
 unpack_hdr(int order, unsigned char *buf, Elf_Ehdr *hdr)

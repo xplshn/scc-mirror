@@ -4,6 +4,7 @@
 #include <scc/elf64.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 int
 elf64probe(unsigned char *buf, char **name)

@@ -4,8 +4,15 @@
 
 #include "libmach.h"
 
+#include "elf64/fun.h"
+#include "coff32/fun.h"
+
+static Symbol *(*ops[NFORMATS])(Obj *, int *, Symbol *) = {
+	[COFF32] = coff32setsym,
+};
+
 Symbol *
 setsym(Obj *obj, int *index, Symbol *sym)
 {
-	return (*obj->ops->setsym)(obj, index, sym);
+	return (*ops[objfmt(obj)])(obj, index, sym);
 }

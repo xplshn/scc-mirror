@@ -7,6 +7,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 static int
 defent(Coff32 *coff, SYMENT *ent, Symbol *sym)

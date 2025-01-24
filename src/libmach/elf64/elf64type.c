@@ -5,6 +5,7 @@
 #include <scc/elf64.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 int
 elf64type(char *name)

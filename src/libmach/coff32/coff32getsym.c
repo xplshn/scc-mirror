@@ -6,6 +6,7 @@
 #include <scc/coff32.h>
 
 #include "../libmach.h"
+#include "fun.h"
 
 static int
 typeof(Coff32 *coff, SYMENT *ent)
