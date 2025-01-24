@@ -14,11 +14,33 @@
 
 #include "objdump.h"
 
+struct binops {
+	void (*dumpsyms)(Obj *);
+	void (*dumpsecs)(Obj *);
+	void (*dumpfhdr)(Obj *, unsigned long long *, Flags *);
+	int (*hasrelloc)(Obj *, Section *);
+};
+
 int tflag, fflag, hflag, pflag, aflag, rflag, sflag;
 char *argv0;
 
 static int status, nsecs;
 static char *filename, *membname, **secs;
+
+static struct binops *op, ops[NFORMATS] = {
+        [COFF32] = {
+		.dumpsyms = coff32syms,
+		.dumpsecs = coff32scns,
+		.dumpfhdr = coff32fhdr,
+		.hasrelloc = coff32hasrelloc,
+	},
+        [ELF64] = {
+		.dumpsyms = elf64syms,
+		.dumpsecs = elf64scns,
+		.dumpfhdr = elf64fhdr,
+		.hasrelloc = elf64hasrelloc,
+	},
+};
 
 void
 error(char *fmt, ...)
@@ -86,18 +108,7 @@ dumpfhdr(Obj *obj, char *fmt)
 
 	f.flags = 0;
 
-	switch (FORMAT(obj->type)) {
-	case COFF32:
-		coff32fhdr(obj, &start, &f);
-		break;
-	case ELF64:
-		elf64fhdr(obj, &start, &f);
-		break;
-	default:
-		error("unknown fhdr binary format");
-		return;
-	}
-
+	(*op->dumpfhdr)(obj, &start, &f);
 	printflags(&f);
 	printf("start address 0x%08llx\n", start);
 }
@@ -129,21 +140,6 @@ selected(char *secname)
 	}
 
 	return 0;
-}
-
-static int
-hasrelloc(Obj *obj, Section *sec)
-{
-	switch (FORMAT(obj->type)) {
-	case COFF32:
-		coff32hasrelloc(obj, sec);
-		break;
-	case ELF64:
-		elf64hasrelloc(obj, sec);
-		break;
-	default:
-		return 0;
-	}
 }
 
 static void
@@ -186,7 +182,7 @@ dumpscns(Obj *obj)
 		debug = sec.type == 'N';
 		setflag(&f, flags & SALLOC, SEC_ALLOC);
 		setflag(&f, flags & SLOAD, SEC_LOAD);
-		setflag(&f, hasrelloc(obj, &sec), SEC_RELOC);
+		setflag(&f, (*op->hasrelloc)(obj, &sec), SEC_RELOC);
 		setflag(&f, (flags & SWRITE) == 0 && !debug, SEC_READONLY);
 		setflag(&f, flags & SEXEC, SEC_CODE);
 		setflag(&f, (flags & (SEXEC|SLOAD)) == SLOAD, SEC_DATA);
@@ -198,17 +194,7 @@ dumpscns(Obj *obj)
 
 	if (!pflag)
 		return;
-
-	switch (FORMAT(obj->type)) {
-	case COFF32:
-		coff32scns(obj);
-		break;
-	case ELF64:
-		elf64scns(obj);
-		break;
-	default:
-		error("unknown fhdr binary format");
-	}
+	(*op->dumpsecs)(obj);
 }
 
 static void
@@ -267,22 +253,6 @@ errno_error:
 
 
 static void
-dumpsyms(Obj *obj)
-{
-	puts("SYMBOL TABLE:");
-	switch (FORMAT(obj->type)) {
-	case COFF32:
-		coff32syms(obj);
-		break;
-	case ELF64:
-		elf64syms(obj);
-		break;
-	default:
-		error("unknown symbol binary format");
-	}
-}
-
-static void
 dumpobj(FILE *fp, int type, char *fmt)
 {
 	Obj *obj;
@@ -302,6 +272,17 @@ dumpobj(FILE *fp, int type, char *fmt)
 		goto err;
 	}
 
+	switch (FORMAT(obj->type)) {
+	case COFF32:
+		op = &ops[COFF32];
+		break;
+	case ELF64:
+		op = &ops[ELF64];
+		break;
+	default:
+		error("unknown symbol binary format");
+	}
+
 	if (fflag)
 		dumpfhdr(obj, fmt);
 	if (hflag)
@@ -309,7 +290,7 @@ dumpobj(FILE *fp, int type, char *fmt)
 	if (sflag)
 		dumpdata(obj, fp);
 	if (tflag)
-		dumpsyms(obj);
+		(*op->dumpsyms)(obj);
 
 err:
 	delobj(obj);
