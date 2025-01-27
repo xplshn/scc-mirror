@@ -255,6 +255,7 @@ errno_error:
 static void
 dumpobj(FILE *fp, int type, char *fmt)
 {
+	int id;
 	Obj *obj;
 
 	printf("\n%s", filename);
@@ -272,16 +273,12 @@ dumpobj(FILE *fp, int type, char *fmt)
 		goto err;
 	}
 
-	switch (objfmt(obj)) {
-	case COFF32:
-		op = &ops[COFF32];
-		break;
-	case ELF64:
-		op = &ops[ELF64];
-		break;
-	default:
+	id = objfmt(obj);
+	if (id >= NFORMATS) {
 		error("unknown symbol binary format");
+		return;
 	}
+	op = &ops[id];
 
 	if (fflag)
 		dumpfhdr(obj, fmt);
