@@ -24,3 +24,12 @@ ELFHDRS =\
 all: $(OBJS)
 
 $(OBJS): $(ELFHDRS)
+
+dep:
+	@(printf 'ELF64OBJS=\\';\
+	echo;\
+	echo $(OBJS) |\
+	sed -E 's@ *([^ ]*)@\telf64/\1\\\n@g') > deps.mk
+
+distclean:
+	rm -f deps.mk

@@ -10,6 +10,30 @@ include $(PROJECTDIR)/scripts/rules.mk
 TARGET = libmach.a
 
 OBJS =\
+	archive.o\
+	armember.o\
+	delobj.o\
+	findsec.o\
+	getindex.o\
+	getsec.o\
+	getsym.o\
+	loadmap.o\
+	newmap.o\
+	newobj.o\
+	objpos.o\
+	objprobe.o\
+	objtype.o\
+	pack.o\
+	pc2line.o\
+	readobj.o\
+	rebase.o\
+	setindex.o\
+	setmap.o\
+	setsec.o\
+	setsym.o\
+	strip.o\
+	unpack.o\
+	writeobj.o\
 
 all:
 	+@$(MAKE) $(DIRS)
@@ -21,9 +45,4 @@ $(TARGET): $(OBJS)
 	cp $@ $(LIBDIR)/scc
 
 dep:
-	(echo H;\
-	 echo /OBJS/a;\
-	 ls *.c */*.c | sed -E 's/(.*)\.c$$/	\1.o\\/';\
-	 echo .; \
-	 echo w) |\
-	ed -s makefile
+	./mkdep elf64 coff32

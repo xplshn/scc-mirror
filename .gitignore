@@ -3,7 +3,8 @@
 bin/
 lib/
 libexec/
-dirs
+/dirs
+deps.mk
 *.gcno
 *.gcda
 /deps

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+ed -s makefile <<EOF
+H
+/include/a
+`for i
+ do
+	echo include $i/deps.mk
+done`
+.
+/OBJS/a
+`for i
+ do
+	printf '\t$('$(echo $i | tr a-z A-Z)'OBJS)\\'
+	echo
+done`
+.
+w
+EOF

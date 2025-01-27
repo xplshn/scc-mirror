@@ -36,3 +36,12 @@ COFFHDRS =\
 all: $(OBJS)
 
 $(OBJS): $(COFFHDRS)
+
+dep:
+	@(printf 'COFF32OBJS=\\';\
+	echo;\
+	echo $(OBJS) |\
+	sed -E 's@ *([^ ]*)@\tcoff32/\1\\\n@g') > deps.mk
+
+distclean:
+	rm -f deps.mk

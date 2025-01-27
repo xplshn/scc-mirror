@@ -7,7 +7,7 @@ trap "rm -f $tmp" EXIT INT TERM HUP
 
 (cat Makefile
 printf "\n#deps\n"
-for i in `find . -name '*.c'`
+for i in *.c
 do
 	file=`basename $i | sed 's/\.c$/.o/'`
 	dir=`dirname $i`
