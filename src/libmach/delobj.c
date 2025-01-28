@@ -5,12 +5,12 @@
 
 #include "libmach.h"
 
-#include "elf64/fun.h"
+#include "elf/fun.h"
 #include "coff32/fun.h"
 
 static void (*ops[NFORMATS])(Obj *) = {
 	[COFF32] = coff32del,
-	[ELF64] = elf64del,
+	[ELF] = elfdel,
 };
 
 void

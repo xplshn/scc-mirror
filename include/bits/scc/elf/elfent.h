@@ -4,13 +4,17 @@
 #define STN_UNDEF       0               /* undefined */
 
 /* Extract symbol info - st_info */
-#define ELF32_ST_BIND(x)        ((x) >> 4)
-#define ELF32_ST_TYPE(x)        (((unsigned int) x) & 0xf)
-#define ELF32_ST_INFO(b,t)      (((b) << 4) + ((t) & 0xf))
+#define ELF_ST_BIND(x)        ((x) >> 4)
+#define ELF_ST_TYPE(x)        (((unsigned int) x) & 0xf)
+#define ELF_ST_INFO(b,t)      (((b) << 4) + ((t) & 0xf))
 
-#define ELF64_ST_BIND(x)        ((x) >> 4)
-#define ELF64_ST_TYPE(x)        (((unsigned int) x) & 0xf)
-#define ELF64_ST_INFO(b,t)      (((b) << 4) + ((t) & 0xf))
+#define ELF32_ST_BIND(x)        ELF_ST_BIND(x)
+#define ELF32_ST_TYPE(x)        ELF_ST_TYPE(x)
+#define ELF32_ST_INFO(b,t)      ELF_ST_INFO(b, t)
+
+#define ELF64_ST_BIND(x)        ELF_ST_BIND(x)
+#define ELF64_ST_TYPE(x)        ELF_ST_TYPE(x)
+#define ELF64_ST_INFO(b,t)      ELF_ST_INFO(b, t)
 
 /* Symbol Binding - ELF32_ST_BIND - st_info */
 #define STB_LOCAL       0               /* Local symbol */

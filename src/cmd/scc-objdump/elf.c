@@ -3,7 +3,12 @@
 #include <string.h>
 
 #include <scc/mach.h>
-#include <scc/elf64.h>
+#include <scc/elf/elftypes.h>
+#include <scc/elf/elfhdr.h>
+#include <scc/elf/elfphdr.h>
+#include <scc/elf/elfshdr.h>
+#include <scc/elf/elfent.h>
+#include <scc/elf.h>
 
 #include "objdump.h"
 
@@ -30,17 +35,17 @@ enum phdrflags {
 };
 
 int
-elf64hasrelloc(Obj *obj, Section *sec)
+elfhasrelloc(Obj *obj, Section *sec)
 {
 	size_t i;
-	Elf64 *elf = obj->data;
-	Elf_Shdr *shdr;
+	Elf *elf = obj->data;
+	Elfsec *shdr;
 
 	for (i = 0; i < elf->nsec; i++) {
-		shdr = &elf->shdr[i];
-		if (shdr->sh_type != SHT_RELA && shdr->sh_type != SHT_REL)
+		shdr = &elf->secs[i];
+		if (shdr->type != SHT_RELA && shdr->type != SHT_REL)
 			continue;
-		if (shdr->sh_info == sec->index)
+		if (shdr->info == sec->index)
 			return 1;
 	}
 
@@ -53,8 +58,8 @@ printents(Obj *obj)
 	int n;
 	size_t i;
 	Section sec;
-	Elf_Sym *ent;
-	Elf64 *elf = obj->data;
+	Elfsym *ent;
+	Elf *elf = obj->data;
 	char *sbind, *stype, *svis, *ssec;
 	unsigned info, bind, type, vis, nsec;
 
@@ -87,11 +92,11 @@ printents(Obj *obj)
 	for (i = 0; i < elf->nsym; i++) {
 		ent = &elf->syms[i];
 
-		info = ent->st_info;
-		bind = ELF64_ST_BIND(info);
-		type = ELF64_ST_TYPE(info);
-		vis = ELF_ST_VISIBILITY(ent->st_other);
-		nsec = ent->st_shndx;
+		info = ent->info;
+		bind = ELF_ST_BIND(info);
+		type = ELF_ST_TYPE(info);
+		vis = ELF_ST_VISIBILITY(ent->other);
+		nsec = ent->shndx;
 
 		sbind = (bind <= STB_HIPROC) ? binds[bind] : "Unknown";
 		stype = (type <= STT_HIPROC) ? types[type] : "Unknown";
@@ -124,19 +129,18 @@ printents(Obj *obj)
 		        "\t\tst_type: %u %s\n"
 		        "\tst_other: %u %s\n"
 		        "\tst_shndx: %u %s\n"
-		        "\tst_value: %llu\n"
+		        "\tst_value: %#llx\n"
 		        "\tst_size: %llu\n"
 		        "\n",
 		        i,
-		        (long) ent->st_name,
-		        elf64str(obj, SYM_STRTBL, ent->st_name),
+		        (long) ent->st_name, ent->name,
 		        info,
 		        bind, sbind,
 		        type, stype,
 		        vis, svis,
 		        nsec, ssec,
-		        (unsigned long long) ent->st_value,
-		        (unsigned long long) ent->st_size);
+		        (unsigned long long) ent->value,
+		        (unsigned long long) ent->size);
 	}
 }
 
@@ -147,9 +151,9 @@ printstbl(Obj *obj)
 	size_t i;
 	Symbol sym;
 	Section sec;
-	Elf_Sym *ent;
-	Elf_Shdr *shdr;
-	Elf64 *elf = obj->data;
+	Elfsym *ent;
+	Elfsec *shdr;
+	Elf *elf = obj->data;
 	unsigned info, bind, type;
 	char cbind, cweak, cctor, cwarn, cindir, cdebug, ctype;
 
@@ -160,13 +164,13 @@ printstbl(Obj *obj)
 
 	for (i = 1; i < elf->nsym; i++) {
 		ent = &elf->syms[i];
-		shdr =&elf->shdr[ent->st_shndx];
+		shdr =&elf->secs[ent->shndx];
 		n = i;
 		getsym(obj, &n, &sym);
-		n = ent->st_shndx;
+		n = ent->shndx;
 		getsec(obj, &n, &sec);
 
-		info = ent->st_info;
+		info = ent->info;
 		bind = ELF64_ST_BIND(info);
 		type = ELF64_ST_TYPE(info);
 
@@ -186,7 +190,7 @@ printstbl(Obj *obj)
 			cbind = ' ';
 			break;
 		default:
-			cdebug = (elf->symtab->sh_type == SHT_DYNAMIC) ? 'D' : ' ';
+			cdebug = (ent->symsec->type  == SHT_DYNAMIC) ? 'D' : ' ';
 		}
 
 		switch (type) {
@@ -206,7 +210,7 @@ printstbl(Obj *obj)
 		}
 
 		printf("%016llx %c%c%c%c%c%c%c %-15s %08llu %-20s [%4zu]\n",
-		       (long long) ent->st_value,
+		       (long long) ent->value,
 		       cbind,
 		       cweak,
 		       cctor,
@@ -215,14 +219,14 @@ printstbl(Obj *obj)
 		       cdebug,
 		       ctype,
 		       sec.name,
-		       (long long) ent->st_size,
+		       (long long) ent->size,
 		       sym.name,
 		       i);
 	}
 }
 
 void
-elf64syms(Obj *obj)
+elfsyms(Obj *obj)
 {
 	printstbl(obj);
 
@@ -231,11 +235,11 @@ elf64syms(Obj *obj)
 }
 
 void
-elf64scns(Obj *obj)
+elfscns(Obj *obj)
 {
 	size_t i;
-	Elf64 *elf = obj->data;
-	Elf_Shdr *shdr;
+	Elf *elf = obj->data;
+	Elfsec *shdr;
 	static char *types[] = {
 		[SHT_NULL] = "inactive",
 		[SHT_PROGBITS] = "program defined information",
@@ -276,9 +280,9 @@ elf64scns(Obj *obj)
 	for (i = 0; i < elf->nsec; i++) {
 		long type;
 		char *stype;
-		shdr = &elf->shdr[i];
+		shdr = &elf->secs[i];
 
-		type = shdr->sh_type;
+		type = shdr->type;
 		if (type <= SHT_SYMTAB_SHNDX) {
 			stype = types[type];
 		} else {
@@ -312,10 +316,10 @@ elf64scns(Obj *obj)
 		if (!stype)
 			stype = "Unknown";
 
-		f.flags = shdr->sh_flags;
+		f.flags = shdr->flags;
 
 		printf("Section %zu:\n"
-		       "\tsh_name: %lu\n"
+		       "\tsh_name: %lu %s\n"
 		       "\tsh_type: %lu %s\n"
 		       "\tsh_flags: %#llx\n"
 		       "\tsh_addr: %#llx\n"
@@ -326,16 +330,16 @@ elf64scns(Obj *obj)
 		       "\tsh_addralign: %llu\n"
 		       "\tsh_entsize: %llu\n",
 		       i,
-		       (long) shdr->sh_name,
+		       (long) shdr->sh_name, shdr->name,
 		       type, stype,
-		       (long long) shdr->sh_flags,
-		       (long long) shdr->sh_addr,
-		       (long long) shdr->sh_offset,
-		       (long long) shdr->sh_size,
-		       (long) shdr->sh_link,
-		       (long) shdr->sh_info,
-		       (long long) shdr->sh_addralign,
-		       (long long) shdr->sh_entsize);
+		       (long long) shdr->flags,
+		       (long long) shdr->addr,
+		       (long long) shdr->offset,
+		       (long long) shdr->size,
+		       (long) shdr->link,
+		       (long) shdr->info,
+		       (long long) shdr->addralign,
+		       (long long) shdr->entsize);
 
 		putchar('\t');
 		printflags(&f);
@@ -344,7 +348,7 @@ elf64scns(Obj *obj)
 }
 
 static void
-printfhdr(Elf_Ehdr *hdr)
+printfhdr(Elfhdr *hdr)
 {
 	unsigned long version;
 	unsigned class, data, abi, type, mach;
@@ -578,12 +582,12 @@ printfhdr(Elf_Ehdr *hdr)
 		[EV_CURRENT] = "Current",
 	};
 
-	class = hdr->e_ident[EI_CLASS];
-	data = hdr->e_ident[EI_DATA];
-	abi = hdr->e_ident[EI_OSABI];
-	type = hdr->e_type;
-	mach = hdr->e_machine;
-	version = hdr->e_version;
+	class = hdr->ident[EI_CLASS];
+	data = hdr->ident[EI_DATA];
+	abi = hdr->ident[EI_OSABI];
+	type = hdr->type;
+	mach = hdr->machine;
+	version = hdr->version;
 
 	sclass = (class <= ELFCLASS64) ? classes[class] : "Unknown";
 	sdata = (data <= ELFDATA2MSB) ? datas[data] : "Unknown";
@@ -604,7 +608,7 @@ printfhdr(Elf_Ehdr *hdr)
 		sabi = (abi <= ELFOSABI_OPENVOS) ? abis[abi] : "Unknown";
 	}
 
-	printf("elfhdr64:\n"
+	printf("elfhdr:\n"
 	       "\tei_class: %u, %s\n"
 	       "\tei_data: %u, %s\n"
 	       "\tei_version: %u\n"
@@ -626,26 +630,26 @@ printfhdr(Elf_Ehdr *hdr)
 	       "\n",
 	       class, sclass,
 	       data, sdata,
-	       hdr->e_ident[EI_VERSION],
+	       hdr->ident[EI_VERSION],
 	       abi, sabi,
-	       hdr->e_ident[EI_ABIVERSION],
+	       hdr->ident[EI_ABIVERSION],
 	       type, stype,
 	       mach, smach,
 	       version, sversion,
-	       (long long) hdr->e_entry,
-	       (long long) hdr->e_phoff,
-	       (long long) hdr->e_shoff,
-	       (long) hdr->e_flags,
-	       (long) hdr->e_ehsize,
-	       (long) hdr->e_phentsize,
-	       (long) hdr->e_phnum,
-	       (long) hdr->e_shentsize,
-	       (long) hdr->e_shnum,
-	       (long) hdr->e_shstrndx);
+	       (long long) hdr->entry,
+	       (long long) hdr->phoff,
+	       (long long) hdr->shoff,
+	       (long) hdr->flags,
+	       (long) hdr->ehsize,
+	       (long) hdr->phentsize,
+	       (long) hdr->phnum,
+	       (long) hdr->shentsize,
+	       (long) hdr->shnum,
+	       (long) hdr->shstrndx);
 }
 
 static void
-printphdr(Elf_Phdr *phdr, unsigned long n)
+printphdr(Elfphdr *phdr, unsigned long n)
 {
 	unsigned long i;
 	static char *types[] = {
@@ -671,9 +675,9 @@ printphdr(Elf_Phdr *phdr, unsigned long n)
 		unsigned long type;
 		char *stype;
 
-		type = phdr->p_type;
+		type = phdr->type;
 		stype = (type <= PT_TLS) ? types[type] : "Unknown";
-		f.flags = phdr->p_flags;
+		f.flags = phdr->flags;
 
 		printf("Program header %ld\n"
 		       "\tp_type: %#lx, %s\n"
@@ -686,13 +690,13 @@ printphdr(Elf_Phdr *phdr, unsigned long n)
 		       "\tp_align: %#08llx\n",
 		       i,
 		       type, stype,
-		       (long) phdr->p_flags,
-		       (long long) phdr->p_offset,
-		       (long long) phdr->p_vaddr,
-		       (long long) phdr->p_paddr,
-		       (long long) phdr->p_filesz,
-		       (long long) phdr->p_memsz,
-		       (long long) phdr->p_align);
+		       (long) phdr->flags,
+		       (long long) phdr->offset,
+		       (long long) phdr->vaddr,
+		       (long long) phdr->paddr,
+		       (long long) phdr->filesz,
+		       (long long) phdr->memsz,
+		       (long long) phdr->align);
 
 		putchar('\t');
 		printflags(&f);
@@ -702,33 +706,33 @@ printphdr(Elf_Phdr *phdr, unsigned long n)
 }
 
 void
-elf64fhdr(Obj *obj, unsigned long long *start, Flags *f)
+elffhdr(Obj *obj, unsigned long long *start, Flags *f)
 {
 	size_t i;
 	char *name;
-	Elf64 *elf = obj->data;
-	Elf_Ehdr *hdr = &elf->hdr;
-	Elf_Shdr *shdr;
+	Elf *elf = obj->data;
+	Elfhdr *hdr = &elf->hdr;
+	Elfsec *shdr;
 
-	*start = hdr->e_entry;
+	*start = hdr->entry;
 
 	for (i = 0; i < elf->nsec; i++) {
-		shdr = &elf->shdr[i];
-		name = elf64str(obj, SEC_STRTBL, shdr->sh_name);
+		shdr = &elf->secs[i];
+		name = shdr->name;
 		setflag(f, strncmp(name, ".debug", 6) == 0, HAS_DEBUG);
 		setflag(f, strncmp(name, ".line", 5) == 0, HAS_LINENO);
 		setflag(f, strcmp(name, ".debug_line") == 0, HAS_LINENO);
-		setflag(f, shdr->sh_type == SHT_RELA, HAS_RELOC);
-		setflag(f, shdr->sh_type == SHT_REL, HAS_RELOC);
+		setflag(f, shdr->type == SHT_RELA, HAS_RELOC);
+		setflag(f, shdr->type == SHT_REL, HAS_RELOC);
 	}
 
-	setflag(f, hdr->e_type == ET_EXEC, EXEC_P);
-	setflag(f, hdr->e_type == ET_DYN, DYNAMIC);
+	setflag(f, hdr->type == ET_EXEC, EXEC_P);
+	setflag(f, hdr->type == ET_DYN, DYNAMIC);
 	setflag(f, elf->nsym > 0, HAS_SYMS);
 
 	if (!pflag)
 		return;
 
 	printfhdr(hdr);
-	printphdr(elf->phdr, hdr->e_phnum);
+	printphdr(elf->phdr, hdr->phnum);
 }

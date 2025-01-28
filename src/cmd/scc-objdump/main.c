@@ -34,11 +34,11 @@ static struct binops *op, ops[NFORMATS] = {
 		.dumpfhdr = coff32fhdr,
 		.hasrelloc = coff32hasrelloc,
 	},
-        [ELF64] = {
-		.dumpsyms = elf64syms,
-		.dumpsecs = elf64scns,
-		.dumpfhdr = elf64fhdr,
-		.hasrelloc = elf64hasrelloc,
+        [ELF] = {
+		.dumpsyms = elfsyms,
+		.dumpsecs = elfscns,
+		.dumpfhdr = elffhdr,
+		.hasrelloc = elfhasrelloc,
 	},
 };
 

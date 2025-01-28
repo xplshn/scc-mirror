@@ -2,17 +2,17 @@
 #include <string.h>
 
 #include <scc/mach.h>
-#include <scc/elf64.h>
+#include <scc/elf.h>
 
 #include "../libmach.h"
 #include "fun.h"
 
 int
-elf64type(char *name)
+elftype(char *name)
 {
 	struct arch *ap;
 
-	for (ap = elf64archs; ap ->name; ap++) {
+	for (ap = elfarchs; ap ->name; ap++) {
 		if (strcmp(ap->name, name) == 0)
 			return ap->type;
 	}

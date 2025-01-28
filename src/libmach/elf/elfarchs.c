@@ -1,16 +1,19 @@
 #include <stdio.h>
 
+
 #include <scc/mach.h>
-#include <scc/elf64.h>
+#include <scc/elf/elftypes.h>
+#include <scc/elf/elfhdr.h>
+#include <scc/elf.h>
 
 #include "../libmach.h"
 
-struct arch elf64archs[] = {
+struct arch elfarchs[] = {
 	{
 		.name = "elf-amd64",
 		.mach = EM_X86_64,
 		.endian = ELFDATA2LSB,
-		.type = OBJ(ELF64, ARCHAMD64, LITTLE_ENDIAN),
+		.type = OBJ(ELF, ARCHAMD64, LITTLE_ENDIAN),
 	},
 	NULL,
 };

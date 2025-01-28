@@ -2,22 +2,21 @@
 #include <stdlib.h>
 
 #include <scc/mach.h>
-#include <scc/elf64.h>
+#include <scc/elf.h>
 
 #include "../libmach.h"
 #include "fun.h"
 
 void
-elf64del(Obj *obj)
+elfdel(Obj *obj)
 {
-        struct elf64 *elf = obj->data;
+        struct elf *elf = obj->data;
 
         if (elf) {
                 free(elf->phdr);
-                free(elf->shdr);
+                free(elf->secs);
 		free(elf->syms);
-                free(elf->strtbl[0]);
-                free(elf->strtbl[1]);
+		free(elf->rels);
         }
         free(obj->data);
         obj->data = NULL;

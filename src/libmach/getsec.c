@@ -4,12 +4,12 @@
 
 #include "libmach.h"
 
-#include "elf64/fun.h"
+#include "elf/fun.h"
 #include "coff32/fun.h"
 
 static Section *(*ops[NFORMATS])(Obj *, int *, Section *) = {
 	[COFF32] = coff32getsec,
-	[ELF64] = elf64getsec,
+	[ELF] = elfgetsec,
 };
 
 Section *

@@ -2,15 +2,15 @@
 #include <stdlib.h>
 
 #include <scc/mach.h>
-#include <scc/elf64.h>
+#include <scc/elf.h>
 
 #include "../libmach.h"
 #include "fun.h"
 
 int
-elf64new(Obj *obj, int type)
+elfnew(Obj *obj, int type)
 {
-	struct elf64 *elf;
+	struct elf *elf;
 
 	if ((elf = calloc(1, sizeof(*elf))) == NULL)
 		return -1;

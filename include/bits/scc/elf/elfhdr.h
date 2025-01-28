@@ -261,7 +261,7 @@
 /* Magic for e_phnum: get real value from sh_info of first section header */
 #define PN_XNUM		0xffff
 
-#define ELFH32SZ              54
+#define ELFH32SZ              52
 #define ELFH64SZ              64
 
 typedef struct elfhdr32 Elf32_Ehdr;

@@ -4,12 +4,12 @@
 
 #include "libmach.h"
 
-#include "elf64/fun.h"
+#include "elf/fun.h"
 #include "coff32/fun.h"
 
 static int (*ops[NFORMATS])(unsigned char *, char **) = {
 	[COFF32] = coff32probe,
-	[ELF64] = elf64probe,
+	[ELF] = elfprobe,
 };
 
 int

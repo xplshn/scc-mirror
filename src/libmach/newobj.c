@@ -7,12 +7,12 @@
 
 #include "libmach.h"
 
-#include "elf64/fun.h"
+#include "elf/fun.h"
 #include "coff32/fun.h"
 
 static int (*ops[NFORMATS])(Obj *, int) = {
 	[COFF32] = coff32new,
-	[ELF64] = elf64new,
+	[ELF] = elfnew,
 };
 
 Obj *

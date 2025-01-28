@@ -1,7 +1,7 @@
 .POSIX:
 
 DIRS =\
-	elf64\
+	elf\
 	coff32\
 
 PROJECTDIR =../..
@@ -45,4 +45,4 @@ $(TARGET): $(OBJS)
 	cp $@ $(LIBDIR)/scc
 
 dep:
-	./mkdep elf64 coff32
+	./mkdep elf coff32

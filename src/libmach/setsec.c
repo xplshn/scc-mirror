@@ -4,7 +4,7 @@
 
 #include "libmach.h"
 
-#include "elf64/fun.h"
+#include "elf/fun.h"
 #include "coff32/fun.h"
 
 static Section *(*ops[NFORMATS])(Obj *, int *, Section *) = {

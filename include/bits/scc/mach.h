@@ -21,7 +21,7 @@ typedef struct mapsec Mapsec;
 
 enum objformat {
 	COFF32,
-	ELF64,
+	ELF,
 	NFORMATS,
 };
 
@@ -32,6 +32,8 @@ enum objarch {
 	ARCHZ80,
 	ARCHARM32,
 	ARCHARM64,
+	ARCHUNK32,
+	ARCHUNK64,
 };
 
 enum order {

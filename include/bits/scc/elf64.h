@@ -4,8 +4,6 @@
 #include <scc/elf/elfshdr.h>
 #include <scc/elf/elfent.h>
 
-#define ELF_ST_BIND ELF64_ST_BIND
-#define ELF_ST_TYPE ELF64_ST_TYPE
 #define Elf_Ehdr Elf64_Ehdr
 #define Elf_Phdr Elf64_Phdr
 #define Elf_Shdr Elf64_Shdr
