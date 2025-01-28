@@ -9,6 +9,7 @@
 
 static Map *(*ops[NFORMATS])(Obj *, FILE *) = {
 	[COFF32] = coff32loadmap,
+	[ELF] = elfloadmap,
 };
 
 Map *

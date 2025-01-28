@@ -8,6 +8,7 @@ OBJS =\
 	elfdel.o\
 	elfgetsec.o\
 	elfgetsym.o\
+	elfloadmap.o\
 	elfnew.o\
 	elfprobe.o\
 	elfread.o\
