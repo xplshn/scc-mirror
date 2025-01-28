@@ -240,7 +240,7 @@ nm(char *fname)
 static void
 usage(void)
 {
-	fputs("nm [-APvfa][-g|-u][-t format] [file...]\n", stderr);
+	fputs("nm [-APvfagu][-t format] [file...]\n", stderr);
 	exit(1);
 }
 
