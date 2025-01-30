@@ -81,6 +81,7 @@ struct elfsym {
 struct elf {
 	Elfhdr hdr;
 	Elfphdr *phdr;
+	int is32;
 
 	Elfsec *secs;
 	int nsec;
@@ -101,6 +102,7 @@ struct arch {
 	int mach;
 	int endian;
 	int type;
+	int is32;
 };
 
 /* globals */

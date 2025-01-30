@@ -712,7 +712,15 @@ elfread(Obj *obj, FILE *fp)
 	fread(buf, sizeof(buf), 1, fp);
 	fsetpos(fp, &pos);
 
-	elf->unpack = (buf[EI_CLASS] == ELFCLASS64) ? &unpack64 : &unpack32;
+	if (buf[EI_CLASS] == ELFCLASS64) {
+		if (elf->is32)
+			return 0;
+		elf->is32 = 0;
+		elf->unpack = &unpack64;
+	} else {
+		elf->is32 = 1;
+		elf->unpack = &unpack32;
+	}
 
 	if (!readhdr(obj, fp))
 		return -1;
