@@ -43,5 +43,8 @@ elfprobe(unsigned char *buf, char **name)
 		}
 	}
 
+	if  (name)
+		*name = "elf-unknown";
+
 	return OBJ(ELF, arch, endian);
 }
