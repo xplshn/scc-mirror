@@ -1,4 +1,4 @@
-#include <errno.h>
+#include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,36 +9,53 @@
 #include "libmach.h"
 
 Map *
-remap(Map *map, int n)
+remap(Map *map, int nsec, int nseg)
 {
-	size_t vsiz;
+	struct mapsec *sec, *seg;
 
-	if (n > SIZE_MAX/sizeof(struct mapsec))
-		goto out_range;
-	vsiz = n * sizeof(struct mapsec);
-	if (vsiz > SIZE_MAX - sizeof(*map))
-		goto out_range;
-	vsiz += sizeof(*map);
-
-	if ((map = realloc(map, vsiz)) == NULL)
+	if (nseg > SIZE_MAX/sizeof(*sec) || nseg > SIZE_MAX/sizeof(*seg))
 		return NULL;
 
-	map->n = n;
-	return map;
+	if (nseg == 0) {
+		free(map->seg);
+		seg = NULL;
+	} else {
+		seg = realloc(map->seg, nseg * sizeof(*seg));
+		if (!seg)
+			return NULL;
+	}
+	map->seg = seg;
+	map->nseg = nseg;
+
+	if (nsec == 0) {
+		free(map->seg);
+		sec = NULL;
+	} else {
+		sec = realloc(map->seg, nsec * sizeof(*sec));
+		if (!sec)
+			return NULL;
+	}
+	map->sec = sec;
+	map->nsec = nsec;
 
 	return map;
-
-out_range:
-	errno = ERANGE;
-	return NULL;
 }
 
 Map *
-newmap(Map *map, int n)
+newmap(int nsec, int nseg)
 {
-	if ((map = remap(map, n)) == NULL)
-		return NULL;
-	memset(map->sec, 0, n * sizeof(struct mapsec));
+	Map m, *map;
+	struct mapsec *sec, *seg;
 
+	if (!remap(memset(&m, 0, sizeof(Map)), nsec, nseg))
+		return NULL;
+
+	if ((map = malloc(sizeof(*map))) == NULL) {
+		free(m.sec);
+		free(m.seg);
+		return NULL;
+	}
+
+	*map = m;
 	return map;
 }

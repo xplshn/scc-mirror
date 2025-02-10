@@ -135,11 +135,20 @@ extern int writeobj(Obj *, Map *, FILE *);
 
 extern Map *loadmap(Obj *, FILE *);
 
-extern int setmap(Map *,
+extern int mapsec(Map *,
                   char *,
                   FILE *,
                   unsigned long long,
                   unsigned long long,
+                  long,
+                  long);
+
+extern int mapseg(Map *,
+                  char *,
+                  FILE *,
+                  unsigned long long,
+                  unsigned long long,
+                  long,
                   long);
 
 extern int setindex(int, long, char **, long *, FILE *);
@@ -147,8 +156,9 @@ extern int getindex(int, long *, char ***, long **, FILE *);
 
 #endif
 
-extern Map *newmap(Map *, int);
-extern Map *remap(Map *, int);
+extern Map *newmap(int, int);
+extern Map *remap(Map *, int, int);
+extern void delmap(Map *);
 
 extern int objtype(char *);
 extern Obj *newobj(int);

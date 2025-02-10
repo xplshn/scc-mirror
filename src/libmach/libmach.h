@@ -1,12 +1,16 @@
+struct mapsec {
+	char *name;
+	FILE *fp;
+	unsigned long long begin;
+	unsigned long long end;
+	long fsiz;
+	long offset;
+};
+
 struct map {
-	int n;
-	struct mapsec {
-		char *name;
-		FILE *fp;
-		unsigned long long begin;
-		unsigned long long end;
-		long offset;
-	} sec[];
+	int nsec, nseg;
+	struct mapsec *sec;
+	struct mapsec *seg;
 };
 
 /* common functions */

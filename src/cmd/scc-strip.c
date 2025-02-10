@@ -94,7 +94,7 @@ err5:
 err4:
 	remove(tmpname);
 err3:
-	free(map);
+	delmap(map);
 err2:
 	delobj(obj);
 err1:

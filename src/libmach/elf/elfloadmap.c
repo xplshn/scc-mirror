@@ -9,33 +9,54 @@
 Map *
 elfloadmap(Obj *obj, FILE *fp)
 {
-	long i;
+	int nsec, nseg;
+	unsigned long o, s;
+	unsigned long long b, e;
+
 	Map *map;
-	char *name;
-	long nsec;
 	FILE *src;
 	Elfsec *shdr;
 	Elf *elf = obj->data;
 	Elfhdr *hdr = &elf->hdr;
+	Elfphdr *phdr;
 
-	nsec = hdr->shnum;
-	if ((map = newmap(NULL, nsec)) == NULL)
+	nseg = hdr->phnum;
+	nsec = elf->nsec;
+	if ((map = newmap(nsec, nseg)) == NULL)
 		return NULL;
 
-	for (shdr = elf->secs; nsec--; ++shdr) {
-		unsigned long o;
-		unsigned long long b = shdr->addralign;
-		unsigned long long e = b + shdr->size;
+	for (shdr = elf->secs; nsec-- > 0; ++shdr) {
+		b = shdr->addr;
+		e = b + shdr->size;
 
 		if (shdr->offset != 0) {
+			s = shdr->size;
 			o = obj->pos + shdr->offset;
 			src = fp;
 		} else {
-			o = 0;
+			s = o = 0;
 			src = NULL;
 		}
 
-		setmap(map, name, src, b, e, o);
+		if (mapsec(map, shdr->name, src, b, e, s, o) < 0)
+			return NULL;
+	}
+
+	for (phdr = elf->phdr; nseg-- > 0; ++phdr) {
+		b = phdr->vaddr;
+		e = b + phdr->memsz;
+
+		if (phdr->offset != 0) {
+			s = phdr->filesz;
+			o = obj->pos + phdr->offset;
+			src = fp;
+		} else {
+			s = o = 0;
+			src = NULL;
+		}
+
+		if (mapseg(map, NULL, src, b, e, s, o) < 0)
+			return NULL;
 	}
 
 	return map;

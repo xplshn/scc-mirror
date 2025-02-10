@@ -12,6 +12,7 @@ TARGET = libmach.a
 OBJS =\
 	archive.o\
 	armember.o\
+	delmap.o\
 	delobj.o\
 	findsec.o\
 	getindex.o\
@@ -28,7 +29,8 @@ OBJS =\
 	readobj.o\
 	rebase.o\
 	setindex.o\
-	setmap.o\
+	mapsec.o\
+	mapseg.o\
 	setsec.o\
 	setsym.o\
 	strip.o\

@@ -11,7 +11,7 @@ findsec(Map *map, char *name)
 	int i;
 	struct mapsec *sec;
 
-	for (i = 0; i < map->n; i++) {
+	for (i = 0; i < map->nsec; i++) {
 		char *s = map->sec[i].name;
 		if (s && strcmp(s, name) == 0)
 			return i;
