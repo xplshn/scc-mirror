@@ -657,7 +657,7 @@ printphdr(Elfphdr *phdr, unsigned long n)
 		[PT_LOAD] = "loadable segment",
 		[PT_DYNAMIC] = "dynamic linking section",
 		[PT_INTERP] = "the RTLD",
-		[PT_NOTE] = "auxiliary information",
+		[PT_NOTE] = "note information",
 		[PT_SHLIB] = "reserved - purpose undefined",
 		[PT_PHDR] = "program header",
 		[PT_TLS] = "thread local storage",
@@ -675,9 +675,29 @@ printphdr(Elfphdr *phdr, unsigned long n)
 		unsigned long type;
 		char *stype;
 
-		type = phdr->type;
-		stype = (type <= PT_TLS) ? types[type] : "Unknown";
 		f.flags = phdr->flags;
+		type = phdr->type;
+		if (type <= PT_TLS) {
+			stype = types[type];
+		} else {
+			switch (type) {
+			case PT_GNU_EH_FRAME:
+				stype = "Frame unwind information";
+				break;
+			case PT_GNU_STACK:
+				stype = "Stack flags";
+				break;
+			case PT_GNU_RELRO:
+				stype = "Read-only after relocation";
+				break;
+			case PT_GNU_PROPERTY:
+				stype = "GNU property";
+				break;
+			default:
+				stype = "Unknown";
+				break;
+			}
+		}
 
 		printf("Program header %ld\n"
 		       "\tp_type: %#lx, %s\n"
