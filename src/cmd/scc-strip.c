@@ -18,7 +18,7 @@ error(char *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	fprintf(stderr, "strip: %s: ", filename);
+	fprintf(stderr, "strip: error: %s: ", filename);
 	vfprintf(stderr, fmt, va);
 	putc('\n', stderr);
 	va_end(va);
