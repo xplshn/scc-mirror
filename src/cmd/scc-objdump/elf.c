@@ -649,8 +649,11 @@ printfhdr(Elfhdr *hdr)
 }
 
 static void
-printphdr(Elfphdr *phdr, unsigned long n)
+printphdr(Obj *obj, Elfphdr *phdr, unsigned long n)
 {
+	int j;
+	Map *map;
+	Mapsec *seg;
 	unsigned long i;
 	static char *types[] = {
 		[PT_NULL] = "unused",
@@ -671,9 +674,14 @@ printphdr(Elfphdr *phdr, unsigned long n)
 		}
 	};
 
+	if ((map = loadmap(obj, NULL)) == NULL) {
+		error("getting the object memory map");
+		return;
+	}
+
 	for (i = 0; i < n; i++) {
-		unsigned long type;
 		char *stype;
+		unsigned long type;
 
 		f.flags = phdr->flags;
 		type = phdr->type;
@@ -720,9 +728,29 @@ printphdr(Elfphdr *phdr, unsigned long n)
 
 		putchar('\t');
 		printflags(&f);
+
+		seg = &map->seg[i];
+		printf("\tSections:");
+		for (j = 0; j < seg->nchild; ++j)
+			printf(" %d", seg->child[j]->sec.index);
 		putchar('\n');
+		putchar('\n');
+
 		++phdr;
 	}
+
+	puts("Section to Segment mapping:\nSegment\tSections");
+	for (i = 0; i < n; ++i) {
+		printf(" %02lu\t", i);
+
+		seg = &map->seg[i];
+		for (j = 0; j < seg->nchild; ++j)
+			printf(" %s", seg->child[j]->sec.name);
+		putchar('\n');
+	}
+	putchar('\n');
+
+	delmap(map);
 }
 
 void
@@ -754,5 +782,5 @@ elffhdr(Obj *obj, unsigned long long *start, Flags *f)
 		return;
 
 	printfhdr(hdr);
-	printphdr(elf->phdr, hdr->phnum);
+	printphdr(obj, elf->phdr, hdr->phnum);
 }
