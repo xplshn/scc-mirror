@@ -20,11 +20,11 @@ int nmagic;       /* nmagic output */
 
 char *filename, *membname;
 
-Segment text = {.type = 'T'};
-Segment rodata = {.type = 'R'};
-Segment data = {.type = 'D'};
-Segment bss = {.type = 'B'};
-Segment debug = {.type = 'N'};
+Section text = {.type = 'T'};
+Section rodata = {.type = 'R'};
+Section data = {.type = 'D'};
+Section bss = {.type = 'B'};
+Section debug = {.type = 'N'};
 
 char *libpaths[MAX_LIB_PATHS];
 

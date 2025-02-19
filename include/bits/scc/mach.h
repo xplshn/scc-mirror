@@ -12,7 +12,6 @@
 #define ORDER(t) (((t) >> 10) & 0x1f)
 #define objfmt(o) FORMAT((o)->type)
 
-typedef struct segment Segment;
 typedef struct section Section;
 typedef struct symbol Symbol;
 typedef struct obj Obj;
@@ -78,18 +77,6 @@ struct obj {
 	long pos;
 	void *data;
 	Obj *next;
-};
-
-struct segment {
-	char *name;
-	unsigned long long base;
-	unsigned long long size;
-	unsigned flags;
-	int index;
-	int type;
-	int align;
-	int nsec;
-	Section **sections;
 };
 
 struct section {

@@ -67,8 +67,9 @@ lookupsec(char *name)
 }
 
 void
-merge(Segment *seg)
+merge(Section *seg)
 {
+#if 0
 	struct sectab *sp;
 	Section *sec, **p;
 	int n = 0;
@@ -90,6 +91,7 @@ merge(Segment *seg)
 	}
 
 	seg->nsec = n;
+#endif
 }
 
 static FILE *
