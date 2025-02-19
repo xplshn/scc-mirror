@@ -12,6 +12,7 @@ TARGET = libmach.a
 OBJS =\
 	archive.o\
 	armember.o\
+	copysec.o\
 	delmap.o\
 	delobj.o\
 	findsec.o\

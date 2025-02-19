@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <scc/mach.h>
 #include <scc/elf.h>
@@ -9,13 +10,11 @@
 Map *
 elfloadmap(Obj *obj, FILE *fp)
 {
+	int i;
 	int nsec, nseg;
-	unsigned long o, s;
-	unsigned long long b, e;
-
 	Map *map;
+	Section sec;
 	FILE *src;
-	Elfsec *shdr;
 	Elf *elf = obj->data;
 	Elfhdr *hdr = &elf->hdr;
 	Elfphdr *phdr;
@@ -25,37 +24,26 @@ elfloadmap(Obj *obj, FILE *fp)
 	if ((map = newmap(nsec, nseg)) == NULL)
 		return NULL;
 
-	for (shdr = elf->secs; nsec-- > 0; ++shdr) {
-		b = shdr->addr;
-		e = b + shdr->size;
+	memset(&sec, 0, sizeof(sec));
+	for (i = 0; i < nseg; ++i) {
+		phdr = &elf->phdr[i];
+		sec.name = NULL;
+		sec.load = phdr->vaddr;
+		sec.base = phdr->paddr;
+		sec.offset = obj->pos + phdr->offset;
+		sec.align = phdr->align;
+		sec.size = phdr->memsz;
+		sec.index = i;
 
-		if (shdr->offset != 0) {
-			s = shdr->size;
-			o = obj->pos + shdr->offset;
-			src = fp;
-		} else {
-			s = o = 0;
-			src = NULL;
-		}
-
-		if (mapsec(map, shdr->name, src, b, e, s, o) < 0)
+		if (mapseg(map, &sec, fp, phdr->filesz) < 0)
 			return NULL;
 	}
 
-	for (phdr = elf->phdr; nseg-- > 0; ++phdr) {
-		b = phdr->vaddr;
-		e = b + phdr->memsz;
+	for (i = 0; getsec(obj, &i, &sec); ++i) {
+		sec.offset += obj->pos;
+		src = ((sec.flags & SALLOC) != 0) ? fp : NULL;
 
-		if (phdr->offset != 0) {
-			s = phdr->filesz;
-			o = obj->pos + phdr->offset;
-			src = fp;
-		} else {
-			s = o = 0;
-			src = NULL;
-		}
-
-		if (mapseg(map, NULL, src, b, e, s, o) < 0)
+		if (mapsec(map, &sec, src, sec.size) < 0)
 			return NULL;
 	}
 

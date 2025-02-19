@@ -83,12 +83,13 @@ coff32getsec(Obj *obj, int *idx, Section *sec)
 	sec->name = coff32str(coff, scn);
 	sec->index = n;
 	sec->size = scn->s_size;
-	sec->base = scn->s_vaddr;
-	sec->load = scn->s_paddr;
+	sec->load = scn->s_vaddr;
+	sec->base = scn->s_paddr;
 	sec->offset = scn->s_scnptr;
 	sec->type = type;
 	sec->flags = sflags;
 	sec->align = 4;
+	sec->fill = 0;
 
 	return sec;
 }

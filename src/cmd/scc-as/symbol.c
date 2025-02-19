@@ -315,7 +315,7 @@ newsec(Symbol *sym, char *attr)
 	lsym = (struct lsymbol *) sym;
 	lsym->sec = sec;
 
-	if (mapsec(map, sym->name, NULL, 0, 0, 0, 0) < 0) {
+	if (mapsec(map, sec, NULL, 0) < 0) {
 		fprintf(stderr,
 		       "as: error allocating section mapping '%s'\n",
 		        sym->name);
@@ -406,13 +406,7 @@ cleansecs(void)
 			continue;
 
 		lsec->fp = tmpfile();
-		r = mapsec(map,
-		           sec->name,
-		           lsec->fp,
-		           sec->base,
-		           sec->base + sec->size,
-		           sec->size,
-	               0);
+		r = mapsec(map, sec, lsec->fp, sec->size);
 
 		if (!lsec->fp || r < 0) {
 			perror("as: creating section mapping");

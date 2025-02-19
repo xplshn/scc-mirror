@@ -93,6 +93,26 @@ struct section {
 	char type;
 };
 
+#ifdef stdin
+struct mapsec {
+	Section sec;
+	int used;
+	int loaded;
+	FILE *fp;
+	long fsiz;
+
+	int nchild;
+	struct mapsec **child;
+};
+#endif
+
+struct map {
+	int nsec, nseg;
+	struct mapsec *sec;
+	struct mapsec *seg;
+};
+
+
 /**
  * @stype: Used internally by libmach
  * @dtype: Coff debug type
@@ -122,21 +142,8 @@ extern int writeobj(Obj *, Map *, FILE *);
 
 extern Map *loadmap(Obj *, FILE *);
 
-extern int mapsec(Map *,
-                  char *,
-                  FILE *,
-                  unsigned long long,
-                  unsigned long long,
-                  long,
-                  long);
-
-extern int mapseg(Map *,
-                  char *,
-                  FILE *,
-                  unsigned long long,
-                  unsigned long long,
-                  long,
-                  long);
+extern int mapsec(Map *, Section *, FILE *, long);
+extern int mapseg(Map *, Section *, FILE *, long);
 
 extern int setindex(int, long, char **, long *, FILE *);
 extern int getindex(int, long *, char ***, long **, FILE *);

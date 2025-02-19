@@ -9,10 +9,10 @@ int
 findsec(Map *map, char *name)
 {
 	int i;
-	struct mapsec *sec;
+	Mapsec *sec;
 
 	for (i = 0; i < map->nsec; i++) {
-		char *s = map->sec[i].name;
+		char *s = map->sec[i].sec.name;
 		if (s && strcmp(s, name) == 0)
 			return i;
 	}

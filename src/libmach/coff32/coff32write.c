@@ -441,29 +441,25 @@ writelines(Obj *obj, FILE *fp)
 static int
 writedata(Obj *obj, Map *map, FILE *fp)
 {
-	int id;
-	long nsec;
-	unsigned long long n;
+	long n;
+	int id, nsec;
+	Mapsec *msec;
+	Section *sec;
 	struct coff32 *coff = obj->data;
 	FILHDR *hdr = &coff->hdr;
 	SCNHDR *scn;
-	Mapsec *sec;
 
 	nsec = hdr->f_nscns;
 	for (scn = coff->scns; nsec--; scn++) {
 		if ((id = findsec(map, scn->s_name)) < 0)
 			continue;
-		sec = &map->sec[id];
-		if (!sec->fp)
+		msec = &map->sec[id];
+		sec = &msec->sec;
+		if (!msec->fp)
 			continue;
 
-		fseek(sec->fp, sec->offset, SEEK_SET);
-
-		for (n = sec->end - sec->begin; n > 0; n--)
-			putc(getc(sec->fp), fp);
-
-		if (ferror(sec->fp))
-			return 0;
+		if (copysec(msec, fp) < 0)
+			return -1;
 	}
 
 	return 1;
