@@ -436,6 +436,8 @@ readphdr(Obj *obj, FILE *fp)
 		if (fread(buf, hdr->phentsize, 1, fp) != 1)
 			goto err1;
 		(*u->phdr)(ORDER(obj->type), buf, &phdr[i]);
+		if (phdr[i].offset > LONG_MAX)
+			goto  err1;
 	}
 	r = 1;
 

@@ -84,7 +84,7 @@ struct section {
 	unsigned long long base;
 	unsigned long long load;
 	unsigned long long size;
-	unsigned long long offset;
+	long offset;
 
 	unsigned flags;
 	int index;
@@ -111,7 +111,6 @@ struct map {
 	struct mapsec *sec;
 	struct mapsec *seg;
 };
-
 
 /**
  * @stype: Used internally by libmach
