@@ -1,4 +1,5 @@
-#define _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
 
 #include <signal.h>
 #include <sys/stat.h>
@@ -18,7 +19,7 @@ is_dir(char *fname)
 
 	if (stat(fname, &st) < 0)
 		return 0;
-	return (st.st_mode & S_IFMT) == S_IFDIR;
+	return S_ISDIR(st.st_mode);
 }
 
 void
