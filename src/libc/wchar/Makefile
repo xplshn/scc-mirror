@@ -7,6 +7,7 @@ OBJS =\
 	fputwc.$O\
 	mbrlen.$O\
 	mbrtowc.$O\
+	mbsinit.$O\
 	mbsrtowcs.$O\
 	wcrtomb.$O\
 	wcslen.$O\

@@ -123,6 +123,7 @@ COMMON_OBJS =\
 	wchar/fputwc.$O\
 	wchar/mbrlen.$O\
 	wchar/mbrtowc.$O\
+	wchar/mbsinit.$O\
 	wchar/mbsrtowcs.$O\
 	wchar/wcrtomb.$O\
 	wchar/wcslen.$O\
