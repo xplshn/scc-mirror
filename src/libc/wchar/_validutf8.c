@@ -23,7 +23,7 @@ _validutf8(wchar_t wc, int *nbytes)
 	};
 	struct range *bp;
 
-	for (bp = ranges; bp->begin <= wc && bp->end > wc; ++bp)
+	for (bp = ranges; bp->begin > wc || bp->end <= wc; ++bp)
 		;
 	*nbytes = bp->nbytes;
 

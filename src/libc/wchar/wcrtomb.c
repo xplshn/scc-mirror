@@ -14,13 +14,18 @@ wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps)
 	if (!s)
 		return 1;
 
+	if (c < 0x80) {
+		*s = wc;
+		return 1;
+	}
+
 	if (!_validutf8(wc, &n)) {
 		errno = EILSEQ;
 		return -1;
 	}
-
 	n--;
-	*s = 0;
+
+	*s = 0x80;
 	for (i = 0; i < n; i++) {
 		*s >>= 1;
 		*s |= 0x80;
