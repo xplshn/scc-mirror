@@ -8,14 +8,9 @@
 #define _NEED_WCHARLIM
 #define _NEED_WINT
 #define _NEED_VA_LIST
+#define _NEED_MBSTATE_T
 #include <sys/cdefs.h>
 #include <arch/cdefs.h>
-
-/*
- * We only support utf8 as multibyte encoding and
- * it does not have state.
- */
-typedef int mbstate_t;
 
 struct tm;
 struct _FILE;
