@@ -9,8 +9,8 @@
 #define _NEED_WINT
 #define _NEED_VA_LIST
 #define _NEED_MBSTATE_T
-#include <sys/cdefs.h>
 #include <arch/cdefs.h>
+#include <sys/cdefs.h>
 
 struct tm;
 struct _FILE;
