@@ -11,8 +11,9 @@ done`
 /OBJS/a
 `for i
  do
-	printf '\t$('$(echo $i | tr a-z A-Z)'OBJS)\\'
-	echo
+	# Need to escape the single backlash to prevent ed
+	# from interperting it as escaping the newline
+	printf '\t$(%sOBJS)\\\\\\n' $(echo $i | tr a-z A-Z)
 done`
 .
 w
