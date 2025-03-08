@@ -17,10 +17,8 @@ OBJS =\
 all: $(OBJS)
 
 dep:
-	@(printf 'ELFOBJS=\\';\
-	echo;\
-	echo $(OBJS) |\
-	sed -E 's@ *([^ ]*)@\telf/\1\\\n@g') > deps.mk
+	@{ printf 'ELFOBJS=\\\n';\
+	printf '\telf/%s\\\n' $(OBJS); } > deps.mk
 
 distclean:
 	rm -f deps.mk
