@@ -8,9 +8,14 @@
 #define _NEED_WCHARLIM
 #define _NEED_WINT
 #define _NEED_VA_LIST
-#define _NEED_MBSTATE_T
 #include <arch/cdefs.h>
 #include <sys/cdefs.h>
+
+typedef struct {
+	unsigned char oc;
+	unsigned char sh;
+	wchar_t wc;
+} mbstate_t;
 
 struct tm;
 struct _FILE;

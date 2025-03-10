@@ -61,8 +61,6 @@ extern void (*_atexithdl)(void);
 
 #ifdef _WCHAR_H
 extern int _validutf8(wchar_t, int *);
-extern int _mbsset(mbstate_t *, int);
-extern int _mbsget(mbstate_t *);
 #ifdef _STDIO_H
 extern wint_t _fputwc(wchar_t, FILE *, int *);
 #endif
