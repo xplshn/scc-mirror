@@ -4,6 +4,8 @@ include $(PROJECTDIR)/scripts/rules.mk
 include ../../rules.mk
 
 OBJS=\
-        _waitpid.$O\
+	_mbsget.$O\
+	_mbsset.$O\
+	_waitpid.$O\
 
 all: $(OBJS)

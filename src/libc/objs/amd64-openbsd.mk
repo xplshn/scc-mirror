@@ -33,6 +33,8 @@ OBJS =\
 	arch/amd64/strcmp.$O\
 	arch/amd64/strcpy.$O\
 	arch/bsd/_waitpid.$O\
+	arch/bsd/_mbsget.$O\
+	arch/bsd/_mbsset.$O\
 	arch/posix/_getheap.$O\
 	arch/posix/_open.$O\
 	arch/posix/_systime.$O\
