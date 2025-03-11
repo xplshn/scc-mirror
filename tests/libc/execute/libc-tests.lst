@@ -34,3 +34,4 @@
 0035-setlocale
 0036-localeconv
 0037-malloc [TODO]
+0038-mbsinit
