@@ -35,3 +35,4 @@
 0036-localeconv
 0037-malloc [TODO]
 0038-mbsinit
+0039-mbrtowc
