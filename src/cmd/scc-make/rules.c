@@ -506,7 +506,7 @@ rebuild(Target *tp, int *buildp)
 		q = *p;
 		debug("checking dependency %s", q->name);
 
-		if (q->actions)
+		if (strcmp(q->name, tp->name) == 0 && q->actions)
 			def = 1;
 
 		build = 0;
@@ -526,10 +526,14 @@ rebuild(Target *tp, int *buildp)
 		}
 	}
 
-	if (tp->stamp == -1)
+	if (tp->stamp == -1) {
 		need = 1;
-	else if (!def && inference(tp, NOFORCE))
-		need = 1;
+	} else if (!def)  {
+		debug("no action found for %s, looking a inference rule",
+		      tp->name);
+		if (inference(tp, NOFORCE))
+			need = 1;
+	}
 
 	if (err) {
 		warning("target %s not remade because of errors", tp->name);
