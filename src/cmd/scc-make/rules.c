@@ -541,6 +541,7 @@ rebuild(Target *tp, int *buildp)
 	} else if (need) {
 		*buildp = 1;
 
+		debug("target %s needs updating", tp->name);
 		r = update(tp);
 		if (r == 0)
 			return 0;
