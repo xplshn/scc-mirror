@@ -19,7 +19,7 @@ _validutf8(wchar_t wc, int *nbytes)
 		{0xD800,    0xDD00,     0, 3},
 		{0xDD00,    0x10000,    1, 3},
 		{0x10000,   0x110000,   1, 4},
-		{0x11000,   -1ul,       0, 0},
+		{0x110000,  -1ul,       0, 0},
 	};
 	struct range *bp;
 
