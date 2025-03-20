@@ -90,7 +90,6 @@ extern size_t mbsrtowcs(wchar_t *restrict, const char **restrict, size_t, mbstat
 extern size_t wcsrtombs(char *restrict, const wchar_t **restrict, size_t, mbstate_t *restrict);
 extern int wcwidth(wchar_t);
 
-#define mbrlen(s, n, ps) mbrtowc(NULL, s, n, ps)
 #define putwc(wc, fp) fputwc(wc, fp)
 
 #endif
