@@ -20,6 +20,7 @@ enum {
 #define SECDAY (24 * SECHOUR)   /* 86400 */
 
 struct tm;
+struct _FILE;
 
 struct tzone {
 	char *name;
@@ -61,7 +62,5 @@ extern void (*_atexithdl)(void);
 
 #ifdef _WCHAR_H
 extern int _validutf8(wchar_t, int *);
-#ifdef _STDIO_H
-extern wint_t _fputwc(wchar_t, FILE *, int *);
-#endif
+extern wint_t _fputwc(wchar_t, struct _FILE *, int *);
 #endif
