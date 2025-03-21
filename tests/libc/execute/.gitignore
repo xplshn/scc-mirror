@@ -38,4 +38,5 @@
 0038-mbsinit
 0039-mbrtowc
 0040-wcrtomb
+0041-mbrlen
 test.log
