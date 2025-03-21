@@ -62,13 +62,17 @@ extern wchar_t *wcsncpy(wchar_t *restrict, const wchar_t *restrict, size_t);
 
 extern wchar_t *wmemcpy(wchar_t *restrict, const wchar_t *restrict, size_t);
 extern wchar_t *wmemmove(wchar_t *, const wchar_t *, size_t);
+extern wchar_t *wmemset(wchar_t *, wchar_t, size_t);
+extern wchar_t *wmemchr(const wchar_t *, wchar_t, size_t);
+extern int wmemcmp(const wchar_t *, const wchar_t *, size_t);
+
+extern size_t wcslen(const wchar_t *);
+extern int wcscmp(const wchar_t *, const wchar_t *);
 extern wchar_t *wcscat(wchar_t *restrict, const wchar_t *restrict);
 extern wchar_t *wcsncat(wchar_t *restrict, const wchar_t *restrict, size_t);
-extern int wcscmp(const wchar_t *, const wchar_t *);
 extern int wcscoll(const wchar_t *, const wchar_t *);
 extern int wcsncmp(const wchar_t *, const wchar_t *, size_t);
 extern size_t wcsxfrm(wchar_t *restrict, const wchar_t *restrict, size_t);
-extern int wmemcmp(const wchar_t *, const wchar_t *, size_t);
 extern wchar_t *wcschr(const wchar_t *, wchar_t);
 extern size_t wcscspn(const wchar_t *, const wchar_t *);
 extern wchar_t *wcspbrk(const wchar_t *, const wchar_t *);
@@ -76,9 +80,7 @@ extern wchar_t *wcsrchr(const wchar_t *, wchar_t);
 extern size_t wcsspn(const wchar_t *, const wchar_t *);
 extern wchar_t *wcsstr(const wchar_t *, const wchar_t *);
 extern wchar_t *wcstok(wchar_t *restrict, const wchar_t *restrict, wchar_t **restrict);
-extern wchar_t *wmemchr(const wchar_t *, wchar_t, size_t);
-extern size_t wcslen(const wchar_t *);
-extern wchar_t *wmemset(wchar_t *, wchar_t, size_t);
+
 extern size_t wcsftime(wchar_t *restrict, size_t, const wchar_t *restrict, const struct tm *restrict);
 extern wint_t btowc(int);
 extern int wctob(wint_t);
