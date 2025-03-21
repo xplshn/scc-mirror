@@ -39,3 +39,4 @@
 0040-wcrtomb
 0041-mbrlen
 0044-wcslen
+0045-wcscmp
