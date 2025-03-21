@@ -39,6 +39,7 @@
 0039-mbrtowc
 0040-wcrtomb
 0041-mbrlen
+0042-mbsrtowcs
 0044-wcslen
 0045-wcscmp
 0046-wcsncmp
