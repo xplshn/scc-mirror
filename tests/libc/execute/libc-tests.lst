@@ -38,3 +38,4 @@
 0039-mbrtowc
 0040-wcrtomb
 0041-mbrlen
+0044-wcslen
