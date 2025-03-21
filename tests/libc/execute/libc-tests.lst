@@ -40,3 +40,4 @@
 0041-mbrlen
 0044-wcslen
 0045-wcscmp
+0046-wcsncmp
