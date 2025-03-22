@@ -43,4 +43,5 @@
 0044-wcslen
 0045-wcscmp
 0046-wcsncmp
+0047-wcscoll
 test.log
