@@ -130,6 +130,7 @@ COMMON_OBJS =\
 	wchar/wcscmp.$O\
 	wchar/wcscoll.$O\
 	wchar/wcsncmp.$O\
+	wchar/wcscpy.$O\
 	wchar/wcsrtombs.$O\
 	wchar/wcwidth.$O\
 	wchar/putwc.$O\

@@ -44,4 +44,5 @@
 0045-wcscmp
 0046-wcsncmp
 0047-wcscoll
+0048-wcscpy
 test.log
