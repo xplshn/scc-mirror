@@ -52,4 +52,5 @@
 0053-wmemcmp
 0054-wcsncpy
 0055-wcscat
+0056-wcsncat
 test.log
