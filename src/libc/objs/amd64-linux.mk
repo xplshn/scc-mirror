@@ -36,8 +36,6 @@ OBJS =\
 	arch/amd64/strcpy.$O\
 	arch/linux/_brk.$O\
 	arch/linux/_getheap.$O\
-	arch/linux/_mbsget.$O\
-	arch/linux/_mbsset.$O\
 	arch/linux/_sigaction.$O\
 	arch/linux/_waitpid.$O\
 	arch/posix/_open.$O\
