@@ -204,7 +204,7 @@ int
 vfprintf(FILE *restrict fp, const char *restrict fmt, va_list va)
 {
 	int ch, n, flags, width, left, fill, prec;
-	size_t inc, len, cnt = 0;
+	size_t inc, len, cnt;
 	char *s;
 	wchar_t *ws;
 	struct conv conv;
