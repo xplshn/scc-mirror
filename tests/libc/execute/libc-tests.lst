@@ -46,4 +46,5 @@
 0048-wcscpy
 0049-wmemchr
 0050-wmemcpy
+0051-wmemmove
 0053-wmemcmp
