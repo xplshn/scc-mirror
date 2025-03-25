@@ -136,6 +136,7 @@ COMMON_OBJS =\
 	wchar/wmemchr.$O\
 	wchar/wmemcpy.$O\
 	wchar/wmemmove.$O\
+	wchar/wmemset.$O\
 	wchar/wmemcmp.$O\
 	wchar/putwc.$O\
 	wchar/_validutf8.$O\

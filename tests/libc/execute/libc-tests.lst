@@ -47,4 +47,5 @@
 0049-wmemchr
 0050-wmemcpy
 0051-wmemmove
+0052-wmemset
 0053-wmemcmp
