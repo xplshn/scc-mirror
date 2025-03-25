@@ -52,3 +52,4 @@
 0054-wcsncpy
 0055-wcscat
 0056-wcsncat
+0057-wcschr
