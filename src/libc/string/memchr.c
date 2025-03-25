@@ -7,7 +7,7 @@ memchr(const void *s, int c, size_t n)
 {
 	unsigned char *bp = (unsigned char *) s;
 
-	while (n > 0 && *bp++ != c)
-		--n;
-	return (n == 0) ? NULL : bp-1;
+	for ( ; n > 0 && *bp != c; n--)
+		++bp;
+	return (n == 0) ? NULL : bp;
 }
