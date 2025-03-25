@@ -55,4 +55,5 @@
 0056-wcsncat
 0057-wcschr
 0058-wcsrchr
+0059-wcsstr
 test.log
