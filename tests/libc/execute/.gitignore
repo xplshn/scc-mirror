@@ -45,4 +45,5 @@
 0046-wcsncmp
 0047-wcscoll
 0048-wcscpy
+0049-wmemchr
 test.log
