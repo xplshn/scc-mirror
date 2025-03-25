@@ -38,6 +38,7 @@ static struct mbtest {
 	{"\x80",                           2, -1, 1, EILSEQ, &wc, -1},
 	{"\xc0\x80",                       2, -1, 1, EILSEQ, &wc, -1},
 	{"\xc0\x00",                       2, -1, 1, EILSEQ, &wc, -1},
+	{"\xc1\x81",                       2, -1, 1, EILSEQ, &wc, -1},
 	{"\xf8\x81\x82\x83\x84\x85",      -1, -1, 1, EILSEQ, &wc, -1},
 	{"\xfe\x81\x82\x83\x84\x85\x86",   8, -1, 1, EILSEQ, &wc, -1},
 };
