@@ -135,6 +135,7 @@ COMMON_OBJS =\
 	wchar/wcwidth.$O\
 	wchar/wmemchr.$O\
 	wchar/wmemcpy.$O\
+	wchar/wcsncpy.$O\
 	wchar/wmemmove.$O\
 	wchar/wmemset.$O\
 	wchar/wmemcmp.$O\
