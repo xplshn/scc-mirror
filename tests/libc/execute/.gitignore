@@ -51,4 +51,5 @@
 0051-wmemmove
 0053-wmemcmp
 0054-wcsncpy
+0055-wcscat
 test.log
