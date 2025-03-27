@@ -31,7 +31,7 @@ tests_mbrlen(void)
 		wc = -1;
 		errno = 0;
 		r = mbrlen(tp->s, tp->l, NULL);
-		assert(tp->r == r);
+		assert(tp->rmbr == r);
 		assert(tp->syserr == errno);
 	}
 
@@ -41,7 +41,7 @@ tests_mbrlen(void)
 		wc = -1;
 		errno = 0;
 		r = mbrlen(tp->s, tp->l, &s);
-		assert(tp->r == r);
+		assert(tp->rmbr == r);
 		assert(tp->syserr == errno);
 		assert(mbsinit(&s) != 0 == tp->mbstate);
 	}
@@ -55,12 +55,8 @@ tests_mblen(void)
 
 	puts("testing mblen");
 	for (tp = tests; tp < &tests[NELEM(tests)]; ++tp) {
-		wc = -1;
-		errno = 0;
 		r = mblen(tp->s, tp->l);
-		assert(tp->syserr == errno);
-		rt = (tp->r >= 0) ? tp->r : -1;
-		assert(rt == r);
+		assert(tp->rmb == r);
 	}
 }
 

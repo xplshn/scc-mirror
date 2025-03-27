@@ -7,12 +7,14 @@
 int
 mbtowc(wchar_t *restrict pwc, const char *restrict s, size_t n)
 {
-	static mbstate_t st;
 	int ret;
+	static mbstate_t st;
 
 	ret = mbrtowc(pwc, s, n, &st);
-	if (ret < 0)
+	if (ret == -2) {
+		memset(&st, 0, sizeof(st));
 		ret = -1;
+	}
 
 	return ret;
 }

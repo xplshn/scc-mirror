@@ -31,9 +31,9 @@ tests_mbrtowc(void)
 		wc = -1;
 		errno = 0;
 		r = mbrtowc(tp->pwc, tp->s, tp->l, NULL);
-		assert(tp->r == r);
+		assert(tp->rmbr == r);
 		assert(tp->syserr == errno);
-		if (tp->r != -1)
+		if (tp->rmbr != -1)
 			assert(tp->wc == wc);
 	}
 
@@ -43,9 +43,9 @@ tests_mbrtowc(void)
 		wc = -1;
 		errno = 0;
 		r = mbrtowc(tp->pwc, tp->s, tp->l, &s);
-		assert(tp->r == r);
+		assert(tp->rmbr == r);
 		assert(tp->syserr == errno);
-		if (tp->r != -1)
+		if (tp->rmbr != -1)
 			assert(tp->wc == wc);
 		assert(mbsinit(&s) != 0 == tp->mbstate);
 	}
@@ -60,16 +60,10 @@ tests_mbtowc(void)
 	puts("testing mbtowc");
 	for (tp = tests; tp < &tests[NELEM(tests)]; ++tp) {
 		wc = -1;
-		errno = 0;
 		r = mbtowc(tp->pwc, tp->s, tp->l);
-		assert(tp->syserr == errno);
-		if (tp->r >= 0) {
-			rt = tp->r;
+		assert(tp->rmb == r);
+		if (tp->rmb >= 0)
 			assert(tp->wc == wc);
-		} else {
-			rt = -1;
-		}
-		assert(rt == r);
 	}
 }
 
