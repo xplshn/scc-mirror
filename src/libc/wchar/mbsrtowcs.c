@@ -16,7 +16,8 @@ mbsrtowcs(wchar_t *restrict dest, const char **restrict src, size_t len,
 	if (!ps)
 		ps = &st;
 
-	for (n = 0; ; n++) {
+	n = 0;
+	for (;;) {
 		cnt = mbrtowc(&wc, s, MB_LEN_MAX, ps);
 		if (cnt == (size_t) -2) {
 			s += MB_LEN_MAX;
@@ -28,19 +29,20 @@ mbsrtowcs(wchar_t *restrict dest, const char **restrict src, size_t len,
 		if (dest) {
 			if (n == len) {
 				*src = s;
-				return n;
+				break;
 			}
 			*dest++ = wc;
 		}
-		s += cnt;
 
-		if (wc == 0)
+		if (wc == 0) {
+			if (dest)
+				*src = NULL;
 			break;
-	}
+		}
 
-	if (dest) {
-		memset(ps, 0, sizeof(mbstate_t));
-		*src = NULL;
+		s += cnt;
+		n++;
+
 	}
 
 	return n;
