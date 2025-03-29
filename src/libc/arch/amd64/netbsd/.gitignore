@@ -1,0 +1,15 @@
+_brk.s
+_close.s
+_exit.s
+_fork.s
+_getpid.s
+_gettimeofday.s
+_kill.s
+_lseek.s
+_open.s
+_read.s
+_setcontext.s
+_sigaction2.s
+_sys_errlist.c
+_wait4.s
+_write.s

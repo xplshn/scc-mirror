@@ -1,0 +1,49 @@
+#!/bin/sh
+
+set -e
+
+for i
+do
+	case "$i" in
+	-p)
+		proto=$2
+		shift 2
+		;;
+	-*)
+		echo usage: uninstall [-p proto] root >&2
+		exit 1
+		;;
+	esac
+done
+
+root=${1?'root missed'}
+proto=${proto:-scripts/proto.all}
+
+while read type perm name
+do
+	case $type in
+	d)
+		echo $type $perm $name
+		continue
+		;;
+	f)
+		rm -f $root/$name
+		;;
+	*)
+		echo install: wrong entry type >&2
+		exit 1
+		;;
+	esac
+done < $proto |
+sort -r |
+while read type perm name
+do
+	case $type in
+	d)
+		if test `ls $root/$name | wc -l` -eq 0
+		then
+			rmdir $root/$name
+		fi
+		;;
+	esac
+done

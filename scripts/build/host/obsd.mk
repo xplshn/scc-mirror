@@ -1,0 +1,4 @@
+DRIVER = posix
+
+HOST_CPPFLAGS = -D_ISOC99_SOURCE
+HOSTCC = clang

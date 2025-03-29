@@ -1,0 +1,355 @@
+Compiling
+=========
+
+SCC is a portable toolchain that can be compiled on any UNIX system out
+of the box. Compiling the project is so simple like:
+
+	$ make
+
+It will build scc selecting the more appropiate options for the host
+system. In some situations (like for example when cross compiling),
+can be desirable to select custom options for the build and use:
+
+	$ make config
+	$ make
+
+and pass the required options the the config target. For example
+if we want to cross compile scc for aarch64-linux-musl target
+from a amd64-linux-gnu host system:
+
+	$ make CROSS_COMPILE=aarch64-linux-musl- CONF=arm64-linux config
+	$ make
+
+The build system of scc supports parallel builds that will reduce
+dramatically the build time.
+
+After a successful install the following programs are installed:
+
+	- gcc-scc: A wrapper shell script to use system cc and ld
+	  with the scc libc.
+
+	- scc: A wrapper shell script that allows the execution
+	  of any scc tool from any directory independently of the
+	  PREFIX used in the build. The tool can be selected as
+	  the first parameter (like for example `scc as` or `scc ar`)
+	  and by default is cc.
+
+	- scc-addr2line: A work in progress to implement a tool
+	  that is able to translate a hexadecimal address into
+	  a symbol.
+
+	- scc-ar: An archiver commonly used for static libraries.
+	  It is binary format agnostic, and it does not create an
+	  index independently of the objects stored in it. Both,
+	  coff and elf specify that an index should be created
+	  when the archive is created, but as this is not done
+	  by scc-ar, if you need an index you have to call
+	  directly to scc-ranlib.
+
+	- scc-cc: Driver of the compiler. It uses the compile
+	  time option PREFIX to locate helper programs and
+	  library files. This value can be overriden by the
+	  `SCCPREFIX` environment variable.
+
+	- scc-cpp: A wrapper shell script that uses scc-cc
+	  to preprocess a file without compiling it.
+
+	- scc-ld: A work in progress to implement a linker for
+	  the scc toolchain.
+
+	- scc-make: An implementation of POSIX make as defined
+	  in POSIX 2018. No POSIX 2024 support is planned in a
+	  near future.
+
+	- scc-nm: An implementation of POSIX nm.
+
+	- scc-objcopy: A work in progress of a GNU objcopy alike
+	  program.
+
+	- scc-objdump: A reduced version of the GUN objdump tool.
+	  It supports many of the options supported by the original
+	  tool, but in some cases it behaves slightly different.
+
+	- scc-ranlib: An implementation of a classical UNIX ranlib.
+	  While ranlib is not specified in current POSIX standards
+	  it is implemented in almost all the UNIX alike systems.
+	  In the case of scc, the ar implementation does not add
+	  index files by default, such a tool like ranlib is
+	  required.
+
+	- scc-size: An implementation of POSIX size.
+
+	- scc-strip: An implementation of POSIX strip.
+
+The toolchain has a good support for COFF files, and a basic support
+for ELF files.
+
+config.mk
+---------
+
+This file is generated when the config target is built. Once it is
+generated it is used by any Makefile in the build system, and it is not
+modified by the build system, allowing to the user doing any modifications
+as required. This file incules the following options that can be overriden
+in the command line of `make config`:
+
+	- TOOL: Specify the toolchain type to be used.  Possible
+	  supported values are:
+
+		- clang
+		- gcov
+		- gnu
+		- pcc
+		- plan9
+		- unix
+
+	- HOST: Specify the host system to be used. Possible supported
+	  values are:
+
+		- bsd
+		- linux
+		- obsd
+		- plan9
+		- posix
+
+	- CONF: Specify the build configuration used. It determines
+	  the default values for the architecture, ABI, system and
+	  binary format for the cross compiler. It also determines
+	  what versions of the libc are built (at this moment scc
+	  depends of external tools to build the libc and it limits
+	  the versions of the libc that can be built to the ones
+	  supported by the toolchain used to build scc itself).
+
+		- amd64-darwin
+		- amd64-dragonfly
+		- amd64-freebsd
+		- amd64-linux
+		- amd64-netbsd
+		- amd64-openbsd
+		- amd64-plan9
+		- arm32-linux
+		- arm64-linux
+		- ppc32-linux
+
+	- CROSS_COMPILE: Specify a prefix name for the tools called by the
+	  Makefile.
+
+	- DESTDIR: Temporary directory prepend to PREFIX used in the
+	  install path. It is mainly intended to help package maintainers
+	  to install in a specific directory used as base for the package
+	  generation.
+
+	- PREFIX: Prefix of the path where scc toolchain is going
+	  to be installed. /usr/local by default.
+
+	- LIBPREFIX: Prefix of the path where scc searchs for
+	  headers and libraries when scc is executed. $PREFIX
+	  by default.
+
+	- LIBPROFILE: The profile used to configure the libc used by the
+	  target compiler.
+
+		- scc: The scc libc.
+		- scc_clang: The scc libc, but using the clang assembler
+		             and linker.
+		- musl: The linux musl libc.
+
+	- STD: What version of the C standard is used in the target
+	  compiler and libc.
+
+		- c89: ANSI or C90 ISO standard.
+		- c99: C99 ISO standard.
+
+Not all the configurations have the same level of support in
+the libc and in some cases the support is minimal.
+
+The main targets of the Makefile are:
+
+	- all:
+	  Compile the toolchain and the libc. It compiles the libc
+	  for all the available configurations based in the host
+	  architecture.
+
+	- dep:
+	  Generate inclusion dependencies, very useful while
+	  modifying the code. Beware that it creates files with
+	  the name `makefile` and changes to `Makefile` files
+	  are not reflected in the build proces until a `make distclean`
+	  or a `make dep` is executed again.
+
+	- config:
+	  Generate config.mk and the headers `include/bits/scc/sys.h`,
+	  `include/bits/scc/std.h` and `include/bits/scc/config.h`.
+	  These files are not modified by any other target of the
+	  Makefile, and they can be customized as required after being
+	  generated. They are  removed by the `distclean` target.
+
+	- install:
+	  Installs scc in PREFIX.
+
+	- uninstall:
+	  Uninstall scc from PREFIX.
+
+	- clean:
+	  Remove all the generated files except the one supposed to be edited
+	  by the user.
+
+	- distclean
+	  Remove all the generated files, including the files generated by the
+	  config target that are not removed by the clean target.
+
+Toolchain configuration
+=======================
+At this moment scc is still using some external tools to generate
+the final binaries. The toolchain execution is configured in the
+file `include/bits/scc/sys.h` and it included basically 5 elements:
+
+	- LDBIN: macro with the name of the linker binary.
+
+	- ASBIN: macro with the name of the assembler binary.
+
+	- sysincludes: It is a list of diretories used to locate
+	  the system headers
+
+	- ldcmd: It describes how the linker command line is built.
+
+	- ascmd: It describes how the assembler command line is built.
+
+The definition of sysincludes, ldcmd and ascmd can include wildcards
+represented by % followed by a single letter:
+
+	- %c: It expands to the full list of input object files of the linker
+	- %a: It expands to the architecture name
+	- %s: It expands to the system name
+	- %p: It expands to the library prefix
+	- %b: It expands too the ABI name
+	- %o: It expands to the output file of the current tool
+
+Scc includes 3 configuration templates that can be used as base for the
+configuration of the toolchain:
+
+	- scc: It uses GNU assembler and linker with the scc libc.
+	- scc_clang: It uses clang assembler and linker with the scc libc.
+	- musl: It uses GNU assembler and linker with the musl libc.
+
+The file `include/bits/scc/sys.h` is automatically created from the scc
+toolchain configuration with the default make target. The target config
+can be used to only create the file based on the value of the variable
+`LIBPROFILE` allowing the user to customize that file as needed. It is
+important to highlight that the file is not removed by `make clean`
+because it can contain local user modifications. You should use
+`make distclean` to remove it.
+
+Runtime dependencies
+====================
+
+Some configurations of scc require having the QBE [1] executable in the PATH,
+whose version must support common storage which was incorporated to it after
+the commit 8ded7a5, but it is not part of a stable release of QBE yet.
+
+[1] https://c9x.me/compile/
+
+Musl libc support
+=================
+The scc libc is a C99 library and cannot be used to compile POSIX compliant
+programs. Scc includes a template that can be used to use a musl libc
+compiled by gcc, and to make easier to get the correct values it also
+provides a specific target to configure scc for a correct support for musl:
+
+	$ make LIBPREFIX=/usr/local/musl config-musl
+	$ make
+	$ make install
+
+or
+
+	$ scc-cc hello.c
+	$ make LIBPREFIX=/usr/local/musl config-musl
+	$ make
+	$ SCCLIBPREFIX=/usr/local/musl scc hello.c
+
+where `LIBPREFIX` points to the prefix used by your musl libc
+installation.  If the helper scc shell script is used instead of scc-cc
+then the environment variable SCCLIBPREFIX must be set. The target
+config-musl uses the output of gcc -v to get a working sys.h with the
+correct paths (it basically extracts the correct value for the macro
+GCCLIBPATH used to locate the gcc crt object files). If you are not
+able to use scc with musl after these steps, please take a look to
+include/bits/scc/sys.h to see if it fits your system setup.
+
+
+Deviations from standard C
+===========================
+This compiler aims to be fully compatible with the C99 standard, but
+it has some differences at this moment:
+
+- Type qualifiers are accepted but partially ignored.
+  --------------------------------------------------
+
+The semantic behind them is not fully implemented, specially in the
+case of volatile. Be aware that some programs can miswork for this
+reason.
+
+- Function type names
+  -------------------
+
+C99 allows you to define type names of function types and write something
+like:
+
+int f(int (int));
+
+Accepting function types in type names (or abstract declarators) makes the
+grammar ambiguous because it is impossible to differentiate between:
+
+        (int (f))  -> function returning int with one parameter of type f
+        (int (f))  -> integer variable f
+
+If you don't believe me try this code:
+
+int
+f(int g())
+{
+	return g();
+}
+
+Function type names seem unnecesary , because they are used as
+an alias of the function pointer types, but it is weird that something
+like sizeof(int (int)) is not allowed (because here it should be
+understood as the size of a function), but f(int (int)) is allowed
+because it is understood as a parameter of function pointer type.
+
+- Definition of variables with incomplete type
+  ---------------------------------------------
+
+C89 allows the definition of variables with incomplete type that
+have external linkage and file scope. The type of the variable is the
+composition of all the definitions found in the file. The exact rules
+are a bit complex (ANSI 3.7.2, or ISO C99 6.2.5p22) so SCC ignores them
+at this moment by simply not allowing any definition of variables with
+incomplete type.
+
+If you don't believe me try this code:
+
+struct foo x;
+
+struct foo {
+	int i;
+};
+
+- Variadic function alike macros
+  ------------------------------
+
+The standard (C99 6.10.3 c 4) forces passing more parameters than
+the number of parameters present in the variadic argument list
+(excluding ...). SCC accepts a parameter list with the same number
+of arguments.
+
+#define P(a, ...) a
+
+P(1)
+
+C99 libc
+========
+
+The C99 libc only supports the C locale using UTF-8 for multibyte
+sequences. It also assumes that the wide character set includes
+ASCII as a subset.

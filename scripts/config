@@ -1,0 +1,67 @@
+#!/bin/sh
+
+exec > $$.tmp
+trap "rm -f $$.tmp" EXIT INT TERM
+
+arch=`uname -m`
+sys=`uname -s | tr 'A-Z' 'a-z'`
+
+case $sys in
+openbsd)
+	echo TOOL=${TOOL:-clang}
+	echo HOST=obsd
+	echo ARFLAGS="${ARFLAGS:--rv}"
+	echo NOPIE_LDFLAGS=-no-pie
+	;;
+netbsd)
+	#TODO: send a patch to NetBSD to solve this problem
+	echo TOOL=${TOOL:-gnu}
+	echo HOST=bsd
+	echo ARFLAGS="${ARFLAGS:--rv}"
+	;;
+freebsd)
+	echo TOOL=${TOOL:-clang}
+	echo HOST=bsd
+	;;
+darwin)
+	echo HOST=bsd
+	echo RANLIB_FLAGS="${RANLIB_FLAGS:--c}"
+	;;
+minix)
+	echo RANLIB="${RANLIB:-ar t}"
+	;;
+*bsd)
+	echo HOST=bsd
+	;;
+linux)
+	echo TOOL=${TOOL:-gnu}
+	echo HOST=linux
+	;;
+plan9)
+	echo TOOL=${TOOL:-plan9}
+	echo HOST=plan9
+	;;
+*)
+	echo TOOL=${TOOL:-unix}
+	echo HOST=${HOST:-posix}
+esac
+
+
+case $arch in
+x86_64)
+	arch=amd64
+	;;
+aarch64)
+	arch=arm64
+	;;
+esac
+
+echo CONF=${CONF:-$arch-$sys}
+echo CROSS_COMPILE=$CROSS_COMPILE
+echo DESTDIR=$DESTDIR
+echo PREFIX=${PREFIX:=/usr/local}
+echo LIBPREFIX=${LIBPREFIX:-$PREFIX}
+echo LIBPROFILE=${LIBPROFILE:-scc}
+echo STD=${STD:-c99}
+
+mv $$.tmp config.mk

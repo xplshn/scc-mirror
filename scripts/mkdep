@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+tmp=$$.tmp
+trap "rm -f $tmp" EXIT INT TERM HUP
+
+(cat Makefile
+printf "\n#deps\n"
+for i in *.c
+do
+	file=`basename $i | sed 's/\.c$/.o/'`
+	dir=`dirname $i`
+
+	sed -n "/^#include / {
+		s///
+		s@\"\(.*\)\"@$dir/$file: $dir/\1@p
+		s@<\(scc/.*\)>@$dir/$file: \$(INCDIR)/bits/\1@p
+	}" $i
+done |
+sed -e 's@^\./@@' -e 's@ \./@ @g' |
+LC_ALL=C sort -s) > $tmp
+
+mv $tmp makefile

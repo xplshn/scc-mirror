@@ -1,0 +1,2 @@
+scc: Remove TINT and TUINT
+ar: It doesn't accept an empty list of object files.

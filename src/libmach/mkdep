@@ -1,0 +1,20 @@
+#!/bin/sh
+
+ed -s makefile <<EOF
+H
+/include/a
+`for i
+ do
+	echo include $i/deps.mk
+done`
+.
+/OBJS/a
+`for i
+ do
+	# Need to escape the single backlash to prevent ed
+	# from interperting it as escaping the newline
+	printf '\t$(%sOBJS)\\\\\\n' $(echo $i | tr a-z A-Z)
+done`
+.
+w
+EOF

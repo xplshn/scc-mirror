@@ -1,0 +1,24 @@
+enum asmop {
+	ASJP = ASLABEL + 1,
+	ASJR,
+	ASRET,
+	ASBRANCH,
+
+	ASPUSH,
+	ASPOP,
+
+	ASADD,
+
+	ASMOV,
+	ASST,
+	ASLD,
+	ASEXHL,
+};
+
+enum asregs {
+	A = 1, B, C, D, E, H, L, IYL, IYH, NREGS,
+	AF = NREGS, HL, DE, BC, IY, NPAIRS,
+	HLDE = NPAIRS, NQUAD,
+	EXHLDE = NQUAD, NOCT,
+	SP = NOCT, IX, NANY,
+};
